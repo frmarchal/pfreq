@@ -1,0 +1,200 @@
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# ---------------------------------------------------------------------------
+# Section EDI
+# ---------------------------------------------------------------------------
+# La section suivante du Makefile du projet est gérée par l'EDI de BCB.
+# Il est recommandé d'utiliser l'EDI pour modifier les valeurs de cette
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.04.04
+# ---------------------------------------------------------------------------
+PROJECT = PFreq.exe
+OBJFILES = obj\PFreq.obj obj\MainScreen.obj obj\Utils.obj obj\GaussSmth.obj obj\Savgol.obj \
+  obj\convlv.obj obj\GraphImage.obj obj\Background.obj obj\SelOutFile.obj \
+  obj\SelColumn.obj obj\XRange.obj
+RESFILES = PFreq.res
+RESDEPEN = $(RESFILES) MainScreen.dfm Background.dfm SelOutFile.dfm SelColumn.dfm XRange.dfm
+LIBFILES =
+LIBRARIES =
+SPARELIBS = VCL40.lib
+PACKAGES = VCL40.bpi
+DEFFILE =
+# ---------------------------------------------------------------------------
+PATHCPP = .;
+PATHPAS = .;
+PATHASM = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+USERDEFINES =
+SYSDEFINES = NO_STRICT;USEPACKAGES
+# ---------------------------------------------------------------------------
+CFLAG1 = -IE:\Borland\CBuilder4\Projects\;$(BCB)\include;$(BCB)\include\vcl -Od -Hc \
+  -H=$(BCB)\lib\vcl40.csm -w -Ve -r- -a8 -5 -k -y -v -vi- -c -b- -w-par -w-inl \
+  -Vx -tW -tWM -D$(SYSDEFINES);$(USERDEFINES)
+PFLAGS = -UE:\Borland\CBuilder4\Projects\;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -IE:\Borland\CBuilder4\Projects\;$(BCB)\include;$(BCB)\include\vcl -N2obj \
+  -N0obj -$Y+ -$W -$O- -v -JPHNE -M
+RFLAGS = -iE:\Borland\CBuilder4\Projects\;$(BCB)\include;$(BCB)\include\vcl
+AFLAGS = /iE:\Borland\CBuilder4\Projects\ /i$(BCB)\include /i$(BCB)\include\vcl /mx /w2 \
+  /zi
+LFLAGS = -LE:\Borland\CBuilder4\Projects\;$(BCB)\lib\obj;$(BCB)\lib;$(RELEASELIBPATH) \
+  -aa -Tpe -x -Gn -v
+# ---------------------------------------------------------------------------
+ALLOBJ = c0w32.obj $(PACKAGES) sysinit.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=2060
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=Maf
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=2
+Item0=E:\Borland\CBuilder4\Projects\;$(BCB)\include;$(BCB)\include\vcl
+Item1=E:\Borland\CBuilder4\Projects;E:\Borland\CBuilder4\Projects\;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=2
+Item0=E:\Borland\CBuilder4\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item1=E:\Borland\CBuilder4\Projects;E:\Borland\CBuilder4\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=obj
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+InMemoryExe=0
+ShowInfoMsgs=0
+
+!endif
+
+# ---------------------------------------------------------------------------
+# SECTION MAKE
+# ---------------------------------------------------------------------------
+# Cette section du fichier projet n'est pas utilisée par l'EDI de BCB. Elle est destinée
+# à la construction à partir de la ligne de commande en utilisant l'utilitaire MAKE.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(CPP32)
+CPP32 = cpp32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) -n$(@D) {$< }
+
+.c.obj:
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) -n$(@D) {$< }
+
+.c.i:
+    $(BCB)\BIN\$(CPP32) $(CFLAG1) -n. {$< }
+
+.cpp.i:
+    $(BCB)\BIN\$(CPP32) $(CFLAG1) -n. {$< }
+
+.asm.obj:
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+# ---------------------------------------------------------------------------
