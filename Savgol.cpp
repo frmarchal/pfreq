@@ -1,15 +1,9 @@
-//---------------------------------------------------------------------------
-#include <vcl.h>
-#pragma hdrstop
-
 #include <stdlib.h>
 #include <math.h>
-#include "SavGol.h"
-#include "utils.h"
+#include <algorithm>
+#include "Savgol.h"
+#include "Utils.h"
 #include "convlv.h"
-
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
 
 //===================================================================
 //===================================================================
@@ -41,7 +35,7 @@ void lubksb(double **a,int n,int *indx,double *b)
 #define TINY 1.0e-20;
 int ludcmp(double **a, int n, int *indx,double *d)
 {
-  int i,imax,j,k;
+  int i,imax=0,j,k;
   double big,dum,sum,temp;
   double *vv;
   static char SavGolDervCalc[]="ludcmp";
@@ -118,47 +112,47 @@ int ludcmp(double **a, int n, int *indx,double *d)
 //===================================================================
 int savgol(double *c, long int np, int nl, int nr, int ld, int m)
 {
-  long kk;
-  int j,mm;
-  int *indx,ipj,k,imj;
-  double d,fac,sum,**a,*b;
-  static char SavGolDervCalc[]="savgol";
+	long kk;
+	int j,mm;
+	int *indx,ipj,k,imj;
+	double d,fac,sum,**a,*b;
+	static char SavGolDervCalc[]="savgol";
 
-  if (np<nl+nr+1 || nl<0 || nr<0 || ld>m || nl+nr<m)
-   {
-   WriteMsg(SavGolDervCalc,__LINE__,"E0065: Bad args in savgol");
-   return(-1);
-   }
-  indx=(int *)malloc((m+2)*sizeof(int))-1;
-  a=(double **)malloc((m+2)*sizeof(double))-1;
-  for (j=1 ; j<=m+1 ; j++) a[j]=(double *)malloc((m+2)*sizeof(double))-1;
-  b=(double *)malloc((m+2)*sizeof(double))-1;
-  for (ipj=0 ; ipj<=(m<<1) ; ipj++)
-   {
-   sum=(ipj ? 0.0 : 1.0);
-   for (k=1 ; k<=nr ; k++) sum+=pow((double)k,(double)ipj);
-   for (k=1 ; k<=nl ; k++) sum+=pow((double)-k,(double)ipj);
-   mm=min(ipj,2*m-ipj);
-   for (imj=-mm ; imj<=mm ; imj+=2) a[1+(ipj+imj)/2][1+(ipj-imj)/2]=sum;
-   }
-  ludcmp(a,m+1,indx,&d);
-  for (j=1 ; j<=m+1 ; j++) b[j]=0.0;
-  b[ld+1]=1.0;
-  lubksb(a,m+1,indx,b);
-  for (kk=1 ; kk<=np ; kk++) c[kk]=0.0;
-  for (k=-nl ; k<=nr ; k++)
-   {
-   sum=b[1];
-   fac=1.0;
-   for (mm=1 ; mm<=m ; mm++) sum+=b[mm+1]*(fac*=k);
-   kk=((np-(long)k)%np)+1;
-   c[kk]=sum;
-   }
-  free((void *)(b+1));
-  for (j=1 ; j<=m+1 ; j++) free((void*)(a[j]+1));
-  free((void *)(a+1));
-  free((void *)(indx+1));
-  return(0);
+	if (np<nl+nr+1 || nl<0 || nr<0 || ld>m || nl+nr<m)
+	{
+		WriteMsg(SavGolDervCalc,__LINE__,"E0065: Bad args in savgol");
+		return(-1);
+	}
+	indx=(int *)malloc((m+2)*sizeof(int))-1;
+	a=(double **)malloc((m+2)*sizeof(double))-1;
+	for (j=1 ; j<=m+1 ; j++) a[j]=(double *)malloc((m+2)*sizeof(double))-1;
+	b=(double *)malloc((m+2)*sizeof(double))-1;
+	for (ipj=0 ; ipj<=(m<<1) ; ipj++)
+	{
+		sum=(ipj ? 0.0 : 1.0);
+		for (k=1 ; k<=nr ; k++) sum+=pow((double)k,(double)ipj);
+		for (k=1 ; k<=nl ; k++) sum+=pow((double)-k,(double)ipj);
+		mm=std::min(ipj,2*m-ipj);
+		for (imj=-mm ; imj<=mm ; imj+=2) a[1+(ipj+imj)/2][1+(ipj-imj)/2]=sum;
+	}
+	ludcmp(a,m+1,indx,&d);
+	for (j=1 ; j<=m+1 ; j++) b[j]=0.0;
+	b[ld+1]=1.0;
+	lubksb(a,m+1,indx,b);
+	for (kk=1 ; kk<=np ; kk++) c[kk]=0.0;
+	for (k=-nl ; k<=nr ; k++)
+	{
+		sum=b[1];
+		fac=1.0;
+		for (mm=1 ; mm<=m ; mm++) sum+=b[mm+1]*(fac*=k);
+		kk=((np-(long)k)%np)+1;
+		c[kk]=sum;
+	}
+	free((void *)(b+1));
+	for (j=1 ; j<=m+1 ; j++) free((void*)(a[j]+1));
+	free((void *)(a+1));
+	free((void *)(indx+1));
+	return(0);
 }
 
 ////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////

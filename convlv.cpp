@@ -1,14 +1,7 @@
-//---------------------------------------------------------------------------
-#include <vcl.h>
-#pragma hdrstop
-
 #include <math.h>
 #include <stdlib.h>
 #include "convlv.h"
-#include "utils.h"
-
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
+#include "Utils.h"
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 
@@ -168,42 +161,43 @@ static float sqrarg;
 //===================================================================
 int convlv(double *data, long int n, double *respns, long int m, int isign, double *ans)
 {
-  long int i,no2;
-  double dum,mag2,*fft;
-  static char FuncName[]="convlv";
+	long int i,no2;
+	double dum,mag2,*fft;
+	static char FuncName[]="convlv";
 
-  fft=((double *)malloc((2*n+1)*sizeof(double))-1);
-  //for (i=1 ; i<=(m-1)/2 ; i++) respns[n+1-i]=respns[m+1-i];
-  //for (i=(m+3)/2 ; i<=n-(m-1)/2 ; i++) respns[i]=0.0;
-  twofft(data,respns,fft,ans,n);
-  no2=n/2;
-  for (i=2 ; i<=n+2 ; i+=2)
-   {
-   if (isign == 1)
-    {
-    ans[i-1]=(fft[i-1]*(dum=ans[i-1])-fft[i]*ans[i])/no2;
-    ans[i]=(fft[i]*dum+fft[i-1]*ans[i])/no2;
-    }
-   else if (isign == -1)
-    {
-    if ((mag2=SQR(ans[i-1])+SQR(ans[i])) == 0.0)
-     {
-     WriteMsg(FuncName,__LINE__,"E0069: Deconvolving at response zero in CONVLV");
-     return(-1);
-     }
-    ans[i-1]=(fft[i-1]*(dum=ans[i-1])+fft[i]*ans[i])/mag2/no2;
-    ans[i]=(fft[i]*dum-fft[i-1]*ans[i])/mag2/no2;
-    }
-   else
-    {
-    WriteMsg(FuncName,__LINE__,"E0070: No meaning for ISIGN in CONVLV");
-    return(-1);
-    }
-   }
-  ans[2]=ans[n+1];
-  realft(ans,no2,-1);
-  //free_vector(fft,(long)1,2*n);
-  free((void*)(fft+1));
-  return(0);
+	m=m;//compiler pacifier
+	fft=((double *)malloc((2*n+1)*sizeof(double))-1);
+	//for (i=1 ; i<=(m-1)/2 ; i++) respns[n+1-i]=respns[m+1-i];
+	//for (i=(m+3)/2 ; i<=n-(m-1)/2 ; i++) respns[i]=0.0;
+	twofft(data,respns,fft,ans,n);
+	no2=n/2;
+	for (i=2 ; i<=n+2 ; i+=2)
+	{
+		if (isign == 1)
+		{
+			ans[i-1]=(fft[i-1]*(dum=ans[i-1])-fft[i]*ans[i])/no2;
+			ans[i]=(fft[i]*dum+fft[i-1]*ans[i])/no2;
+		}
+		else if (isign == -1)
+		{
+			if ((mag2=SQR(ans[i-1])+SQR(ans[i])) == 0.0)
+			{
+				WriteMsg(FuncName,__LINE__,"E0069: Deconvolving at response zero in CONVLV");
+				return(-1);
+			}
+			ans[i-1]=(fft[i-1]*(dum=ans[i-1])+fft[i]*ans[i])/mag2/no2;
+			ans[i]=(fft[i]*dum-fft[i-1]*ans[i])/mag2/no2;
+		}
+		else
+		{
+			WriteMsg(FuncName,__LINE__,"E0070: No meaning for ISIGN in CONVLV");
+			return(-1);
+		}
+	}
+	ans[2]=ans[n+1];
+	realft(ans,no2,-1);
+	//free_vector(fft,(long)1,2*n);
+	free((void*)(fft+1));
+	return(0);
 }
 #undef SQR

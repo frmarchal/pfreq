@@ -1,27 +1,32 @@
-//---------------------------------------------------------------------------
-#ifndef GraphImageH
-#define GraphImageH
-//---------------------------------------------------------------------------
+#ifndef GRAPHIMAGE_HEADER
+#define GRAPHIMAGE_HEADER
+
+#include <qwidget.h>
+#include <qstring.h>
+#include <qcolor.h>
+#include <qpainter.h>
+#include <QMouseEvent>
+#include <qrubberband.h>
 
 #define MAX_CURVES 3     //maximum number of curves that can be drawn in the graphic
 #define GRAD 5           //length of a tick mark
 #define MAXXNAME 15      //maximum number of characters in the name of the X axis
 #define MAXYNAME 15      //maximum number of characters in the name of the X axis
 
-class ImageGraph
+class GraphImage : public QWidget
 {
+	Q_OBJECT
+
 private:
-    void *ParentPtr;     //pointer to the parent class
-    TImage *MainImage;   //handle of the parent image
-    TCanvas *PCanvas;    //Canvas of the parent image
+	QPainter PCanvas;
     int ImageHeight;     //heigth of the parent control
     int ImageWidth;      //width of the parent control
     int GTop,GBottom,GRight,GLeft;  //position of the curves area
     int FontHeight,FontWidth;   //size of the font to draw the text
-    enum TColor CTextBg;   //color of the text background
-    enum TColor CFrame;    //color of the frame
-    enum TColor CData[MAX_CURVES];     //color of the data curves
-    enum TColor CDataBg;   //color of the data curve background
+	QColor CTextBg;   //color of the text background
+	QColor CFrame;    //color of the frame
+	QColor CData[MAX_CURVES];     //color of the data curves
+	QColor CDataBg;   //color of the data curve background
     double PlotXMin,PlotXMax,PlotYMin,PlotYMax;   //visible area on the graphic
     double DispXMin,DispXMax,DispYMin,DispYMax;   //maximum area necessary to view the whole graphics
     int NPoints[MAX_CURVES];         //number of points in the curves
@@ -33,32 +38,52 @@ private:
     int XZoom,YZoom;           //first point of the zoom area
     int XZoom2,YZoom2;         //second point of the zoom area
     bool ZoomEnabled;          //Set when the graphic is zoomed
+	//! The area selected with the mouse,
+	QRubberBand *Selection;
 
-    void ImageGraph::SetXTicks(double min,double max);
-    void ImageGraph::SetYTicks(double min,double max);
+	void SetXTicks(double min,double max);
+	void SetYTicks(double min,double max);
     int join(double x0, double y0, double x1, double y1);
-    void __fastcall wts(double x, double y, int * ix, int* iy);
-    void __fastcall MouseDown(TObject *Sender,TMouseButton Button,TShiftState Shift,int X,int Y);
-    void __fastcall MouseMove(TObject *Sender,TShiftState Shift, int X, int Y);
-    void __fastcall MouseUp(TObject *Sender,TMouseButton Button,TShiftState Shift,int X,int Y);
-    void ScaleDisplay();
+	void wts(double x, double y, int * ix, int* iy);
+	void ScaleDisplay();
+
+protected:
+	void mousePressEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
+	void paintEvent(QPaintEvent *event);
 
 public:
-    char XName[MAXXNAME];      //label of the X axis
-    char YName[MAXYNAME];      //label of the Y axis
 
-    void (*LeftMouseClick)(void *Parent,double x,double y,Classes::TShiftState Shift);
-    void (*RightMouseClick)(void *Parent,double x,double y,Classes::TShiftState Shift);
-    void (*MouseMoveCallback)(void *Parent,bool InGraph,double x,double y);
+	class MouseClickCallback
+	{
+	public:
+		virtual void MouseClick(double x,double y,Qt::MouseButtons Shift)=0;
+	};
+	class MouseMoveCallback
+	{
+	public:
+		virtual void MouseMove(bool InGraph,double x,double y)=0;
+	};
 
-    ImageGraph(void *ParentClass,TImage * Parent);
-    void Redraw(void);
+	//! Label of the X axis.
+	QString XName;
+	//! Label of the Y axis.
+	QString YName;
+
+	MouseClickCallback *LeftMouseClick;
+	MouseClickCallback *RightMouseClick;
+	MouseMoveCallback *MouseMoveCallback;
+
+	GraphImage(QWidget *Parent=0);
+	void Redraw();
     void SetZoom(double XMin, double XMax, double YMin, double YMax);
-    void Unzoom(void);
+	void Unzoom();
     void SetGraphic(int Graphic,double *XPoints, double *YPoints,int NPts);
-    void DeleteAllCurves(void);
+	void DeleteAllCurves();
     void DeleteCurve(int Curve);
     bool GetMousePos(int X, int Y,double *XPos,double *YPos);
-    void ResizeGraph(void);
+	void ResizeGraph();
 };
-#endif
+
+#endif //GRAPHIMAGE_HEADER

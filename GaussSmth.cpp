@@ -1,14 +1,7 @@
-//---------------------------------------------------------------------------
-#include <vcl.h>
-#pragma hdrstop
-
 #include <stdlib.h>
 #include <math.h>
 #include "GaussSmth.h"
-#include "utils.h"
-
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
+#include "Utils.h"
 
 ////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
 // Name: CalcGaussSmooth

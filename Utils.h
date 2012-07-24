@@ -1,8 +1,9 @@
-//---------------------------------------------------------------------------
-#ifndef UtilsH
-#define UtilsH
-//---------------------------------------------------------------------------
+#ifndef UTILS_HEADER
+#define UTILS_HEADER
 
-void WriteMsg(char *FuncName,int LineNum,char *Message,...);
+#include <qstring.h>
+
+void WriteMsg(const char *FuncName,int LineNum,const QString &Message);
 void Purge(double *&Ptr);
-#endif
+
+#endif //UTILS_HEADER
