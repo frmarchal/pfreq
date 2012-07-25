@@ -27,6 +27,7 @@ private:
 
 private slots:
 	void on_ExitMenu_triggered();
+	void on_LoadMenu_triggered();
 
 private:
 	QFileInfo DefaultFileName;
@@ -52,6 +53,7 @@ private:
 	bool HasBeenCut;
 	bool ExitProgram;
 
+	bool GetColumns(int NColumn,int &XColumn,int &YColumn);
 	bool LoadCsvFile(char *Buffer,unsigned int FSize);
 	bool LoadTirFile(char *Buffer,unsigned int FSize);
 	void TrackPosition(bool XSource);
@@ -60,13 +62,12 @@ private:
 	void WriteXFreq(double XFreq);
 	void WriteXTime0(double XTime);
 	void SetGraphSize(GraphImage *Control,int Width,int Height);
+	void AddMemoLine(const QString &Text);
 
 public:		// Déclarations de l'utilisateur
 	int NPoints;
 	double *XPlot,*YPlot;  //buffer to store the calculated curves
 	double *YSmooth,*YDerv;
-	GraphImage *MainGraphic;
-	GraphImage *DervGraphic;
 
 	void RecalculateGraphics(void);
 	void UpdateGraphics(void);

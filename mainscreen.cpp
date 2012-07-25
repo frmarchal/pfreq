@@ -1,3 +1,7 @@
+#include <qfile.h>
+#include <qelapsedtimer.h>
+#include <qfiledialog.h>
+#include <math.h>
 #include "mainscreen.h"
 #include "ui_mainscreen.h"
 #include "GaussSmth.h"
@@ -5,7 +9,7 @@
 //#include "SavGol.h"
 //#include "SelOutFile.h"
 //#include "background.h"
-//#include "selcolumn.h"
+#include "selectcolumn.h"
 //#include "xrange.h"
 #include "config.h"
 
@@ -154,3 +158,722 @@ void MainScreen::on_ExitMenu_triggered()
 {
 	close();
 }
+
+/*==========================================================================*/
+/*!
+  The user wants to load a file.
+
+  \date
+	\arg 2003-03-24 created by Frederic
+ */
+/*==========================================================================*/
+bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,int &NPoints,int &NAllocated,
+	bool &InData,int XColumn,int YColumn,int Line)
+{
+	double XValue,YValue,*TData;
+	bool CXValid,CYValid;
+
+	if (XColumn>=0)
+	{
+		XValue=0.;
+		CXValid=(sscanf(ColumnsTxt[XColumn],"%lf",&XValue)==1);
+		if (!CXValid)
+		{
+			if (InData)
+			{
+				WriteMsg(__FILE__,__LINE__,QString("Column %1 contains an invalid number at line %2").arg(XColumn).arg(Line));
+				return(false);
+			}
+			return(true);
+		}
+	}
+	YValue=0.;
+	CYValid=(sscanf(ColumnsTxt[YColumn],"%lf",&YValue)==1);
+	if (!CYValid)
+	{
+		if (InData)
+		{
+			WriteMsg(__FILE__,__LINE__,QString("Column %1 contains an invalid number at line %2").arg(YColumn).arg(Line));
+			return(false);
+		}
+		return(true);
+	}
+	InData=true;
+
+	if (NPoints>=NAllocated)
+	{
+		NAllocated+=256;
+		TData=(double *)realloc(*YData,NAllocated*sizeof(double));
+		if (!TData)
+		{
+			WriteMsg(__FILE__,__LINE__,QString("Not enough memory to load all the file. Some points after line %1 are missing").arg(Line));
+			return(false);
+		}
+		*YData=TData;
+		if (XColumn>=0)
+		{
+			TData=(double *)realloc(*XData,NAllocated*sizeof(double));
+			if (!TData)
+			{
+				WriteMsg(__FILE__,__LINE__,QString("Not enough memory to load all the file. Some points after line %1 are missing").arg(Line));
+				return(false);
+			}
+			*XData=TData;
+		}
+	}
+	if (XColumn>=0) (*XData)[NPoints]=XValue;
+	(*YData)[NPoints++]=YValue;
+	return(true);
+}
+
+/*==========================================================================*/
+/*!
+  Get the column indexes corresponding to the specified number of columns.
+
+  \param NColumn The number of columns in the file.
+  \param XColumn The index of the X column is returned in this variable.
+  \param YColumn The index of the Y column is returned in this variable.
+
+  \return \c True if the column indexes are correct or \c false if an error
+  is detected.
+ */
+/*==========================================================================*/
+bool MainScreen::GetColumns(int NColumn,int &XColumn,int &YColumn)
+{
+	QString Item;
+	QString ColMark;
+
+	Item=QString::number(NColumn);
+	ColMark=ConfigFile->Config_GetStringNoWrite("Columns",Item,"-1,-1");
+	QRegExp ColRe("^(\\d+),(\\d+)$");
+	if (ColRe.indexIn(ColMark)<0) return(false);
+	QStringList Match=ColRe.capturedTexts();
+	bool OkX=false;
+	XColumn=Match.at(1).toInt(&OkX);
+	bool OkY=false;
+	YColumn=Match.at(2).toInt(&OkY);
+	if (!OkX) return(false);
+	if (!OkY) return(false);
+	return(true);
+}
+
+/*==========================================================================*/
+/*!
+  Decode and load a CSV file.
+
+  \param Buffer The buffer containing the file to convert.
+  \param FSize The size of the file buffer.
+
+  \return True if the data could be parsed or false if an error occured.
+
+  \date 2004-02-06
+ */
+/*==========================================================================*/
+bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
+{
+#define NSTORED_LINES 25
+	char Delim;
+	QString Item;
+	QString ColMark;
+	char *StoredColumns[NSTORED_LINES][MAX_COLUMN];
+	double Value;
+	int i,XColumn,YColumn;
+
+	int Line=1;
+	char *Ptr=Buffer;
+	int NAllocated=0;
+	int NColumn=0;
+	int Column=0;
+	int ValidColumns=0;
+	bool InData=false;
+	int NStoredLines=0;
+	int NonSpaces;
+	bool SelectingColumns=false;
+	for (unsigned int NRead=0 ; NRead<FSize ; NRead++)
+	{
+		//while (NRead<FSize && Buffer[NRead]<=' ') NRead++;
+		//if (NRead>=FSize) break;
+		Ptr=Buffer+NRead;
+		if (NStoredLines<NSTORED_LINES) StoredColumns[NStoredLines][Column]=Ptr;
+		NonSpaces=0;
+		for ( ; NRead<FSize && (Buffer[NRead]>' ' || (Buffer[NRead]==' ' && !NonSpaces)) ; NRead++)
+			if (Buffer[NRead]!=' ') NonSpaces=1;
+		if (NRead>=FSize) break;
+		Delim=Buffer[NRead];
+		Buffer[NRead]=0;
+		if (*Ptr) ValidColumns+=sscanf(Ptr,"%lf",&Value);
+		Column++;
+		if (Column>=MAX_COLUMN)
+		{
+			WriteMsg(__FILE__,__LINE__,"Too many columns in file. Reading aborted.");
+			break;
+		}
+		if (Delim=='\r' || Delim=='\n')
+		{
+			if (!NColumn)
+			{
+				if (ValidColumns>0 || Line>1)
+				{
+					NColumn=Column;
+					if (!GetColumns(NColumn,XColumn,YColumn) || YColumn<0)
+					{
+						if (NColumn==1)
+						{
+							ConfigFile->Config_WriteString("Columns",Item,"-1,0");
+							XColumn=-1;
+							YColumn=0;
+						}
+						else if (NColumn==2)
+						{
+							ConfigFile->Config_WriteString("Columns",Item,"0,1");
+							XColumn=0;
+							YColumn=1;
+						}
+						else
+						{
+							SelectingColumns=true;
+						}
+					}
+					if (XColumn>=NColumn)
+					{
+						WriteMsg(__FILE__,__LINE__,QString("Invalid X column for a file containing %1 columns").arg(NColumn));
+						break;
+					}
+					if (YColumn>=NColumn)
+					{
+						WriteMsg(__FILE__,__LINE__,QString("Invalid Y column for a file containing %1 columns").arg(NColumn));
+						break;
+					}
+				}
+				else
+				{
+					SelectingColumns=true;
+				}
+			}
+			else
+			{
+				if (NColumn!=Column)
+				{
+					if (ValidColumns>0) WriteMsg(__FILE__,__LINE__,QString("Inconsistant number of columns in the file at line %1").arg(Line));
+					break;
+				}
+			}
+
+			if (SelectingColumns)
+			{
+				int Result;
+
+				if ((ValidColumns>0 || Line>1) && ++NStoredLines>=NSTORED_LINES)
+				{
+					SelectColumn ColSel(this);
+					ColSel.PrepareList(NColumn);
+					for (i=0 ; i<NStoredLines ; i++)
+						ColSel.AddLine(StoredColumns[i],NColumn);
+
+					Result=ColSel.exec();
+					if (Result==QDialog::Accepted)
+						ColSel.GetColumn(XColumn,YColumn);
+					if (Result!=QDialog::Accepted) break;
+					SelectingColumns=false;
+					for (i=0 ; i<NStoredLines ; i++)
+					{
+						if (!AddDataPoint(StoredColumns[i],&XData,&YData,NPoints,NAllocated,InData,XColumn,YColumn,i)) break;
+					}
+					if (i<NStoredLines) break;
+					NStoredLines=0;
+				}
+			}
+			else
+			{
+				if (!AddDataPoint(StoredColumns[0],&XData,&YData,NPoints,NAllocated,InData,XColumn,YColumn,Line)) break;
+			}
+			Column=0;
+			ValidColumns=0;
+			if (Delim=='\r' && Buffer[NRead+1]=='\n') NRead++;
+			Line++;
+		}
+	}
+	return(true);
+}
+
+/*=============================================================================*/
+/*!
+  Convert a binary file. The file is only made of float in big endian order.
+
+  \param Buffer The buffer containing the file to convert.
+  \param FSize The size of the file buffer.
+
+  \return True if the data could be parsed or false if an error occured.
+
+  \date 2004-01-30
+ */
+/*=============================================================================*/
+bool MainScreen::LoadTirFile(char *Buffer,unsigned int FSize)
+{
+	char Swap,*Data;
+	float Value;
+	int i,NFilePoints;
+	double *TData;
+
+	int NAllocated=0;
+
+	//***** convert the data *****
+	NFilePoints=FSize/4;
+	Data=Buffer;
+	for (i=0 ; i<NFilePoints ; i++)
+	{
+		Swap=Data[0];
+		Data[0]=Data[3];
+		Data[3]=Swap;
+		Swap=Data[1];
+		Data[1]=Data[2];
+		Data[2]=Swap;
+		Value=*((float *)Data);
+		Data+=4;
+
+		if (NPoints>=NAllocated)
+		{
+			NAllocated+=256;
+			TData=(double *)realloc(YData,NAllocated*sizeof(double));
+			if (!TData)
+			{
+				WriteMsg(__FILE__,__LINE__,
+						 tr("Not enough memory to load all the file. %1 points may be missing").arg(NFilePoints-i));
+				return(false);
+			}
+			YData=TData;
+		}
+		YData[NPoints++]=Value;
+	}
+	return(true);
+}
+
+/*==========================================================================*/
+/*!
+  The user wants to load a file.
+
+  \date
+	\arg 2001-10-22 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_LoadMenu_triggered()
+{
+	qint64 FSize,NRead;
+	char *Buffer;
+
+	//***** get file name *****
+	QString FileName=QFileDialog::getOpenFileName(this, tr("Open File"),
+												  DefaultFileName.filePath(),
+												  tr("All (*.*)"));
+	if (FileName.isEmpty()) return;
+	DefaultFileName=FileName;
+	ConfigFile->Config_WriteFileName("Input","FileName",DefaultFileName);
+
+	//***** read file *****
+	{
+		QFile hFile(FileName);
+		if (!hFile.open(QIODevice::ReadOnly))
+		{
+			WriteMsg(__FILE__,__LINE__,QString("Cannot open %1").arg(FileName));
+			return;
+		}
+		FSize=hFile.size();
+		if (FSize==0)
+		{
+			hFile.close();
+			WriteMsg(__FILE__,__LINE__,"File is empty");
+			return;
+		}
+		Buffer=(char *)malloc(FSize);
+		if (!Buffer)
+		{
+			hFile.close();
+			WriteMsg(__FILE__,__LINE__,"Not enough memory to load the file");
+			return;
+		}
+		NRead=hFile.read(Buffer,FSize);
+		if (NRead!=FSize)
+		{
+			free(Buffer);
+			hFile.close();
+			WriteMsg(__FILE__,__LINE__,"Cannot read file");
+			return;
+		}
+		hFile.close();
+	}
+
+	//***** parse file *****
+	if (!XData && !HasBeenCut)  //if no X currently in memory, store the paramters
+	{
+		StoredXFreq=XFreq;
+		StoredTime0=Time0;
+	}
+	ui->MainGraphCtrl->DeleteAllCurves();
+	ui->DervGraphCtrl->DeleteAllCurves();
+	NPoints=0;
+	HasBeenCut=false;
+	Purge(XData);
+	Purge(YData);
+	Purge(XPlot);
+	Purge(YPlot);
+	Purge(YSmooth);
+	Purge(YDerv);
+	setWindowTitle("MainForm "+DefaultFileName.fileName());
+
+	//***** test the type of the file *****
+	int NonText=0;
+	int InvalidText=0;
+	char *Ptr=Buffer;
+	int Column=0;
+	int ValidLine=0,ValidColumn=0;
+	int NDots=0,NSigns=0,NExp=0;
+	int MultiSpaces=0;
+	for (unsigned int i=0 ; i<FSize ; i++ , Ptr++)
+	{
+		if (*Ptr=='\t' || *Ptr=='\r' || *Ptr=='\n' || *Ptr==' ')
+		{
+			if (!MultiSpaces)
+			{
+				if (Column>0) ValidColumn++;
+				if (*Ptr!='\t' || *Ptr==' ')
+				{
+					MultiSpaces++;
+					if (ValidColumn>0) ValidLine++;
+					ValidColumn=0;
+				}
+				Column=0;
+				NDots=0;
+				NSigns=0;
+				NExp=0;
+			}
+			continue;
+		}
+		MultiSpaces=0;
+		if (Column>=0)
+		{
+			if (*Ptr=='.' || *Ptr==',')
+			{
+				if (NDots>0)
+					Column=-1;
+				else
+					NDots++;
+				continue;
+			}
+			if (*Ptr=='-' || *Ptr=='+')
+			{
+				if (NSigns>1)
+					Column=-1;
+				else
+					NSigns++;
+				continue;
+			}
+			if (*Ptr=='E' || *Ptr=='e')
+			{
+				if (NExp>0)
+					Column=-1;
+				else
+					NExp++;
+				continue;
+			}
+			if (isdigit(*Ptr))
+				Column++;
+			else
+				Column=-1;
+		}
+		if (!(isdigit(*Ptr) || *Ptr=='.' || *Ptr==',' || *Ptr=='\r' ||
+			  *Ptr=='\n' || *Ptr=='-' || *Ptr=='+' || toupper(*Ptr)=='E' ||
+			  *Ptr=='/' || *Ptr==':' || *Ptr=='A' || *Ptr=='P' || *Ptr=='M' ||
+			  *Ptr==' '))
+			NonText++;
+		if ((unsigned char)*Ptr<' ' && *Ptr!='\n' && *Ptr!='\r' && *Ptr!='\t')
+			InvalidText++;
+	}
+	if ((InvalidText || NonText>10) && ValidLine<20)
+		LoadTirFile(Buffer,FSize);
+	else
+		LoadCsvFile(Buffer,FSize);
+
+	free(Buffer);
+	if (NPoints<2)
+	{
+		WriteMsg(__FILE__,__LINE__,QString("Only %1 data points in the file").arg(NPoints));
+		Purge(XData);
+		Purge(YData);
+		NPoints=0;
+	}
+
+	//***** resize memory *****
+	if (NPoints>0 && YData)
+	{
+		double *TData;
+
+		TData=(double *)realloc(YData,NPoints*sizeof(double));
+		if (TData) YData=TData;
+		XPlot=(double *)malloc(NPoints*sizeof(double));
+		if (!XPlot)
+		{
+			WriteMsg(__FILE__,__LINE__,"Not enough memory to load the file");
+			Purge(XData);
+			Purge(YData);
+			NPoints=0;
+		}
+		YPlot=(double *)malloc(NPoints*sizeof(double));
+		if (!YPlot)
+		{
+			WriteMsg(__FILE__,__LINE__,"Not enough memory to load the file");
+			Purge(XData);
+			Purge(YData);
+			NPoints=0;
+		}
+		YSmooth=(double *)malloc(NPoints*sizeof(double));
+		YDerv=(double *)malloc(NPoints*sizeof(double));
+	}
+
+	if (XData)
+	{
+		int i;
+		double StepSize,Diff,MinDiff,MaxDiff;
+
+		Time0=XData[0];
+		Diff=XData[1]-XData[0];
+		MinDiff=MaxDiff=Diff;
+		for (i=2 ; i<NPoints ; i++)
+		{
+			Diff=XData[i]-XData[i-1];
+			if (MinDiff>Diff) MinDiff=Diff;
+			else if (MaxDiff<Diff) MaxDiff=Diff;
+		}
+		StepSize=fabs((XData[NPoints-1]-XData[0])/(NPoints-1));
+		if (StepSize<1e-15)
+			XFreq=0.;
+		else
+			XFreq=1./StepSize;
+		/*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
+	{
+	Purge(YSmooth);
+	Purge(YDerv);
+	}*/
+	}
+	else
+	{
+		XFreq=StoredXFreq;
+		Time0=StoredTime0;
+	}
+
+	LastGWidth=-1.;
+	LastGNeigh=-1;
+	LastSGPoly=-1;
+	LastSGNeigh=-1;
+	UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  Add a string to the memo.
+
+  \param Text The text to add.
+ */
+/*==========================================================================*/
+void MainScreen::AddMemoLine(const QString &Text)
+{
+	QTextCursor Cursor=ui->Memo1->textCursor();
+	Cursor.insertText(Text);
+	ui->Memo1->setTextCursor(Cursor);
+}
+
+/*==========================================================================*/
+/*!
+  Recalculate the graphic with the data in memory.
+
+  \date
+	\arg 2001-10-22 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::RecalculateGraphics()
+{
+	int i;
+	QElapsedTimer t0;
+	double NextX,Slope,x,SMax;
+	double Offset,Bkgr;
+	QString Text;
+
+	if (!YData || NPoints<=0) return;
+	t0.start();
+	QTextDocument *Doc=ui->Memo1->document();
+	Doc->clear();
+	AddMemoLine("Clear:"+QString::number(t0.elapsed())+"\n");
+
+	if (XData)
+	{
+		ui->XFrequency->setEnabled(false);
+		ui->XTime0->setEnabled(false);
+		for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
+	}
+	else
+	{
+		ui->XFrequency->setEnabled(true);
+		ui->XTime0->setEnabled(true);
+		for (i=0 ; i<NPoints ; i++) XPlot[i]=(double)i/XFreq+Time0;
+	}
+	Text.sprintf("%.4lf",XFreq);
+	ui->XFrequency->setText(Text);
+	Text.sprintf("%.4lf",Time0);
+	ui->XTime0->setText(Text);
+
+	for (i=0 ; i<NPoints ; i++) YPlot[i]=YData[i]*YGain+YOffset;
+	ui->MainGraphCtrl->SetGraphic(0,XPlot,YPlot,NPoints);
+#if 0
+	if (BackgroundForm)
+	{
+		BackgroundForm->CalculateAutoBackground();
+		if (BackgroundForm->PrepareBkgr(Time0,XFreq,NPoints))
+			ui->MainGraphCtrl->SetGraphic(2,BackgroundForm->XBkgr,BackgroundForm->YBkgr,BackgroundForm->NBgPoints);
+		else
+			ui->MainGraphCtrl->DeleteCurve(2);
+	}
+	else
+		ui->MainGraphCtrl->DeleteCurve(2);
+#endif
+	AddMemoLine("Data:"+QString::number(t0.elapsed())+"\n");
+
+#if 0
+	//***** redraw smoothed curve *****
+	if (YSmooth && (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh))
+	{
+		CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
+		LastGWidth=GaussWidth;
+		LastGNeigh=GaussNeigh;
+	}
+	if (YSmooth && Smooth)
+	{
+		//NextX=Time0;
+		//if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
+		if (XFreq<0.) //get last point if X axes reverted
+			NextX=XPlot[NPoints-1];
+		else
+			NextX=XPlot[0];
+		Slope=0.;
+		Offset=0.;
+		BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		Bkgr=Time0*Slope+Offset;
+		SMax=Smooth[0]*YGain+YOffset-Bkgr;
+		for (i=0 ; i<NPoints ; i++)
+		{
+			YSmooth[i]=Smooth[i]*YGain+YOffset;
+			/*x=(double)i/XFreq+Time0;
+	if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+	 BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+			if (XFreq>0.)
+			{
+				x=XPlot[i];
+				if (x>=NextX) BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+			}
+			else
+			{
+				x=XPlot[NPoints-1-i];
+				if (x<=NextX) BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+			}
+			Bkgr=x*Slope+Offset;
+			if (YSmooth[i]-Bkgr>SMax) SMax=YSmooth[i]-Bkgr;
+		}
+		ui->MainGraphCtrl->SetGraphic(1,XPlot,YSmooth,NPoints);
+		Text.sprintf("%.7lg",SMax);
+	}
+	else
+		Text.clear();
+	ui->SmoothMaxCtrl->setText(Text);
+	Memo1->Lines->Add("Smooth:"+QString::number(t0.elapsed()));
+
+	//***** redraw derivative curve *****
+	if (YDerv)
+	{
+		if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
+		{
+			SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
+			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq;
+			LastSGPoly=SavGolPoly;
+			LastSGNeigh=SavGolNeigh;
+		}
+		if (ui->RawSmoothButton->isChecked() && Smooth)
+		{
+			LastSGPoly=-1;
+			Purge(Derive);
+			Derive=(double *)malloc(NPoints*sizeof(double));
+			if (Derive==NULL)
+			{
+				WriteMsg(__FILE__,__LINE__,"Derivative cannot be allocated");
+			}
+			else
+			{
+				x=0.5*XFreq;
+				for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
+				*Derive=Derive[1];
+				Derive[NPoints-1]=Derive[NPoints-2];
+			}
+		}
+	}
+	if (YDerv && Derive)
+	{
+		if (XFreq>0.)
+		{
+			NextX=Time0;
+			for (i=0 ; i<NPoints ; i++)
+			{
+				if (XPlot[i]>=NextX) Slope=BackgroundForm->GetNextSlope(&NextX);
+				YDerv[i]=Derive[i]*YGain-Slope;
+			}
+		}
+		else
+		{
+			NextX=(double)(NPoints-1)/XFreq+Time0;
+			for (i=NPoints-1 ; i>=0 ; i--)
+			{
+				if (XPlot[i]>=NextX) Slope=BackgroundForm->GetNextSlope(&NextX);
+				YDerv[i]=Derive[i]*YGain-Slope;
+			}
+		}
+		DervGraphic->SetGraphic(0,XPlot,YDerv,NPoints);
+		SMax=YDerv[0];
+		for (i=1 ; i<NPoints-1 ; i++)
+			if (YDerv[i]>SMax) SMax=YDerv[i];
+		Text.sprintf("%.7lg",SMax);
+	}
+	else
+		Text.clear();
+	ui->DervMaxCtrl->setText(Text);
+	Memo1->Lines->Add("Derivative:"+QString::number(t0.elapsed()));
+#endif
+}
+
+/*==========================================================================*/
+/*!
+  Update the graphic with the data in memory.
+
+  \date
+	\arg 2001-10-22 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::UpdateGraphics()
+{
+	QElapsedTimer t0;
+
+	if (!YData || NPoints<2) return;
+	t0.start();
+	RecalculateGraphics();
+	ui->MainGraphCtrl->Unzoom();
+	ui->DervGraphCtrl->Unzoom();
+	if (!YSmooth && ui->TrackSmooth->isChecked())
+	{
+		ui->TrackSmooth->setChecked(false);
+		ui->TrackData->setChecked(true);
+	}
+	if (!YDerv && ui->TrackDerv->isChecked())
+	{
+		ui->TrackDerv->setChecked(false);
+		ui->TrackData->setChecked(true);
+	}
+	ui->TrackSmooth->setEnabled(YSmooth!=NULL);
+	ui->TrackDerv->setEnabled(YDerv!=NULL);
+	AddMemoLine("Total:"+QString::number(t0.elapsed())+"\n");
+}
+

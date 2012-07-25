@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     config.cpp \
     qexception.cpp \
     GraphImage.cpp \
-    convlv.cpp
+    convlv.cpp \
+    selectcolumn.cpp
 
 HEADERS  += mainscreen.h \
     Savgol.h \
@@ -27,8 +28,10 @@ HEADERS  += mainscreen.h \
     config.h \
     qexception.h \
     GraphImage.h \
-    convlv.h
+    convlv.h \
+    selectcolumn.h
 
-FORMS    += mainscreen.ui
+FORMS    += mainscreen.ui \
+    selectcolumn.ui
 
 
