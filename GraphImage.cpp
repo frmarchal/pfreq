@@ -35,7 +35,6 @@
 //////////////////////////////////// EOD /////////////////////////////////////
 GraphImage::GraphImage(QWidget *Parent) :
 	QWidget(Parent),
-	PCanvas(this),
 	Selection(NULL),
 	LeftMouseClick(NULL),
 	RightMouseClick(NULL),
@@ -121,6 +120,7 @@ void GraphImage::Redraw()
 	GRight=ImageWidth;
 
 	//***** clear axis *****
+	QPainter PCanvas(this);
 	QPen Pen;
 	Pen.setStyle(Qt::SolidLine);
 	Pen.setColor(CTextBg);
@@ -138,8 +138,8 @@ void GraphImage::Redraw()
 	//VMaxY = OY-1-Limite;
 
 	//***** dessiner axes *****
-	SetXTicks(PlotXMin,PlotXMax);
-	SetYTicks(PlotYMin,PlotYMax);
+	SetXTicks(PCanvas,PlotXMin,PlotXMax);
+	SetYTicks(PCanvas,PlotYMin,PlotYMax);
 
 	//***** draw curve *****
 	for (j=0 ; j<MAX_CURVES ; j++)
@@ -278,13 +278,13 @@ void GraphImage::Redraw()
 // Revision:
 //
 //////////////////////////////////// EOD /////////////////////////////////////
-void GraphImage::SetXTicks(double min,double max)
+void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 {
 	double ex, fen, del=0., i,c,start,y10;
 	double y, xoffset, yoffset,ix;
 	char Deci=0;
 	QString val;
-	QRectF Size;
+	QRect Size;
 
 	fen=max-min;
 	if (fen==0.)
@@ -329,12 +329,12 @@ void GraphImage::SetXTicks(double min,double max)
 			val.sprintf("%.2f",i);
 		else
 			val.sprintf("%.0f",i);
-		Size=PCanvas.boundingRect(QRectF(),val);
-		if (ix+Size.width()/2<ImageWidth) PCanvas.drawText((int)ix-Size.width()/2,(int)yoffset+1,val);
+		Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
+		if (ix+Size.width()/2<ImageWidth) PCanvas.drawText(Size,Qt::AlignHCenter | Qt::AlignTop,val);
 	}
 
-	Size=PCanvas.boundingRect(QRectF(),XName);
-	PCanvas.drawText(GRight-Size.width(),ImageHeight-Size.height(),XName);
+	Size=PCanvas.boundingRect(QRect(GRight,ImageHeight,0,0),Qt::AlignRight | Qt::AlignBottom,XName);
+	PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignBottom,XName);
 }
 
 ////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
@@ -364,12 +364,12 @@ void GraphImage::SetXTicks(double min,double max)
 // Revision:
 //
 //////////////////////////////////// EOD /////////////////////////////////////
-void GraphImage::SetYTicks(double min,double max)
+void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 {
 	double ex, fen, del=0., i, y10,c,start;
 	double y, xoffset, yoffset, iy,Bottom=0.;
 	QString val;
-	QRectF Size,Size1;
+	QRect Size,Size1;
 
 	//if (min<0.) min=0.;
 	//if (max<0.) max=10.;
@@ -412,12 +412,12 @@ void GraphImage::SetYTicks(double min,double max)
 	//y--;
 	y10=pow(10.,y);
 	/*if ((max/y10)>1. && log10(fabs(floor(max/y10)))>5.)
-   {
-   Bottom=start;
-   SetTextAlign(DC,TA_LEFT|TA_TOP);
-   sprintf(val,"Bottom at:%g",Bottom);
-   PrintText(DC,0,scr_b,val,900);
-   }*/
+	{
+	Bottom=start;
+	SetTextAlign(DC,TA_LEFT|TA_TOP);
+	sprintf(val,"Bottom at:%g",Bottom);
+	PrintText(DC,0,scr_b,val,900);
+	}*/
 
 	//***** afficher echelle *****
 	PCanvas.setPen(CFrame);
@@ -429,26 +429,27 @@ void GraphImage::SetYTicks(double min,double max)
 		PCanvas.drawLine((int)xoffset+1,(int)iy,(int)xoffset+GRAD,(int)iy);
 		PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
 		val.sprintf("%5ld",(long int)((i-Bottom) / y10));
-		Size=PCanvas.boundingRect(QRectF(),val);
-		if (iy>GTop+3+3*FontHeight/2) PCanvas.drawText((int)xoffset-Size.width()-GRAD,(int)iy-Size.height()/2,val);
+		Size=PCanvas.boundingRect(QRect(xoffset,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+		if (iy>GTop+3+3*FontHeight/2) PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
 	}
 
 	//***** afficher facteur d'échelle *****
 	/*SetTextAlign(DC,TA_LEFT|TA_TOP);
-  PrintText(DC,0,scr_t+3+FontHeight/2,"x10",0);*/
+	PrintText(DC,0,scr_t+3+FontHeight/2,"x10",0);*/
 	val.sprintf("%+02d",(int)y);
-	Size=PCanvas.boundingRect(QRectF(),"x10");
-	Size1=PCanvas.boundingRect(QRectF(),val);
-	PCanvas.drawText(0,GTop+Size1.height()/2,"x10");
-	PCanvas.drawText(Size.width(),GTop,val);
+	Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
+	Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
+	Size.translate(0,Size1.height()/2);
+	PCanvas.drawText(Size,Qt::AlignLeft | Qt::AlignTop,"x10");
+	PCanvas.drawText(Size1,Qt::AlignLeft | Qt::AlignTop,val);
 
 	//if (h->DivEner)
 	/*SetTextAlign(DC,TA_RIGHT|TA_TOP);
-  PrintText(DC,0,scr_t+3*FontHeight,Spect->YName,900);
-  SetTextAlign(DC,TA_LEFT|TA_TOP);
-  if (!HasDC) ReleaseDC(MainHWind,DC);*/
+	PrintText(DC,0,scr_t+3*FontHeight,Spect->YName,900);
+	SetTextAlign(DC,TA_LEFT|TA_TOP);
+	if (!HasDC) ReleaseDC(MainHWind,DC);*/
 	/*Size=PCanvas->TextExtent(YName);
-  PCanvas->TextOut(0,GTop+Size1.cy/2,YName);*/
+	PCanvas->TextOut(0,GTop+Size1.cy/2,YName);*/
 	return;
 }
 
@@ -479,7 +480,7 @@ void GraphImage::SetYTicks(double min,double max)
 // Revision:
 //
 //////////////////////////////////// EOD /////////////////////////////////////
-int GraphImage::join(double x0, double y0, double x1, double y1)
+/*int GraphImage::join(double x0, double y0, double x1, double y1)
 {
 	double xx0, yy0, y00, xx1, yy1, y11, h;
 	int ix0, iy0, ix1, iy1;
@@ -553,7 +554,7 @@ int GraphImage::join(double x0, double y0, double x1, double y1)
 		PCanvas.drawLine(ix0,iy0,ix1,iy1);
 	}
 	return(1);
-}
+}*/
 
 ////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
 // Name: wts
@@ -758,6 +759,7 @@ void GraphImage::Unzoom()
 		}
 		SetZoom(XMin,XMax,YMin,YMax);
 		Redraw();
+		update();
 		DispXMin=XMin;
 		DispXMax=XMax;
 		DispYMin=YMin;

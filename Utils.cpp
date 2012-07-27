@@ -41,3 +41,24 @@ void Purge(double *&Ptr)
 	free(Ptr);
 	Ptr=NULL;
 }
+
+/*=============================================================================*/
+/*!
+  Convert a string into a double number.
+
+  \param String The string to convert.
+  \param Value A variable to store the result. The pointer may be NULL.
+
+  \retval \c True if the number is valid or \c false if the conversion failed.
+ */
+/*=============================================================================*/
+bool StrToDouble(const char *String,double *Value)
+{
+	char *Next;
+	double Val;
+
+	Val=strtod(String,&Next);
+	if (*Next!='\0') return(false);
+	*Value=Val;
+	return(true);
+}

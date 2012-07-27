@@ -25,6 +25,10 @@ int Run(QApplication &a)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+	// locale must be C to parse numbers with decimal dots
+	setlocale(LC_NUMERIC,"C");
+
 	Configure();
 
 	int RetCode=Run(a);

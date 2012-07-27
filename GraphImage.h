@@ -18,7 +18,6 @@ class GraphImage : public QWidget
 	Q_OBJECT
 
 private:
-	QPainter PCanvas;
     int ImageHeight;     //heigth of the parent control
     int ImageWidth;      //width of the parent control
     int GTop,GBottom,GRight,GLeft;  //position of the curves area
@@ -41,9 +40,9 @@ private:
 	//! The area selected with the mouse,
 	QRubberBand *Selection;
 
-	void SetXTicks(double min,double max);
-	void SetYTicks(double min,double max);
-    int join(double x0, double y0, double x1, double y1);
+	void SetXTicks(QPainter &PCanvas,double min,double max);
+	void SetYTicks(QPainter &PCanvas,double min,double max);
+	//int join(double x0, double y0, double x1, double y1);
 	void wts(double x, double y, int * ix, int* iy);
 	void ScaleDisplay();
 

@@ -176,7 +176,7 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 	if (XColumn>=0)
 	{
 		XValue=0.;
-		CXValid=(sscanf(ColumnsTxt[XColumn],"%lf",&XValue)==1);
+		CXValid=StrToDouble(ColumnsTxt[XColumn],&XValue);
 		if (!CXValid)
 		{
 			if (InData)
@@ -188,7 +188,7 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 		}
 	}
 	YValue=0.;
-	CYValid=(sscanf(ColumnsTxt[YColumn],"%lf",&YValue)==1);
+	CYValid=StrToDouble(ColumnsTxt[YColumn],&YValue);
 	if (!CYValid)
 	{
 		if (InData)
@@ -300,8 +300,8 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 			if (Buffer[NRead]!=' ') NonSpaces=1;
 		if (NRead>=FSize) break;
 		Delim=Buffer[NRead];
-		Buffer[NRead]=0;
-		if (*Ptr) ValidColumns+=sscanf(Ptr,"%lf",&Value);
+		Buffer[NRead]='\0';
+		if (*Ptr) ValidColumns+=StrToDouble(Ptr,&Value) ? 1 : 0;
 		Column++;
 		if (Column>=MAX_COLUMN)
 		{
