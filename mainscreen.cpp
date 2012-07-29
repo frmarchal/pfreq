@@ -9,7 +9,7 @@
 #include "GaussSmth.h"
 #include "Utils.h"
 //#include "SavGol.h"
-//#include "SelOutFile.h"
+#include "seloutfile.h"
 #include "background.h"
 #include "selectcolumn.h"
 //#include "xrange.h"
@@ -1389,5 +1389,19 @@ void MainScreen::BkgrRightClick(QMouseEvent *event)
 	else
 		ui->MainGraphCtrl->DeleteCurve(2);
 	UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  Display the dialog box to select the output files.
+
+  \date
+    \arg 2001-12-01 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_SelectOutputFile_triggered()
+{
+	SelOutFile Form(this);
+	Form.exec();
 }
 

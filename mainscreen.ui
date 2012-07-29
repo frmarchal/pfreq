@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>750</width>
-    <height>680</height>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -516,7 +516,7 @@ QGroupBox {
      <x>0</x>
      <y>0</y>
      <width>750</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -558,7 +558,7 @@ QGroupBox {
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="actionOutput_files"/>
+    <addaction name="SelectOutputFile"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuData"/>
@@ -634,7 +634,7 @@ QGroupBox {
     <string>Cut</string>
    </property>
   </action>
-  <action name="actionOutput_files">
+  <action name="SelectOutputFile">
    <property name="text">
     <string>Output files</string>
    </property>
