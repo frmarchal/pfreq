@@ -106,13 +106,18 @@ void BackgroundForm::AddPoint(double x, double y)
 	YData[i]=y;
 	NPoints++;
 
+	if (i>=ui->BkgrPointsList->rowCount())
+	{
+		ui->BkgrPointsList->insertRow(i);
+	}
+
 	Text.sprintf("%.3lg",x);
 	QTableWidgetItem *XListItem=new QTableWidgetItem(Text);
-	ui->BkgrPointsList->setItem(i+1,1,XListItem);
+	ui->BkgrPointsList->setItem(i,0,XListItem);
 
 	Text.sprintf("%.3lg",y);
 	QTableWidgetItem *YListItem=new QTableWidgetItem(Text);
-	ui->BkgrPointsList->setItem(i+1,2,YListItem);
+	ui->BkgrPointsList->setItem(i,1,YListItem);
 }
 
 /*=============================================================================*/
