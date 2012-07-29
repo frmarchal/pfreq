@@ -49,6 +49,7 @@ public:
 	void Config_WriteUInt(const QString &Section,const QString &Item,unsigned int Value);
 	void Config_WriteDouble(const QString &Section,const QString &Item,double Value);
 	void Config_WriteFileName(const QString &Section,const QString &Item,const QFileInfo &Value);
+	void Config_WriteFileName(const QString &Section,const QString &Item,const QString &Value);
 
 	class ConfigError : public QException
 	{

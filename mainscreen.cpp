@@ -1,6 +1,8 @@
 #include <qfile.h>
 #include <qelapsedtimer.h>
 #include <qfiledialog.h>
+#include <qtextstream.h>
+#include <qfileinfo.h>
 #include <math.h>
 #include "mainscreen.h"
 #include "ui_mainscreen.h"
@@ -8,7 +10,7 @@
 #include "Utils.h"
 //#include "SavGol.h"
 //#include "SelOutFile.h"
-//#include "background.h"
+#include "background.h"
 #include "selectcolumn.h"
 //#include "xrange.h"
 #include "config.h"
@@ -19,7 +21,11 @@
 //! Maximum number of columns in the file to load.
 #define MAX_COLUMN 30
 
+MainScreen *MainForm=NULL;
+
 extern ConfigObject *ConfigFile;
+
+extern BackgroundForm *BgForm;
 
 /*==========================================================================*/
 /*!
@@ -35,6 +41,7 @@ MainScreen::MainScreen(QWidget *parent) :
     ui(new Ui::MainScreen)
 {
     ui->setupUi(this);
+	MainForm=this;
 
 	QString Text;
 	int Selection;
@@ -722,18 +729,16 @@ void MainScreen::RecalculateGraphics()
 
 	for (i=0 ; i<NPoints ; i++) YPlot[i]=YData[i]*YGain+YOffset;
 	ui->MainGraphCtrl->SetGraphic(0,XPlot,YPlot,NPoints);
-#if 0
-	if (BackgroundForm)
+	if (BgForm)
 	{
-		BackgroundForm->CalculateAutoBackground();
-		if (BackgroundForm->PrepareBkgr(Time0,XFreq,NPoints))
-			ui->MainGraphCtrl->SetGraphic(2,BackgroundForm->XBkgr,BackgroundForm->YBkgr,BackgroundForm->NBgPoints);
+		BgForm->CalculateAutoBackground();
+		if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+			ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
 		else
 			ui->MainGraphCtrl->DeleteCurve(2);
 	}
 	else
 		ui->MainGraphCtrl->DeleteCurve(2);
-#endif
 	AddMemoLine("Data:"+QString::number(t0.elapsed())+"\n");
 
 #if 0
@@ -875,5 +880,514 @@ void MainScreen::UpdateGraphics()
 	ui->TrackSmooth->setEnabled(YSmooth!=NULL);
 	ui->TrackDerv->setEnabled(YDerv!=NULL);
 	AddMemoLine("Total:"+QString::number(t0.elapsed())+"\n");
+}
+
+/*==========================================================================*/
+/*!
+  Write the new modified XFreq to the configuration file.
+
+  \param XFreq X sampling frequency to write to the configuration file.
+
+  \date
+	\arg 2003-05-26 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::WriteXFreq(double XFreq)
+{
+	ConfigFile->Config_WriteDouble("Axis","XFreq",XFreq);
+}
+
+/*==========================================================================*/
+/*!
+  The user go to another control. Update the new value.
+
+  \date
+	\arg 2001-12-13 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_XFrequency_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->XFrequency->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==XFreq) return;
+	if (Value>=0.001) XFreq=Value;
+
+	QString Text;
+	Text.sprintf("%.0lf",XFreq);
+	ui->XFrequency->setText(Text);
+	LastSGPoly=-1;
+	WriteXFreq(XFreq);
+	UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  Write the new modified XTime0 to the configuration file.
+
+  \param Time0 First time of the X axis to write to the configuration file.
+
+  \date
+	\arg 2003-05-26 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::WriteXTime0(double Time0)
+{
+	ConfigFile->Config_WriteDouble("Axis","XTime0",Time0);
+}
+
+/*==========================================================================*/
+/*!
+  The user pressed on the enter key while typing the start time.
+
+  \date
+	\arg 2001-12-13 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_XTime0_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->XTime0->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==Time0) return;
+	Time0=Value;
+
+	QString Text;
+	Text.sprintf("%.4lf",Time0);
+	ui->XTime0->setText(Text);
+	LastSGPoly=-1;
+	WriteXTime0(Time0);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user pressed on the enter key while typing the width for
+  the gaussian smoothing.
+
+  \date 2001-12-13
+*/
+/*=============================================================================*/
+void MainScreen::on_GaussWidthCtrl_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->GaussWidthCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==GaussWidth) return;
+	if (Value>0.) GaussWidth=Value;
+
+	QString Text;
+	Text.sprintf("%.3lf",GaussWidth);
+	ui->GaussWidthCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user pressed on the enter key while typing the number of
+  neigbourg for the gaussian smoothing.
+
+  \date: 2001-10-23
+ */
+/*=============================================================================*/
+void MainScreen::on_GaussNeighCtrl_editingFinished()
+{
+	int Value;
+	bool Ok=false;
+
+	Value=ui->GaussNeighCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==GaussNeigh) return;
+	if (Value>0) GaussNeigh=Value;
+
+	QString Text;
+	Text.sprintf("%d",GaussNeigh);
+	ui->GaussNeighCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user pressed on the enter key while typing the Y gain.
+
+  \date 2001-12-13
+ */
+/*=============================================================================*/
+void MainScreen::on_YGainCtrl_editingFinished()
+{
+	double Value;
+	QString Text;
+	bool Ok=false;
+
+	Value=ui->YGainCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==YGain) return;
+	YGain=Value;
+	Text.sprintf("%lf",YGain);
+	ui->YGainCtrl->setText(Text);
+	LastSGPoly=-1;
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user pressed on the enter key while typing the Y offset.
+
+  \date 2001-12-28
+ */
+/*=============================================================================*/
+void MainScreen::on_YOffsetCtrl_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->YOffsetCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==YOffset) return;
+	YOffset=Value;
+
+	QString Text;
+	Text.sprintf("%lf",YOffset);
+	ui->YOffsetCtrl->setText(Text);
+	LastSGPoly=-1;
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user pressed on the enter key while typing the polynomial
+  for the derivative.
+
+  \date 2001-12-13
+ */
+/*=============================================================================*/
+void MainScreen::on_SavGolPolyCtrl_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->SavGolPolyCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==SavGolPoly) return;
+	SavGolPoly=Value;
+
+	QString Text;
+	Text.sprintf("%d",SavGolPoly);
+	ui->SavGolPolyCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user pressed on the enter key while typing the number
+  the neighbourg for the derivative.
+
+  \date 2001-12-13
+ */
+/*=============================================================================*/
+void MainScreen::on_SavGolNeighCtrl_editingFinished()
+{
+	int Value;
+	bool Ok=false;
+
+	Value=ui->SavGolNeighCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==SavGolNeigh) return;
+	SavGolNeigh=Value;
+
+	QString Text;
+	Text.sprintf("%d",SavGolNeigh);
+	ui->SavGolNeighCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user wants to save the curves.
+
+  \date 2001-10-29
+ */
+/*=============================================================================*/
+void MainScreen::on_SaveMenu_aboutToShow()
+{
+	if (!YData)
+	{
+		ui->SaveDataMenu->setEnabled(false);
+		ui->SaveDerivativeMenu->setEnabled(false);
+		ui->SaveSmoothMenu->setEnabled(false);
+	}
+	else
+	{
+		ui->SaveDataMenu->setEnabled(true);
+		ui->SaveSmoothMenu->setEnabled(Smooth!=NULL);
+		ui->SaveDerivativeMenu->setEnabled(Derive!=NULL);
+	}
+}
+
+/*=============================================================================*/
+/*!
+  The user wants to save the curves.
+
+  \date 2001-10-29
+ */
+/*=============================================================================*/
+void MainScreen::on_SaveDerivativeMenu_triggered()
+{
+	int i;
+	double NextX,Slope,Offset,x,Bkgr;
+
+	if (!Derive) return;
+	if (!YDerv)
+	{
+		WriteMsg(__FILE__,__LINE__,"No derivative curve");
+		return;
+	}
+	QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Derivative","");
+	if (FileName.filePath().isEmpty())
+	{
+		ConfigFile->Config_WriteFileName("Output","Derivative","derive.txt");
+		WriteMsg(__FILE__,__LINE__,"No output file in the config file");
+		return;
+	}
+	QFile fo(FileName.filePath());
+	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		WriteMsg(__FILE__,__LINE__,QString("Cannot save file %1").arg(FileName.filePath()));
+		return;
+	}
+	QTextStream Out(&fo);
+	//NextX=Time0;
+	//if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
+	if (XFreq<0.) //get last point if X axes reverted
+		NextX=XPlot[NPoints-1];
+	else
+		NextX=XPlot[0];
+	bool Error=false;
+	for (i=0 ; i<NPoints ; i++)
+	{
+		/*x=(double)i/XFreq+Time0;
+   if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+	BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+		if (XFreq>0.)
+		{
+			x=XPlot[i];
+			if (x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		else
+		{
+			x=XPlot[NPoints-1-i];
+			if (x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		Bkgr=Slope;
+		Out << YDerv[i]-Bkgr << endl;
+		//if (fprintf(fo,"%lf\n",YDerv[i]-Bkgr)==EOF) Error=true;
+
+		if (Out.status()!=QTextStream::Ok)
+		{
+			Error=true;
+			break;
+		}
+	}
+	fo.close();
+	if (Error)
+		WriteMsg(__FILE__,__LINE__,QString("Error while writting %1").arg(FileName.filePath()));
+	else
+		WriteMsg(__FILE__,__LINE__,QString("Derivative saved in %1").arg(FileName.filePath()));
+}
+
+/*=============================================================================*/
+/*!
+  The user wants to save the curves.
+
+  \date 2001-10-29
+ */
+/*=============================================================================*/
+void MainScreen::on_SaveSmoothMenu_triggered()
+{
+	int i;
+	double x,Slope,Offset,NextX,Bkgr;
+
+	if (!YSmooth)
+	{
+		WriteMsg(__FILE__,__LINE__,"No smoothed curve");
+		return;
+	}
+	QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Smooth","");
+	if (FileName.filePath().isEmpty())
+	{
+		ConfigFile->Config_WriteFileName("Output","Smooth","smooth.txt");
+		WriteMsg(__FILE__,__LINE__,"No output file in the config file");
+		return;
+	}
+	QFile fo(FileName.filePath());
+	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		WriteMsg(__FILE__,__LINE__,QString("Cannot save file %1").arg(FileName.filePath()));
+		return;
+	}
+	QTextStream Out(&fo);
+	//NextX=Time0;
+	//if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
+	if (XFreq<0.) //get last point if X axes reverted
+		NextX=XPlot[NPoints-1];
+	else
+		NextX=XPlot[0];
+	bool Error=false;
+	for (i=0 ; i<NPoints && !Error ; i++)
+	{
+		/*x=(double)i/XFreq+Time0;
+   if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+	BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+		if (XFreq>0.)
+		{
+			x=XPlot[i];
+			if (x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		else
+		{
+			x=XPlot[NPoints-1-i];
+			if (x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		Bkgr=x*Slope+Offset;
+		Out << YSmooth[i]-Bkgr << endl;
+		if (Out.status()!=QTextStream::Ok)
+		{
+			Error=true;
+			break;
+		}
+	}
+	fo.close();
+	if (Error)
+		WriteMsg(__FILE__,__LINE__,QString("Error while writting %1").arg(FileName.filePath()));
+	else
+		WriteMsg(__FILE__,__LINE__,QString("Smoothed curve saved in %1").arg(FileName.filePath()));
+}
+
+/*==========================================================================*/
+/*!
+  The user wants to save the curves.
+
+  \date
+	\arg 2001-10-29 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_SaveDataMenu_triggered()
+{
+	int i;
+
+	if (!XPlot || !YPlot)
+	{
+		WriteMsg(__FILE__,__LINE__,"No data to save");
+		return;
+	}
+	QFileInfo SrcName(DefaultFileName);
+
+	QString FileName=QFileDialog::getSaveFileName(this, tr("Save File"),
+												  SrcName.completeBaseName()+".txt",
+												  tr("Data (*.txt)"));
+	if (FileName.isEmpty()) return;
+
+	QFile fo(FileName);
+	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		WriteMsg(__FILE__,__LINE__,QString("Cannot open output file %1 for writting").arg(FileName));
+		return;
+	}
+	QTextStream Out(&fo);
+	for (i=0 ; i<NPoints ; i++)
+		Out << XPlot[i] << "\t" << YPlot[i] << endl;
+
+	fo.close();
+}
+
+/*==========================================================================*/
+/*!
+  The user wants to display or hide the dialog to edit the background.
+
+  \date
+	\arg 2001-11-22 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_BackgroundMenu_triggered()
+{
+	if (!BgForm)
+	{
+		BgForm=new BackgroundForm(this);
+		BgForm->setModal(false);
+		connect(BgForm,SIGNAL(UpdateGraphics()),this,SLOT(UpdateGraphics()));
+		BgForm->open();
+	}
+	else if (BgForm->isVisible())
+	{
+		BgForm->setVisible(false);
+	}
+	else
+	{
+		BgForm->setVisible(true);
+		BgForm->setFocus(Qt::OtherFocusReason);
+	}
+}
+
+/*==========================================================================*/
+/*!
+  Set the function to call when the click on the main grah.
+ */
+/*==========================================================================*/
+void MainScreen::SetBgMouseClick(bool Active)
+{
+	if (Active)
+	{
+		connect(ui->MainGraphCtrl,SIGNAL(LeftMouseClick(QMouseEvent*)),this,SLOT(BkgrLeftClick(QMouseEvent*)));
+		connect(ui->MainGraphCtrl,SIGNAL(RightMouseClick(QMouseEvent*)),this,SLOT(BkgrRightClick(QMouseEvent*)));
+	}
+	else
+	{
+		disconnect(ui->MainGraphCtrl,SIGNAL(LeftMouseClick(QMouseEvent*)),this,SLOT(BkgrLeftClick(QMouseEvent*)));
+		disconnect(ui->MainGraphCtrl,SIGNAL(RightMouseClick(QMouseEvent*)),this,SLOT(BkgrRightClick(QMouseEvent*)));
+	}
+}
+
+/*==========================================================================*/
+/*!
+  Function called when the user click on the main graphic and the
+  background window is visible.
+
+  \date
+	\arg 2001-11-22 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::BkgrLeftClick(QMouseEvent *event)
+{
+	BgForm->AddPoint(event->x(),event->y());
+	if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+		ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+	else
+		ui->MainGraphCtrl->DeleteCurve(2);
+	UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  Function called when the user click on the main graphic and the
+  background window is visible.
+
+  \date
+	\arg 2001-11-22 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::BkgrRightClick(QMouseEvent *event)
+{
+	BgForm->RemovePoint(event->x(),event->y());
+	if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+		ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+	else
+		ui->MainGraphCtrl->DeleteCurve(2);
+	UpdateGraphics();
 }
 

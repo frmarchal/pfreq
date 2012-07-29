@@ -19,7 +19,10 @@ SOURCES += main.cpp\
     qexception.cpp \
     GraphImage.cpp \
     convlv.cpp \
-    selectcolumn.cpp
+    selectcolumn.cpp \
+    background.cpp \
+    seloutfile.cpp \
+    xrange.cpp
 
 HEADERS  += mainscreen.h \
     Savgol.h \
@@ -29,9 +32,15 @@ HEADERS  += mainscreen.h \
     qexception.h \
     GraphImage.h \
     convlv.h \
-    selectcolumn.h
+    selectcolumn.h \
+    background.h \
+    seloutfile.h \
+    xrange.h
 
 FORMS    += mainscreen.ui \
-    selectcolumn.ui
+    selectcolumn.ui \
+    background.ui \
+    seloutfile.ui \
+    xrange.ui
 
 

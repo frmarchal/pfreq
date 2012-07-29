@@ -35,10 +35,7 @@
 //////////////////////////////////// EOD /////////////////////////////////////
 GraphImage::GraphImage(QWidget *Parent) :
 	QWidget(Parent),
-	Selection(NULL),
-	LeftMouseClick(NULL),
-	RightMouseClick(NULL),
-	MouseMoveCallback(NULL)
+	Selection(NULL)
 {
 	//***** init variables *****
 	for (int i=0 ; i<MAX_CURVES ; i++)
@@ -47,9 +44,6 @@ GraphImage::GraphImage(QWidget *Parent) :
 		XData[i]=NULL;
 		YData[i]=NULL;
 	}
-	LeftMouseClick=NULL;
-	RightMouseClick=NULL;
-	MouseMoveCallback=NULL;
 	Zooming=false;
 	ZoomEnabled=false;
 
@@ -815,7 +809,7 @@ void GraphImage::DeleteAllCurves()
 	DispYMax=0.;
 	XName=tr("X axis");
 	YName=tr("Y axis");
-	Redraw();
+	update();
 }
 
 ////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
@@ -852,10 +846,9 @@ void GraphImage::mousePressEvent(QMouseEvent *event)
 	x=((double)X-bx)/ax;
 	y=((double)Y-by)/ay;
 	Qt::MouseButton Button=event->button();
-	Qt::MouseButtons Shift=event->buttons();
-	if (Button==Qt::LeftButton && LeftMouseClick) LeftMouseClick->MouseClick(x,y,Shift);
-	if (Button==Qt::RightButton && RightMouseClick) RightMouseClick->MouseClick(x,y,Shift);
-	if (!LeftMouseClick && Button==Qt::LeftButton && DispXMin!=DispXMax && DispYMin!=DispYMax)
+	if (Button==Qt::LeftButton) emit LeftMouseClick(event);
+	if (Button==Qt::RightButton) emit RightMouseClick(event);
+	if (Button==Qt::LeftButton && DispXMin!=DispXMax && DispYMin!=DispYMax && receivers(SIGNAL(LeftMouseClick(QMouseEvent*)))==0)
 	{
 		XZoom=X;
 		YZoom=Y;
@@ -866,11 +859,11 @@ void GraphImage::mousePressEvent(QMouseEvent *event)
 		Selection->setGeometry(QRect(XZoom,YZoom,0,0));
 		Selection->show();
 	}
-	if (!RightMouseClick && Button==Qt::RightButton)
+	if (Button==Qt::RightButton && receivers(SIGNAL(RightMouseClick(QMouseEvent*)))==0)
 	{
 		ZoomEnabled=false;
 		Unzoom();
-		Redraw();
+		update();
 	}
 }
 
@@ -887,12 +880,12 @@ void GraphImage::mouseMoveEvent(QMouseEvent *event)
 
 	int X=event->x();
 	int Y=event->y();
-	if (MouseMoveCallback)
+	if (receivers(SIGNAL(MouseMove(bool,double,double))))
 	{
 		bool InGraph=!(X<GLeft || X>GRight || Y<GTop || Y>GBottom);
 		double XPos=((double)X-bx)/ax;
 		double YPos=((double)Y-by)/ay;
-		MouseMoveCallback->MouseMove(InGraph,XPos,YPos);
+		emit MouseMove(InGraph,XPos,YPos);
 	}
 	if (Zooming)
 	{
@@ -1030,7 +1023,7 @@ void GraphImage::mouseReleaseEvent(QMouseEvent *event)
 			MousePointed=false;
 			SetZoom(zx0,zx1,zy0,zy1);
 			ZoomEnabled=true;
-			Redraw();
+			update();
 		}
 	}
 	else
@@ -1074,7 +1067,7 @@ void GraphImage::DeleteCurve(int Curve)
 	XData[Curve]=NULL;
 	YData[Curve]=NULL;
 	Unzoom();
-	Redraw();
+	update();
 }
 
 /*=============================================================================*/
@@ -1118,6 +1111,6 @@ void GraphImage::ResizeGraph()
 	GRight=ImageWidth;
 	ScaleDisplay();
 	//Unzoom();
-	Redraw();
+	update();
 }
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>750</width>
-    <height>675</height>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -523,16 +523,16 @@ QGroupBox {
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuSave">
+    <widget class="QMenu" name="SaveMenu">
      <property name="title">
       <string>Save</string>
      </property>
-     <addaction name="actionData"/>
-     <addaction name="actionSmooth"/>
-     <addaction name="actionDerivative"/>
+     <addaction name="SaveDataMenu"/>
+     <addaction name="SaveSmoothMenu"/>
+     <addaction name="SaveDerivativeMenu"/>
     </widget>
     <addaction name="LoadMenu"/>
-    <addaction name="menuSave"/>
+    <addaction name="SaveMenu"/>
     <addaction name="separator"/>
     <addaction name="ExitMenu"/>
    </widget>
@@ -551,7 +551,7 @@ QGroupBox {
     </widget>
     <addaction name="menuCopy"/>
     <addaction name="separator"/>
-    <addaction name="actionBackground_2"/>
+    <addaction name="BackgroundMenu"/>
     <addaction name="actionCut"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
@@ -572,7 +572,7 @@ QGroupBox {
     <string>F2</string>
    </property>
   </action>
-  <action name="actionData">
+  <action name="SaveDataMenu">
    <property name="text">
     <string>Data</string>
    </property>
@@ -580,7 +580,7 @@ QGroupBox {
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSmooth">
+  <action name="SaveSmoothMenu">
    <property name="text">
     <string>Smooth</string>
    </property>
@@ -588,7 +588,7 @@ QGroupBox {
     <string>F3</string>
    </property>
   </action>
-  <action name="actionDerivative">
+  <action name="SaveDerivativeMenu">
    <property name="text">
     <string>Derivative</string>
    </property>
@@ -621,7 +621,7 @@ QGroupBox {
     <string>Background</string>
    </property>
   </action>
-  <action name="actionBackground_2">
+  <action name="BackgroundMenu">
    <property name="text">
     <string>Background</string>
    </property>

@@ -52,27 +52,16 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event);
 	void paintEvent(QPaintEvent *event);
 
+signals:
+	void LeftMouseClick(QMouseEvent *event);
+	void RightMouseClick(QMouseEvent *event);
+	void MouseMove(bool InGraph,double x,double y);
+
 public:
-
-	class MouseClickCallback
-	{
-	public:
-		virtual void MouseClick(double x,double y,Qt::MouseButtons Shift)=0;
-	};
-	class MouseMoveCallback
-	{
-	public:
-		virtual void MouseMove(bool InGraph,double x,double y)=0;
-	};
-
 	//! Label of the X axis.
 	QString XName;
 	//! Label of the Y axis.
 	QString YName;
-
-	MouseClickCallback *LeftMouseClick;
-	MouseClickCallback *RightMouseClick;
-	MouseMoveCallback *MouseMoveCallback;
 
 	GraphImage(QWidget *Parent=0);
 	void Redraw();

@@ -1398,8 +1398,6 @@ void ConfigObject::Config_WriteDouble(const QString &Section,const QString &Item
   \param Item The item to write.
   \param Value The file name to store. It must be less than MAX_PATHNAME_LEN bytes
          long.
-  \param ConfigFile The name of the config file. If it is NULL, the default file
-         name is used.
 
   \date 2007-05-31
  */
@@ -1409,6 +1407,28 @@ void ConfigObject::Config_WriteFileName(const QString &Section,const QString &It
 	Load();
 	AccessLock.lockForWrite();
 	ConfigFile.Store(Section,Item,BasePath.relativeFilePath(Value.filePath()));
+	AccessLock.unlock();
+}
+
+/*=============================================================================*/
+/*!
+  Write a file name in the configuration file. If the file name can be expressed
+  as a relative path from the main configuration file, it will be converted to
+  a relative path.
+
+  \param Section The section with the file name.
+  \param Item The item to write.
+  \param Value The file name to store. It must be less than MAX_PATHNAME_LEN bytes
+		 long.
+
+  \date 2007-05-31
+ */
+/*=============================================================================*/
+void ConfigObject::Config_WriteFileName(const QString &Section,const QString &Item, const QString &Value)
+{
+	Load();
+	AccessLock.lockForWrite();
+	ConfigFile.Store(Section,Item,BasePath.relativeFilePath(Value));
 	AccessLock.unlock();
 }
 

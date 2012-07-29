@@ -28,6 +28,25 @@ private:
 private slots:
 	void on_ExitMenu_triggered();
 	void on_LoadMenu_triggered();
+	void on_SaveMenu_aboutToShow();
+	void on_SaveDerivativeMenu_triggered();
+	void on_SaveSmoothMenu_triggered();
+	void on_SaveDataMenu_triggered();
+	void on_BackgroundMenu_triggered();
+
+	void on_XFrequency_editingFinished();
+	void on_XTime0_editingFinished();
+	void on_GaussWidthCtrl_editingFinished();
+	void on_GaussNeighCtrl_editingFinished();
+	void on_YGainCtrl_editingFinished();
+	void on_YOffsetCtrl_editingFinished();
+	void on_SavGolPolyCtrl_editingFinished();
+	void on_SavGolNeighCtrl_editingFinished();
+
+public slots:
+	void UpdateGraphics();
+	void BkgrLeftClick(QMouseEvent *event);
+	void BkgrRightClick(QMouseEvent *event);
 
 private:
 	QFileInfo DefaultFileName;
@@ -70,10 +89,8 @@ public:		// Déclarations de l'utilisateur
 	double *YSmooth,*YDerv;
 
 	void RecalculateGraphics(void);
-	void UpdateGraphics(void);
 
-	static void BkgrLeftClick(void *Parent,double x,double y,Qt::MouseButtons Shift);
-	static void BkgrRightClick(void *Parent,double x,double y,Qt::MouseButtons Shift);
+	void SetBgMouseClick(bool Active);
 	static void TrackMouseMove(void *Parent,bool InGraph,double x,double y);
 	bool WriteToClipboard(char * Text);
 };
