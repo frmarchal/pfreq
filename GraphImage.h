@@ -22,6 +22,7 @@ private:
     int ImageWidth;      //width of the parent control
     int GTop,GBottom,GRight,GLeft;  //position of the curves area
     int FontHeight,FontWidth;   //size of the font to draw the text
+	QColor CText;   //color of the text
 	QColor CTextBg;   //color of the text background
 	QColor CFrame;    //color of the frame
 	QColor CData[MAX_CURVES];     //color of the data curves

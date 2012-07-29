@@ -52,11 +52,12 @@ GraphImage::GraphImage(QWidget *Parent) :
 	ImageWidth=width();
 
 	//***** get default colors *****
+	CText=QColor(0x00,0x00,0x00);
 	CTextBg=QColor(0x80,0x80,0x80);
-	CFrame=QColor(0x00,0x00,0xFF);
-	CData[0]=QColor(0x00,0x00,0xFF);
+	CFrame=QColor(0xFF,0x00,0x00);
+	CData[0]=QColor(0xFF,0x00,0x00);
 	CData[1]=QColor(0x00,0xFF,0x00);
-	CData[2]=QColor(0xFF,0x00,0x00);
+	CData[2]=QColor(0x00,0x00,0xFF);
 	CDataBg=QColor(0x00,0x00,0x00);
 
 	//***** get font size *****
@@ -123,13 +124,8 @@ void GraphImage::Redraw()
 	PCanvas.fillRect(0, GBottom, GRight, ImageHeight-GBottom,CTextBg);
 	Pen.setColor(CFrame);
 	PCanvas.setPen(Pen);
-	PCanvas.drawRect(GLeft,GTop,GRight-GLeft,GBottom-GTop);
-	PCanvas.fillRect(GLeft+1, GTop+1, GRight-1-GLeft-1, GBottom-1-GTop-1,CDataBg);
-
-	//OX = GrY+1;
-	//OY = GrX-1;
-	//VMaxX = MaxX-OX-1;
-	//VMaxY = OY-1-Limite;
+	//PCanvas.drawRect(GLeft,GTop,GRight-GLeft,GBottom-GTop);
+	PCanvas.fillRect(GLeft, GTop, GRight-GLeft, GBottom-GTop,CDataBg);
 
 	//***** dessiner axes *****
 	SetXTicks(PCanvas,PlotXMin,PlotXMax);
@@ -155,7 +151,6 @@ void GraphImage::Redraw()
 			y0=y[i-1];
 			y1=y[i];
 			if ((y0<PlotYMin && y1<PlotYMin) || (y0>PlotYMax && y1>PlotYMax)) continue;
-			//join(x[i-1],y[i-1],x[i],y[i]);
 
 			if (x0<PlotXMin || x1<PlotXMin || x0>PlotXMax || x1>PlotXMax ||
 					y0<PlotYMin || y1<PlotYMin || y0>PlotYMax || y1>PlotYMax)
@@ -312,17 +307,18 @@ void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 	if (c-y<.3) del=1.*y10;
 	start=ceil(min/y10)*y10;
 	if (del<1.) Deci=1;
-	PCanvas.setPen(CFrame);
 	PCanvas.setBrush(CTextBg);
 	for (i = start ; i <= max ; i += del)
 	{
 		ix = xoffset + (i - min) * ex;
+		PCanvas.setPen(CFrame);
 		PCanvas.drawLine((int)ix,(int)yoffset-1,(int)ix,(int)yoffset-GRAD);
 		PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
 		if (Deci)
 			val.sprintf("%.2f",i);
 		else
 			val.sprintf("%.0f",i);
+		PCanvas.setPen(CText);
 		Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
 		if (ix+Size.width()/2<ImageWidth) PCanvas.drawText(Size,Qt::AlignHCenter | Qt::AlignTop,val);
 	}
@@ -414,15 +410,16 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	}*/
 
 	//***** afficher echelle *****
-	PCanvas.setPen(CFrame);
 	PCanvas.setBrush(CTextBg);
 	//SetTextAlign(DC,TA_RIGHT|TA_BASELINE);
 	for (i = start ; i <= max ; i += del)
 	{
 		iy = yoffset-((i - min) * ex);
+		PCanvas.setPen(CFrame);
 		PCanvas.drawLine((int)xoffset+1,(int)iy,(int)xoffset+GRAD,(int)iy);
 		PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
 		val.sprintf("%5ld",(long int)((i-Bottom) / y10));
+		PCanvas.setPen(CText);
 		Size=PCanvas.boundingRect(QRect(xoffset,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
 		if (iy>GTop+3+3*FontHeight/2) PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
 	}
