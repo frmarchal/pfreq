@@ -8,11 +8,11 @@
 #include "ui_mainscreen.h"
 #include "GaussSmth.h"
 #include "Utils.h"
-//#include "SavGol.h"
+#include "Savgol.h"
 #include "seloutfile.h"
 #include "background.h"
 #include "selectcolumn.h"
-//#include "xrange.h"
+#include "xrange.h"
 #include "config.h"
 
 #define PROG_VERSION 2
@@ -1403,5 +1403,116 @@ void MainScreen::on_SelectOutputFile_triggered()
 {
 	SelOutFile Form(this);
 	Form.exec();
+}
+
+/*==========================================================================*/
+/*!
+  The user wants to cut some data points and only leave the center part of
+  the curve. A dialog box is displayed to ask the range to keep.
+
+  \date
+    \arg 2003-03-24 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_CutMenu_triggered()
+{
+	double XStart,XStop,StartTime;
+	double *TData;
+	int i,j;
+	QString Text;
+
+	if (!YData) return;
+
+	{
+		XRange XRangeForm(this);
+		int Result=XRangeForm.exec();
+		if (Result!=QDialog::Accepted)
+		{
+			return;
+		}
+		XRangeForm.GetRange(&XStart,&XStop);
+	}
+	if (XStart==XStop)
+	{
+		WriteMsg(__FILE__,__LINE__,"XStart and XStop must be different");
+		return;
+	}
+	if (!XData)
+	{
+		XData=(double *)malloc(NPoints*sizeof(double));
+		if (!XData)
+		{
+			WriteMsg(__FILE__,__LINE__,"Not enough memory to store XData");
+			return;
+		}
+		for (i=0 ; i<NPoints ; i++) XData[i]=(double)i/XFreq+Time0;
+	}
+
+	//***** remove the data point *****
+	if (XStart<XStop)
+	{
+		for (i=0 , j=0 ; i<NPoints && XPlot[i]<=XStop ; i++)
+			if (XPlot[i]>=XStart)
+			{
+				if (j==0) StartTime=XPlot[i];
+				if (XData) XData[j]=XData[i];
+				YData[j]=YData[i];
+				j++;
+			}
+	}
+	else
+	{
+		for (i=0 , j=0 ; i<NPoints ; i++)
+			if (XPlot[i]<=XStart || XPlot[i]>=XStop)
+			{
+				if (j==0) StartTime=XPlot[i];
+				if (XData) XData[j]=XData[i];
+				YData[j]=YData[i];
+				j++;
+			}
+	}
+	if (j<2)
+	{
+		WriteMsg(__FILE__,__LINE__,"Those limits would remove every data points. Cut not performed");
+		return;
+	}
+	NPoints=j;
+	Time0=StartTime;
+	Text.sprintf("%.4lf",Time0);
+	ui->XTime0->setText(Text);
+	HasBeenCut=true;
+
+	ConfigFile->Config_WriteDouble("Cut","XStart",XStart);
+	ConfigFile->Config_WriteDouble("Cut","XStop",XStop);
+
+	if (XData)
+	{
+		TData=(double *)realloc(XData,NPoints*sizeof(double));
+		if (TData) XData=TData;
+	}
+	TData=(double *)realloc(YData,NPoints*sizeof(double));
+	if (TData) YData=TData;
+	TData=(double *)realloc(XPlot,NPoints*sizeof(double));
+	if (TData) XPlot=TData;
+	TData=(double *)realloc(YPlot,NPoints*sizeof(double));
+	if (TData) YPlot=TData;
+	if (YSmooth)
+	{
+		TData=(double *)realloc(YSmooth,NPoints*sizeof(double));
+		if (TData) YSmooth=TData;
+	}
+	if (YDerv)
+	{
+		TData=(double *)realloc(YDerv,NPoints*sizeof(double));
+		if (TData) YDerv=TData;
+	}
+
+	ui->MainGraphCtrl->DeleteAllCurves();
+	ui->DervGraphCtrl->DeleteAllCurves();
+	LastGWidth=-1.;
+	LastGNeigh=-1;
+	LastSGPoly=-1;
+	LastSGNeigh=-1;
+	UpdateGraphics();
 }
 

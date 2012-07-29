@@ -552,7 +552,7 @@ QGroupBox {
     <addaction name="menuCopy"/>
     <addaction name="separator"/>
     <addaction name="BackgroundMenu"/>
-    <addaction name="actionCut"/>
+    <addaction name="CutMenu"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -629,7 +629,7 @@ QGroupBox {
     <string>F5</string>
    </property>
   </action>
-  <action name="actionCut">
+  <action name="CutMenu">
    <property name="text">
     <string>Cut</string>
    </property>

@@ -34,6 +34,7 @@ private slots:
 	void on_SaveDataMenu_triggered();
 	void on_BackgroundMenu_triggered();
 	void on_SelectOutputFile_triggered();
+	void on_CutMenu_triggered();
 
 	void on_XFrequency_editingFinished();
 	void on_XTime0_editingFinished();

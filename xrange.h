@@ -14,9 +14,14 @@ class XRange : public QDialog
 public:
 	explicit XRange(QWidget *parent = 0);
 	~XRange();
-	
+
+	void GetRange(double *XStart,double *XStop);
+
 private:
 	Ui::XRange *ui;
+
+	double XStart;
+    double XStop;
 };
 
 #endif // XRANGE_H
