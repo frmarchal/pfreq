@@ -3,6 +3,7 @@
 #include <qfiledialog.h>
 #include <qtextstream.h>
 #include <qfileinfo.h>
+#include <qclipboard.h>
 #include <math.h>
 #include "mainscreen.h"
 #include "ui_mainscreen.h"
@@ -1404,6 +1405,255 @@ void MainScreen::on_SelectOutputFile_triggered()
 	SelOutFile Form(this);
 	Form.exec();
 }
+
+/*==========================================================================*/
+/*!
+  Copy some text to the clipboard.
+
+  \return true if the text was copied on the clipboard or false in case
+           of failure.
+
+  \date
+    \arg 2001-12-04 created by Frederic
+ */
+/*==========================================================================*/
+bool MainScreen::WriteToClipboard(const QString *Text)
+{
+	QClipboard *clipboard=QApplication::clipboard();
+	clipboard->setText(*Text);
+	return(true);
+}
+
+/*==========================================================================*/
+/*!
+  Copy the data curve to the clipboard.
+
+  \date 2001-12-04
+ */
+/*==========================================================================*/
+void MainScreen::on_CopyData_triggered()
+{
+	long i;
+	double x,Bkgr,NextX,Slope,Offset;
+	QString Text;
+
+	QString TBuff;
+	QTextStream Buff(&TBuff);
+
+	if (XFreq<0.) //get last point if X axes reverted
+		NextX=XPlot[NPoints-1];
+	else
+		NextX=XPlot[0];
+	for (i=0 ; i<NPoints ; i++)
+	{
+		if (XFreq>0.)
+		{
+			x=XPlot[i];
+			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		else
+		{
+			x=XPlot[NPoints-1-i];
+			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		Bkgr=x*Slope+Offset;
+		Text.sprintf("%11.5g\t%11.5g", XPlot[i], YPlot[i]-Bkgr);
+		Buff << Text << endl;
+	}
+
+	WriteToClipboard(Buff.string());
+	return;
+}
+
+/*==========================================================================*/
+/*!
+  Copy the background curve to the clipboard.
+
+  \date
+    \arg 2001-12-04 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_CopyBkgrMenu_triggered()
+{
+	long i;
+	double x,Bkgr,NextX,Slope,Offset;
+	QString Text;
+
+	QString TBuff;
+	QTextStream Buff(&TBuff);
+
+	if (XFreq<0.) //get last point if X axes reverted
+		NextX=XPlot[NPoints-1];
+	else
+		NextX=XPlot[0];
+	for (i=0 ; i<NPoints ; i++)
+	{
+		if (XFreq>0.)
+		{
+			x=XPlot[i];
+			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		else
+		{
+			x=XPlot[NPoints-1-i];
+			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		Bkgr=x*Slope+Offset;
+		Text.sprintf("%11.5g\t%11.5g", XPlot[i], Bkgr);
+		Buff << Text << endl;
+	}
+
+	WriteToClipboard(Buff.string());
+	return;
+}
+
+/*==========================================================================*/
+/*!
+  Enable the copy menu items according to the data available in memory.
+
+  \date
+    \arg 2001-12-04 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_CopyMenu_aboutToShow()
+{
+  ui->CopyData->setEnabled(YPlot!=NULL);
+  ui->CopyBkgrMenu->setEnabled(YPlot!=NULL && BgForm && BgForm->BackgroundOk);
+  ui->CopySmoothMenu->setEnabled(YSmooth!=NULL);
+  ui->CopyDeriveMenu->setEnabled(YDerv!=NULL);
+}
+
+void MainScreen::on_RawSmoothButton_clicked()
+{
+  UpdateGraphics();
+}
+
+void MainScreen::on_SavGolButton_clicked()
+{
+  UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  The user is removing the focus out of the tracker control. We update the
+  tracked position.
+
+  \date 2003-03-22
+ */
+/*==========================================================================*/
+void MainScreen::on_XTracker_editingFinished()
+{
+	TrackPosition(true);
+}
+
+/*==========================================================================*/
+/*!
+  The user is removing the focus out of the tracker control. We update the
+  tracked position.
+
+  \date 2003-03-22
+ */
+/*==========================================================================*/
+void MainScreen::on_YTracker_editingFinished()
+{
+  TrackPosition(false);
+}
+
+/*==========================================================================*/
+/*!
+  Display the X or Y position corresponding to the given coordinate.
+
+  \param XSource If true, then we track the X position. If false, we track
+         the Y position.
+
+  \date 2003-03-22
+ */
+/*==========================================================================*/
+void MainScreen::TrackPosition(bool XSource)
+{
+	int i;
+	double XPosition,YPosition;
+	double *XPtr,*YPtr,*XSrc,*YSrc;
+	QString Text;
+	bool Found;
+
+	LastTrackSrc=XSource;
+
+	//***** get the source *****
+	if (ui->TrackSmooth->isChecked())
+	{
+		XSrc=XPlot;
+		YSrc=YSmooth;
+	}
+	else if (ui->TrackDerv->isChecked())
+	{
+		XSrc=XPlot;
+		YSrc=YDerv;
+	}
+	else
+	{
+		XSrc=XPlot;
+		YSrc=YPlot;
+	}
+	if (XSource)
+	{
+		if (ui->XTracker->text().isEmpty())
+		{
+			ui->YTracker->setText("");
+			return;
+		}
+		XPosition=ui->XTracker->text().toDouble();
+		XPtr=XSrc;
+		YPtr=YSrc;
+	}
+	else
+	{
+		if (ui->YTracker->text().isEmpty())
+		{
+			ui->XTracker->setText("");
+			return;
+		}
+		XPosition=ui->YTracker->text().toDouble();
+		XPtr=YSrc;
+		YPtr=XSrc;
+	}
+
+	//***** scan the data for the corresponding point *****
+	Found=false;
+	if (XPtr && YPtr)
+	{
+		for (i=1 ; i<NPoints ; i++)
+		{
+			if ((XPosition-XPtr[i-1])*(XPosition-XPtr[i])<=0.)
+			{
+				if (fabs(YPtr[i]-YPtr[i-1])>=1e50*fabs(XPtr[i]-XPtr[i-1]))
+				{
+					YPosition=YPtr[i];
+				}
+				else
+				{
+					YPosition=(XPosition-XPtr[i])/(XPtr[i-1]-XPtr[i])*(YPtr[i-1]-YPtr[i])+YPtr[i];
+				}
+				Found=true;
+				break;
+			}
+		}
+	}
+
+	//***** display the corresponding value *****
+	Text[0]=0;
+	if (XSource)
+	{
+		if (Found) Text.sprintf("%.7lg",YPosition);
+		ui->YTracker->setText(Text);
+	}
+	else
+	{
+		if (Found) Text.sprintf("%.4lg",YPosition);
+		ui->XTracker->setText(Text);
+	}
+}
+
 
 /*==========================================================================*/
 /*!

@@ -34,6 +34,11 @@ private slots:
 	void on_SaveDataMenu_triggered();
 	void on_BackgroundMenu_triggered();
 	void on_SelectOutputFile_triggered();
+	void on_CopyData_triggered();
+	void on_CopyBkgrMenu_triggered();
+	void on_CopyMenu_aboutToShow();
+	void on_RawSmoothButton_clicked();
+	void on_SavGolButton_clicked();
 	void on_CutMenu_triggered();
 
 	void on_XFrequency_editingFinished();
@@ -44,6 +49,8 @@ private slots:
 	void on_YOffsetCtrl_editingFinished();
 	void on_SavGolPolyCtrl_editingFinished();
 	void on_SavGolNeighCtrl_editingFinished();
+	void on_XTracker_editingFinished();
+	void on_YTracker_editingFinished();
 
 public slots:
 	void UpdateGraphics();
@@ -94,7 +101,7 @@ public:		// Déclarations de l'utilisateur
 
 	void SetBgMouseClick(bool Active);
 	static void TrackMouseMove(void *Parent,bool InGraph,double x,double y);
-	bool WriteToClipboard(char * Text);
+	bool WriteToClipboard(const QString *Text);
 };
 
 #endif // MAINSCREEN_H
