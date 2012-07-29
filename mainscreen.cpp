@@ -15,8 +15,8 @@
 //#include "xrange.h"
 #include "config.h"
 
-#define PROG_VERSION 1
-#define PROG_REVISION 6
+#define PROG_VERSION 2
+#define PROG_REVISION 0
 
 //! Maximum number of columns in the file to load.
 #define MAX_COLUMN 30
