@@ -1509,6 +1509,102 @@ void MainScreen::on_CopyBkgrMenu_triggered()
 
 /*==========================================================================*/
 /*!
+  Copy the smoothed curve to the clipboard.
+
+  \date
+    \arg 2001-12-04 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_CopySmoothMenu_triggered()
+{
+	long i;
+	double x,Bkgr,NextX,Slope,Offset;
+
+	if (!YSmooth)
+	{
+		WriteMsg(__FILE__,__LINE__,"No smoothed curve");
+		return;
+	}
+
+	QString Text;
+	QString TBuff;
+	QTextStream Buff(&TBuff);
+
+	if (XFreq<0.) //get last point if X axes reverted
+		NextX=XPlot[NPoints-1];
+	else
+		NextX=XPlot[0];
+	for (i=0 ; i<NPoints ; i++)
+	{
+		if (XFreq>0.)
+		{
+			x=XPlot[i];
+			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		else
+		{
+			x=XPlot[NPoints-1-i];
+			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		Bkgr=x*Slope+Offset;
+		Text.sprintf("%11.5g\t%11.5g", XPlot[i], YSmooth[i]-Bkgr);
+		Buff << Text << endl;
+	}
+
+	WriteToClipboard(Buff.string());
+	return;
+}
+
+/*==========================================================================*/
+/*!
+  Copy the derivative curve to the clipboard.
+
+  \date
+    \arg 2001-12-04 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_CopyDeriveMenu_triggered()
+{
+	long i;
+	double x,Bkgr,NextX,Slope,Offset;
+
+	if (!YDerv)
+	{
+		WriteMsg(__FILE__,__LINE__,"No derivative curve");
+		return;
+	}
+
+	QString Text;
+	QString TBuff;
+	QTextStream Buff(&TBuff);
+
+	if (XFreq<0.) //get last point if X axes reverted
+		NextX=XPlot[NPoints-1];
+	else
+		NextX=XPlot[0];
+	for (i=0 ; i<NPoints ; i++)
+	{
+		if (XFreq>0.)
+		{
+			x=XPlot[i];
+			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		else
+		{
+			x=XPlot[NPoints-1-i];
+			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		}
+		Bkgr=Slope;
+		Text.sprintf("%11.5g\t%11.5g", XPlot[i], YDerv[i]-Bkgr);
+		Buff << Text << endl;
+	}
+
+	WriteToClipboard(Buff.string());
+	return;
+}
+
+/*==========================================================================*/
+/*!
   Enable the copy menu items according to the data available in memory.
 
   \date
@@ -1523,14 +1619,18 @@ void MainScreen::on_CopyMenu_aboutToShow()
   ui->CopyDeriveMenu->setEnabled(YDerv!=NULL);
 }
 
+/*==========================================================================*/
+/*==========================================================================*/
 void MainScreen::on_RawSmoothButton_clicked()
 {
-  UpdateGraphics();
+	UpdateGraphics();
 }
 
+/*==========================================================================*/
+/*==========================================================================*/
 void MainScreen::on_SavGolButton_clicked()
 {
-  UpdateGraphics();
+	UpdateGraphics();
 }
 
 /*==========================================================================*/
@@ -1556,7 +1656,7 @@ void MainScreen::on_XTracker_editingFinished()
 /*==========================================================================*/
 void MainScreen::on_YTracker_editingFinished()
 {
-  TrackPosition(false);
+	TrackPosition(false);
 }
 
 /*==========================================================================*/
@@ -1654,6 +1754,53 @@ void MainScreen::TrackPosition(bool XSource)
 	}
 }
 
+
+/*=============================================================================*/
+/*!
+  Control to track the position on the data.
+ */
+/*=============================================================================*/
+void MainScreen::on_TrackData_clicked()
+{
+	disconnect(ui->MainGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	disconnect(ui->DervGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	TrackPosition(LastTrackSrc);
+}
+
+/*=============================================================================*/
+/*!
+  Control to track the position on the smoothed curve.
+ */
+/*=============================================================================*/
+void MainScreen::on_TrackSmooth_clicked()
+{
+	disconnect(ui->MainGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	disconnect(ui->DervGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	TrackPosition(LastTrackSrc);
+}
+
+/*=============================================================================*/
+/*!
+  Control to track the position on the derivative.
+ */
+/*=============================================================================*/
+void MainScreen::on_TrackDerv_clicked()
+{
+	disconnect(ui->MainGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	disconnect(ui->DervGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	TrackPosition(LastTrackSrc);
+}
+
+/*=============================================================================*/
+/*!
+  Control to track the position on the derivative.
+ */
+/*=============================================================================*/
+void MainScreen::on_TrackMouse_clicked()
+{
+	connect(ui->MainGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+	connect(ui->DervGraphCtrl,SIGNAL(MouseMove(bool,double,double)),this,SLOT(TrackMouseMove(bool,double,double)));
+}
 
 /*==========================================================================*/
 /*!
@@ -1764,5 +1911,31 @@ void MainScreen::on_CutMenu_triggered()
 	LastSGPoly=-1;
 	LastSGNeigh=-1;
 	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  Function called when the mouse move on the graph.
+
+  \date 2004-02-03
+ */
+/*=============================================================================*/
+void MainScreen::TrackMouseMove(bool InGraph,double x,double y)
+{
+	QString Text;
+
+	if (!ui->TrackMouse->isChecked()) return;
+	if (InGraph)
+	{
+		Text.sprintf("%.7lg",x);
+		ui->XTracker->setText(Text);
+		Text.sprintf("%.4lg",y);
+		ui->YTracker->setText(Text);
+	}
+	else
+	{
+		ui->XTracker->setText("");
+		ui->YTracker->setText("");
+	}
 }
 

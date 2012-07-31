@@ -252,7 +252,7 @@ QGroupBox {
               </widget>
              </item>
              <item>
-              <widget class="QRadioButton" name="radioButton_4">
+              <widget class="QRadioButton" name="TrackMouse">
                <property name="text">
                 <string>Mouse</string>
                </property>

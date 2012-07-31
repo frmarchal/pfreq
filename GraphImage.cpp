@@ -79,6 +79,8 @@ GraphImage::GraphImage(QWidget *Parent) :
 	DispYMax=0.;
 	XName=tr("X axis");
 	YName=tr("Y axis");
+
+	setMouseTracking(true);
 }
 
 /*=============================================================================*/

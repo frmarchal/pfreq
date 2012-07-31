@@ -36,7 +36,13 @@ private slots:
 	void on_SelectOutputFile_triggered();
 	void on_CopyData_triggered();
 	void on_CopyBkgrMenu_triggered();
+	void on_CopySmoothMenu_triggered();
+	void on_CopyDeriveMenu_triggered();
 	void on_CopyMenu_aboutToShow();
+	void on_TrackData_clicked();
+	void on_TrackSmooth_clicked();
+	void on_TrackDerv_clicked();
+	void on_TrackMouse_clicked();
 	void on_RawSmoothButton_clicked();
 	void on_SavGolButton_clicked();
 	void on_CutMenu_triggered();
@@ -56,6 +62,7 @@ public slots:
 	void UpdateGraphics();
 	void BkgrLeftClick(QMouseEvent *event);
 	void BkgrRightClick(QMouseEvent *event);
+	void TrackMouseMove(bool InGraph,double x,double y);
 
 private:
 	QFileInfo DefaultFileName;
