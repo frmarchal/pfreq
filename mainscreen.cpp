@@ -742,7 +742,6 @@ void MainScreen::RecalculateGraphics()
 		ui->MainGraphCtrl->DeleteCurve(2);
 	AddMemoLine("Data:"+QString::number(t0.elapsed())+"\n");
 
-#if 0
 	//***** redraw smoothed curve *****
 	if (YSmooth && (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh))
 	{
@@ -760,7 +759,7 @@ void MainScreen::RecalculateGraphics()
 			NextX=XPlot[0];
 		Slope=0.;
 		Offset=0.;
-		BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+		if (BgForm) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 		Bkgr=Time0*Slope+Offset;
 		SMax=Smooth[0]*YGain+YOffset-Bkgr;
 		for (i=0 ; i<NPoints ; i++)
@@ -772,12 +771,12 @@ void MainScreen::RecalculateGraphics()
 			if (XFreq>0.)
 			{
 				x=XPlot[i];
-				if (x>=NextX) BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+				if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 			}
 			else
 			{
 				x=XPlot[NPoints-1-i];
-				if (x<=NextX) BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+				if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 			}
 			Bkgr=x*Slope+Offset;
 			if (YSmooth[i]-Bkgr>SMax) SMax=YSmooth[i]-Bkgr;
@@ -788,7 +787,7 @@ void MainScreen::RecalculateGraphics()
 	else
 		Text.clear();
 	ui->SmoothMaxCtrl->setText(Text);
-	Memo1->Lines->Add("Smooth:"+QString::number(t0.elapsed()));
+	AddMemoLine("Smooth:"+QString::number(t0.elapsed()));
 
 	//***** redraw derivative curve *****
 	if (YDerv)
@@ -825,7 +824,7 @@ void MainScreen::RecalculateGraphics()
 			NextX=Time0;
 			for (i=0 ; i<NPoints ; i++)
 			{
-				if (XPlot[i]>=NextX) Slope=BackgroundForm->GetNextSlope(&NextX);
+				if (BgForm && XPlot[i]>=NextX) Slope=BgForm->GetNextSlope(&NextX);
 				YDerv[i]=Derive[i]*YGain-Slope;
 			}
 		}
@@ -834,11 +833,11 @@ void MainScreen::RecalculateGraphics()
 			NextX=(double)(NPoints-1)/XFreq+Time0;
 			for (i=NPoints-1 ; i>=0 ; i--)
 			{
-				if (XPlot[i]>=NextX) Slope=BackgroundForm->GetNextSlope(&NextX);
+				if (BgForm && XPlot[i]>=NextX) Slope=BgForm->GetNextSlope(&NextX);
 				YDerv[i]=Derive[i]*YGain-Slope;
 			}
 		}
-		DervGraphic->SetGraphic(0,XPlot,YDerv,NPoints);
+		ui->DervGraphCtrl->SetGraphic(0,XPlot,YDerv,NPoints);
 		SMax=YDerv[0];
 		for (i=1 ; i<NPoints-1 ; i++)
 			if (YDerv[i]>SMax) SMax=YDerv[i];
@@ -847,8 +846,7 @@ void MainScreen::RecalculateGraphics()
 	else
 		Text.clear();
 	ui->DervMaxCtrl->setText(Text);
-	Memo1->Lines->Add("Derivative:"+QString::number(t0.elapsed()));
-#endif
+	AddMemoLine("Derivative:"+QString::number(t0.elapsed()));
 }
 
 /*==========================================================================*/
