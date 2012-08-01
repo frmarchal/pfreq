@@ -1613,10 +1613,10 @@ void MainScreen::on_CopyDeriveMenu_triggered()
 /*==========================================================================*/
 void MainScreen::on_CopyMenu_aboutToShow()
 {
-  ui->CopyData->setEnabled(YPlot!=NULL);
-  ui->CopyBkgrMenu->setEnabled(YPlot!=NULL && BgForm && BgForm->BackgroundOk);
-  ui->CopySmoothMenu->setEnabled(YSmooth!=NULL);
-  ui->CopyDeriveMenu->setEnabled(YDerv!=NULL);
+	ui->CopyData->setEnabled(YPlot!=NULL);
+	ui->CopyBkgrMenu->setEnabled(YPlot!=NULL && BgForm && BgForm->BackgroundOk);
+	ui->CopySmoothMenu->setEnabled(YSmooth!=NULL);
+	ui->CopyDeriveMenu->setEnabled(YDerv!=NULL);
 }
 
 /*==========================================================================*/

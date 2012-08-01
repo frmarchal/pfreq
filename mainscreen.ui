@@ -540,7 +540,7 @@ QGroupBox {
     <property name="title">
      <string>Data</string>
     </property>
-    <widget class="QMenu" name="menuCopy">
+    <widget class="QMenu" name="CopyMenu">
      <property name="title">
       <string>Copy</string>
      </property>
@@ -549,7 +549,7 @@ QGroupBox {
      <addaction name="CopyDeriveMenu"/>
      <addaction name="CopyBkgrMenu"/>
     </widget>
-    <addaction name="menuCopy"/>
+    <addaction name="CopyMenu"/>
     <addaction name="separator"/>
     <addaction name="BackgroundMenu"/>
     <addaction name="CutMenu"/>
