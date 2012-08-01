@@ -109,12 +109,16 @@ void GraphImage::Redraw()
 	double xx0, yy0, y00, xx1, yy1, y11, h,ox0,oy0;
 	int ix0, iy0, ix1, iy1;
 
-	ImageHeight=height();
-	ImageWidth=width();
-	GTop=0;
-	GBottom=ImageHeight-2*FontHeight;
-	GLeft=5*FontWidth+FontHeight;
-	GRight=ImageWidth;
+	if (ImageHeight!=height() || ImageWidth!=width())
+	{
+		ImageHeight=height();
+		ImageWidth=width();
+		GTop=0;
+		GBottom=ImageHeight-2*FontHeight;
+		GLeft=5*FontWidth+FontHeight;
+		GRight=ImageWidth;
+		ScaleDisplay();
+	}
 
 	//***** clear axis *****
 	QPainter PCanvas(this);
@@ -1090,26 +1094,3 @@ bool GraphImage::GetMousePos(int X, int Y,double *XPos,double *YPos)
 	if (YPos) *YPos=((double)Y-by)/ay;
 	return(true);
 }
-
-/*=============================================================================*/
-/*!
-  Resize the graphics.
-
-  \date 2005-01-17
- */
-/*=============================================================================*/
-void GraphImage::ResizeGraph()
-{
-	ImageHeight=height();
-	ImageWidth=width();
-
-	//***** calculate the size of the image *****
-	GTop=0;
-	GBottom=ImageHeight-2*FontHeight;
-	GLeft=5*FontWidth+FontHeight;
-	GRight=ImageWidth;
-	ScaleDisplay();
-	//Unzoom();
-	update();
-}
-

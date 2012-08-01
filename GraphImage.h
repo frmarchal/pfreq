@@ -72,7 +72,6 @@ public:
 	void DeleteAllCurves();
     void DeleteCurve(int Curve);
     bool GetMousePos(int X, int Y,double *XPos,double *YPos);
-	void ResizeGraph();
 };
 
 #endif //GRAPHIMAGE_HEADER
