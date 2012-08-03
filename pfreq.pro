@@ -43,4 +43,4 @@ FORMS    += mainscreen.ui \
     seloutfile.ui \
     xrange.ui
 
-
+RC_FILE = mafico.rc
