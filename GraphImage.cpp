@@ -48,8 +48,8 @@ GraphImage::GraphImage(QWidget *Parent) :
 	ZoomEnabled=false;
 
 	//***** get informations about the parent image *****
-	ImageHeight=height();
-	ImageWidth=width();
+	ImageHeight=0;
+	ImageWidth=0;
 
 	//***** get default colors *****
 	CText=QColor(0x00,0x00,0x00);
@@ -65,14 +65,12 @@ GraphImage::GraphImage(QWidget *Parent) :
 	FontHeight = tm.height();
 	FontWidth = tm.maxWidth();
 
-	//***** calculate the size of the image *****
-	GTop=0;
-	GBottom=ImageHeight-2*FontHeight;
-	GLeft=5*FontWidth+FontHeight;
-	GRight=ImageWidth;
-
 	//***** set default view region *****
 	SetZoom(0.,10.,0.,10.);
+	PlotXMin=0.;
+	PlotXMax=10.;
+	PlotYMin=0.;
+	PlotYMax=10.;
 	DispXMin=0.;
 	DispXMax=0.;
 	DispYMin=0.;
@@ -109,19 +107,20 @@ void GraphImage::Redraw()
 	double xx0, yy0, y00, xx1, yy1, y11, h,ox0,oy0;
 	int ix0, iy0, ix1, iy1;
 
+	QPainter PCanvas(this);
+
 	if (ImageHeight!=height() || ImageWidth!=width())
 	{
 		ImageHeight=height();
 		ImageWidth=width();
 		GTop=0;
 		GBottom=ImageHeight-2*FontHeight;
-		GLeft=5*FontWidth+FontHeight;
 		GRight=ImageWidth;
+		ComputeGLeft(PCanvas,PlotYMin,PlotYMax);
 		ScaleDisplay();
 	}
 
-	//***** clear axis *****
-	QPainter PCanvas(this);
+	// draw graph area
 	QPen Pen;
 	Pen.setStyle(Qt::SolidLine);
 	Pen.setColor(CTextBg);
@@ -133,11 +132,11 @@ void GraphImage::Redraw()
 	//PCanvas.drawRect(GLeft,GTop,GRight-GLeft,GBottom-GTop);
 	PCanvas.fillRect(GLeft, GTop, GRight-GLeft, GBottom-GTop,CDataBg);
 
-	//***** dessiner axes *****
+	// plot axis
 	SetXTicks(PCanvas,PlotXMin,PlotXMax);
 	SetYTicks(PCanvas,PlotYMin,PlotYMax);
 
-	//***** draw curve *****
+	// draw curves
 	for (j=0 ; j<MAX_CURVES ; j++)
 	{
 		if (!XData[j] || !YData[j]) continue;
@@ -333,33 +332,78 @@ void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 	PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignBottom,XName);
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: SetYTicks
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Set the Ticks on the Y axis.
-//
-//
-//
-// Usage: void ImageGraph::SetYTicks(double ea,double eb)
-//
-//
-// Returns:
-//
-// Remarks:
-//
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 11/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Set the Ticks on the Y axis.
+
+  \date 2001-11-11
+ */
+/*=============================================================================*/
+void GraphImage::ComputeGLeft(QPainter &PCanvas,double min,double max)
+{
+	double ex, fen, del=0., i, y10,c,start;
+	double y, yoffset, iy,Bottom=0.;
+	QString val;
+	QRect Size,Size1;
+	int wmax=0;
+
+	fen = max - min;
+	if (fen==0.)
+	{
+		min=0.;
+		max=10.;
+		fen=10.;
+	}
+
+	if (fen<0.)
+	{
+		i=max;
+		max=min;
+		min=i;
+		yoffset = (double)GTop;
+	}
+	else
+	{
+		yoffset = (double)GBottom;
+	}
+
+	ex = (double)(GBottom-GTop)/fen;
+	c=log10(fabs(fen)/3.);
+	y=floor(c);
+	y10=pow(10.,y);
+	if (c-y<2.) del=5.*y10;
+	if (c-y<.8) del=4.*y10;
+	if (c-y<.6) del=2.*y10;
+	if (c-y<.3) del=1.*y10;
+	start=ceil(min/y10)*y10;
+	//y--;
+	y10=pow(10.,y);
+
+	PCanvas.setBrush(CTextBg);
+	for (i = start ; i <= max ; i += del)
+	{
+		iy = yoffset-((i - min) * ex);
+		if (iy>GTop+3+3*FontHeight/2)
+		{
+			val.sprintf("%5ld",(long int)((i-Bottom) / y10));
+			Size=PCanvas.boundingRect(QRect(0,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+			if (wmax<Size.width()) wmax=Size.width();
+		}
+	}
+
+	val.sprintf("%+02d",(int)y);
+	Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
+	Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
+	GLeft=Size.width()+Size1.width()+wmax;
+}
+
+/*=============================================================================*/
+/*!
+  Set the Ticks on the Y axis.
+
+  \date 2001-11-11
+ */
+/*=============================================================================*/
 void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 {
 	double ex, fen, del=0., i, y10,c,start;
@@ -370,7 +414,7 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	//if (min<0.) min=0.;
 	//if (max<0.) max=10.;
 
-	//***** calculer echelle *****
+	// compute scale
 	fen = max - min;
 	if (fen==0.)
 	{
@@ -407,36 +451,30 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	start=ceil(min/y10)*y10;
 	//y--;
 	y10=pow(10.,y);
-	/*if ((max/y10)>1. && log10(fabs(floor(max/y10)))>5.)
-	{
-	Bottom=start;
-	SetTextAlign(DC,TA_LEFT|TA_TOP);
-	sprintf(val,"Bottom at:%g",Bottom);
-	PrintText(DC,0,scr_b,val,900);
-	}*/
 
-	//***** afficher echelle *****
+	// display scale
 	PCanvas.setBrush(CTextBg);
-	//SetTextAlign(DC,TA_RIGHT|TA_BASELINE);
 	for (i = start ; i <= max ; i += del)
 	{
 		iy = yoffset-((i - min) * ex);
 		PCanvas.setPen(CFrame);
 		PCanvas.drawLine((int)xoffset+1,(int)iy,(int)xoffset+GRAD,(int)iy);
 		PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
-		val.sprintf("%5ld",(long int)((i-Bottom) / y10));
-		PCanvas.setPen(CText);
-		Size=PCanvas.boundingRect(QRect(xoffset,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
-		if (iy>GTop+3+3*FontHeight/2) PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
+		if (iy>GTop+3+3*FontHeight/2)
+		{
+			val.sprintf("%5ld",(long int)((i-Bottom) / y10));
+			PCanvas.setPen(CText);
+			Size=PCanvas.boundingRect(QRect(xoffset,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+			PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
+		}
 	}
 
-	//***** afficher facteur d'échelle *****
-	/*SetTextAlign(DC,TA_LEFT|TA_TOP);
-	PrintText(DC,0,scr_t+3+FontHeight/2,"x10",0);*/
+	// display scaling factor
 	val.sprintf("%+02d",(int)y);
 	Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
 	Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
 	Size.translate(0,Size1.height()/2);
+	PCanvas.setPen(CText);
 	PCanvas.drawText(Size,Qt::AlignLeft | Qt::AlignTop,"x10");
 	PCanvas.drawText(Size1,Qt::AlignLeft | Qt::AlignTop,val);
 
