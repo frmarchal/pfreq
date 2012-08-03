@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>750</width>
-    <height>681</height>
+    <width>821</width>
+    <height>695</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,7 @@
   <property name="styleSheet">
    <string notr="true">QLineEdit {
 	font-size:8pt;
+	width:6em;
 }
 QLabel {
 	font-size:8pt;
@@ -28,6 +29,16 @@ QTextEdit {
 }
 QGroupBox {
 	font-size:8pt;
+}
+QFrame {
+	border:none;
+}
+#ProgVersionLabel {
+	color:#808080;
+}
+#Memo1 {
+	border:2px solid;
+	border-color: #404040 #D4D0C8 #D4D0C8 #404040
 }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -47,19 +58,9 @@ QGroupBox {
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="spacing">
-        <number>4</number>
-       </property>
        <property name="margin">
-        <number>4</number>
+        <number>0</number>
        </property>
-       <item>
-        <widget class="QLabel" name="ProgVersionLabel">
-         <property name="text">
-          <string>PFreq v%d.%02d</string>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
@@ -222,10 +223,19 @@ QGroupBox {
             </property>
             <layout class="QVBoxLayout" name="verticalLayout">
              <property name="spacing">
-              <number>-1</number>
+              <number>0</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
               <number>4</number>
+             </property>
+             <property name="topMargin">
+              <number>1</number>
+             </property>
+             <property name="rightMargin">
+              <number>4</number>
+             </property>
+             <property name="bottomMargin">
+              <number>1</number>
              </property>
              <item>
               <widget class="QRadioButton" name="TrackData">
@@ -320,7 +330,7 @@ QGroupBox {
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="spacing">
-           <number>4</number>
+           <number>0</number>
           </property>
           <property name="margin">
            <number>4</number>
@@ -424,7 +434,11 @@ QGroupBox {
               </widget>
              </item>
              <item row="2" column="1">
-              <widget class="QLineEdit" name="DervMaxCtrl"/>
+              <widget class="QLineEdit" name="DervMaxCtrl">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -451,6 +465,13 @@ QGroupBox {
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="ProgVersionLabel">
+         <property name="text">
+          <string>PFreq v%d.%02d</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -469,6 +490,12 @@ QGroupBox {
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0,1">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="GraphImage" name="MainGraphCtrl" native="true">
          <property name="minimumSize">
@@ -525,7 +552,7 @@ QGroupBox {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>750</width>
+     <width>821</width>
      <height>25</height>
     </rect>
    </property>

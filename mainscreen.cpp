@@ -282,7 +282,6 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 #define NSTORED_LINES 25
 	char Delim;
 	QString Item;
-	QString ColMark;
 	char *StoredColumns[NSTORED_LINES][MAX_COLUMN];
 	double Value;
 	int i,XColumn,YColumn;
@@ -295,17 +294,15 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 	int ValidColumns=0;
 	bool InData=false;
 	int NStoredLines=0;
-	int NonSpaces;
+	bool NonSpaces;
 	bool SelectingColumns=false;
 	for (unsigned int NRead=0 ; NRead<FSize ; NRead++)
 	{
-		//while (NRead<FSize && Buffer[NRead]<=' ') NRead++;
-		//if (NRead>=FSize) break;
 		Ptr=Buffer+NRead;
 		if (NStoredLines<NSTORED_LINES) StoredColumns[NStoredLines][Column]=Ptr;
-		NonSpaces=0;
-		for ( ; NRead<FSize && (Buffer[NRead]>' ' || (Buffer[NRead]==' ' && !NonSpaces)) ; NRead++)
-			if (Buffer[NRead]!=' ') NonSpaces=1;
+		NonSpaces=false;
+		for ( ; NRead<FSize && ((unsigned char)Buffer[NRead]>' ' || (Buffer[NRead]==' ' && !NonSpaces)) ; NRead++)
+			if (Buffer[NRead]!=' ') NonSpaces=true;
 		if (NRead>=FSize) break;
 		Delim=Buffer[NRead];
 		Buffer[NRead]='\0';
@@ -787,7 +784,7 @@ void MainScreen::RecalculateGraphics()
 	else
 		Text.clear();
 	ui->SmoothMaxCtrl->setText(Text);
-	AddMemoLine("Smooth:"+QString::number(t0.elapsed()));
+	AddMemoLine("Smooth:"+QString::number(t0.elapsed())+"\n");
 
 	//***** redraw derivative curve *****
 	if (YDerv)
@@ -846,7 +843,7 @@ void MainScreen::RecalculateGraphics()
 	else
 		Text.clear();
 	ui->DervMaxCtrl->setText(Text);
-	AddMemoLine("Derivative:"+QString::number(t0.elapsed()));
+	AddMemoLine("Derivative:"+QString::number(t0.elapsed())+"\n");
 }
 
 /*==========================================================================*/
