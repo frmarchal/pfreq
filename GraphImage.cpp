@@ -6,33 +6,17 @@
 #define MIN_ZOOM_AREA 5  //minimum size of the zoom area in pixels
 #define MIN_ZOOM_FACTOR 1E-10  //zoom area must be bigger than MIN_ZOOM_FACTOR*(Full axis range of unzoomed data)
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: ImageGraph
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Create a new graphic using the specified image.
-//
-// Usage: ImageGraph::ImageGraph(void *ParentClass,TImage * Parent)
-//
-//    -@- void *ParentClass: Pointer to the parent class that can be passed
-//              to the functions invoked when the user click on the graphic.
-//    -@- TImage *Parent: Image control where we must draw the graphic.
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 6/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Create a new graphic using the specified image.
+
+  \param ParentClass Pointer to the parent class that can be passed
+         to the functions invoked when the user click on the graphic.
+  \param Parent Image control where we must draw the graphic.
+
+  \date 2001-11-06
+ */
+/*=============================================================================*/
 GraphImage::GraphImage(QWidget *Parent) :
 	QWidget(Parent),
 	Selection(NULL)
@@ -245,33 +229,13 @@ void GraphImage::Redraw()
 
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: SetXTicks
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Set the Ticks on the X axis.
-//
-//
-//
-// Usage: void ImageGraph::SetXTicks(double ea,double eb)
-//
-//
-// Returns:
-//
-// Remarks:
-//
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 11/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Set the Ticks on the X axis.
+
+  \date 2001-11-11
+ */
+/*=============================================================================*/
 void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 {
 	double ex, fen, del=0., i,c,start,y10;
@@ -488,132 +452,13 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	return;
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: join
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Draw a line between two points.
-//
-//
-//
-// Usage: int ImageGraph::join(double x0, double y0, double x1, double y1)
-//
-//
-// Returns:
-//
-// Remarks:
-//
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 14/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
-/*int GraphImage::join(double x0, double y0, double x1, double y1)
-{
-	double xx0, yy0, y00, xx1, yy1, y11, h;
-	int ix0, iy0, ix1, iy1;
+/*=============================================================================*/
+/*!
+  Convert a point coordinate in a screen position.
 
-	if (x0<=PlotXMin || x1<=PlotXMin || x0>=PlotXMax || x1>=PlotXMax ||
-			y0<=PlotYMin || y1<=PlotYMin || y0>=PlotYMax || y1>=PlotYMax)
-	{
-		if ((y0<=PlotYMin) && (y1<=PlotYMin)) return(-1);
-		if ((x0>=PlotXMax) && (x1>=PlotXMax)) return(-2);
-		if ((y0>=PlotYMax) && (y1>=PlotYMax)) return(-3);
-		if ((x0<=PlotXMin) && (x1<=PlotXMin)) return(-4);
-		if (x0 != x1)
-		{
-			if (x0>PlotXMax) xx0=PlotXMax;
-			else if (x0<PlotXMin) xx0=PlotXMin;
-			else xx0=x0;
-			if (x1>PlotXMax) xx1=PlotXMax;
-			else if (x1<PlotXMin) xx1=PlotXMin;
-			else xx1=x1;
-			h = (y1 - y0)/(x1 - x0);
-			y00 = y0 + h*(xx0 - x0);
-			y11 = y1 + h*(xx1 - x1);
-			if (y00 != y11)
-			{
-				if (y00>PlotYMax) yy0=PlotYMax;
-				else if (y00<PlotYMin) yy0=PlotYMin;
-				else yy0=y00;
-				if (y11>PlotYMax) yy1=PlotYMax;
-				else if (y11<PlotYMin) yy1=PlotYMin;
-				else yy1=y11;
-				xx0 = x0 + (yy0 - y0)/h;
-				xx1 = x1 + (yy1 - y1)/h;
-			}
-			else
-			{
-				yy0 = y00;
-				yy1 = y11;
-			}
-		}
-		else
-		{
-			xx0 = xx1 = x0;
-			if (y0>PlotYMax) yy0=PlotYMax;
-			else if (y0<PlotYMin) yy0=PlotYMin;
-			else yy0=y0;
-			if (y1>PlotYMax) yy1=PlotYMax;
-			else if (y1<PlotYMin) yy1=PlotYMin;
-			else yy1=y1;
-		}
-	}
-	else
-	{
-		xx0=x0;
-		yy0=y0;
-		xx1=x1;
-		yy1=y1;
-	}
-
-	wts(xx0, yy0, &ix0, &iy0);
-	if (ix0>GRight) ix0=GRight;
-	else if (ix0<GLeft) ix0=GLeft;
-	if (iy0>GBottom) iy0=GBottom;
-	else if (iy0<GTop) iy0=GTop;
-	wts(xx1, yy1, &ix1, &iy1);
-	if (ix1>GRight) ix1=GRight;
-	else if (ix1<GLeft) ix1=GLeft;
-	if (iy1>GBottom) iy1=GBottom;
-	else if (iy1<GTop) iy1=GTop;
-	if (ix0!=ix1 || iy0!=iy1)
-	{
-		PCanvas.drawLine(ix0,iy0,ix1,iy1);
-	}
-	return(1);
-}*/
-
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: wts
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Convert a point coordinate in a screen position.
-//
-// Usage: void __fastcall ImageGraph::wts(double x, double y, int * ix, int* iy)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 21/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+  \date 2001-11-21
+ */
+/*=============================================================================*/
 void GraphImage::wts(double x, double y, int * ix, int* iy)
 {
 	double x1,y1;
@@ -688,29 +533,13 @@ void GraphImage::SetZoom(double XMin, double XMax, double YMin, double YMax)
 	ScaleDisplay();
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: SetGraphic
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Set a new curve to the graphic but do not redraw.
-//
-// Usage: void ImageGraph::SetGraphic(int Graphic,double *XPoints, double *YPoints,int NPoints)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 21/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Set a new curve to the graphic but do not redraw.
+
+  \date 2001-11-21
+ */
+/*=============================================================================*/
 void GraphImage::SetGraphic(int Graphic,double *XPoints, double *YPoints,int NPts)
 {
 	//***** init variables *****
@@ -720,29 +549,13 @@ void GraphImage::SetGraphic(int Graphic,double *XPoints, double *YPoints,int NPt
 	YData[Graphic]=YPoints;
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: Unzoom
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Unzoom the graphic.
-//
-// Usage: void ImageGraph::Unzoom(void)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 21/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Unzoom the graphic.
+
+  \date 2001-11-21
+ */
+/*=============================================================================*/
 void GraphImage::Unzoom()
 {
 	int i,j;
@@ -810,29 +623,13 @@ void GraphImage::Unzoom()
 	}
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: DeleteAllCurves
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Delete all curves on the graphic.
-//
-// Usage: void ImageGraph::DeleteAllCurves(void)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 21/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Delete all curves on the graphic.
+
+  \date 2001-11-21
+ */
+/*=============================================================================*/
 void GraphImage::DeleteAllCurves()
 {
 	int i;
@@ -853,30 +650,13 @@ void GraphImage::DeleteAllCurves()
 	update();
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: MouseDown
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Function called each time a mouse button is pressed.
-//
-// Usage: void __fastcall ImageGraph::MouseDown(TObject *Sender, TMouseButton Button,
-//                        TShiftState Shift, int X, int Y)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 22/11/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Function called each time a mouse button is pressed.
+
+  \date 2001-11-22
+ */
+/*=============================================================================*/
 void GraphImage::mousePressEvent(QMouseEvent *event)
 {
 	double x,y;
@@ -987,30 +767,13 @@ void GraphImage::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: MouseUp
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Function called each time a mouse button is released.
-//
-// Usage: void __fastcall ImageGraph::MouseUp(TObject *Sender, TMouseButton Button,
-//                        TShiftState Shift, int X, int Y)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 31/12/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Function called each time a mouse button is released.
+
+  \date 2001-12-31
+ */
+/*=============================================================================*/
 void GraphImage::mouseReleaseEvent(QMouseEvent *event)
 {
 	int x0,y0,x1,y1;
@@ -1078,29 +841,13 @@ void GraphImage::mouseReleaseEvent(QMouseEvent *event)
    }*/
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: DeleteCurve
-//
-// Type: Function
-//
-// Applies To: ImageGraph
-//
-// Description: Delete one curve of the graphic.
-//
-// Usage: void ImageGraph::DeleteCurve(int Curve)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 1/12/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Delete one curve of the graphic.
+
+  \date 2001-12-01
+ */
+/*=============================================================================*/
 void GraphImage::DeleteCurve(int Curve)
 {
 	if (Curve<0 || Curve>=MAX_CURVES) return;

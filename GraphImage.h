@@ -44,7 +44,6 @@ private:
 	void ComputeGLeft(QPainter &PCanvas,double min,double max);
 	void SetXTicks(QPainter &PCanvas,double min,double max);
 	void SetYTicks(QPainter &PCanvas,double min,double max);
-	//int join(double x0, double y0, double x1, double y1);
 	void wts(double x, double y, int * ix, int* iy);
 	void ScaleDisplay();
 
