@@ -287,7 +287,6 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 	int i,XColumn,YColumn;
 
 	int Line=1;
-	char *Ptr=Buffer;
 	int NAllocated=0;
 	int NColumn=0;
 	int Column=0;
@@ -296,107 +295,117 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 	int NStoredLines=0;
 	bool NonSpaces;
 	bool SelectingColumns=false;
-	for (unsigned int NRead=0 ; NRead<FSize ; NRead++)
+	unsigned int NRead=0;
+	while (NRead<FSize)
 	{
-		Ptr=Buffer+NRead;
-		if (NStoredLines<NSTORED_LINES) StoredColumns[NStoredLines][Column]=Ptr;
-		NonSpaces=false;
-		for ( ; NRead<FSize && ((unsigned char)Buffer[NRead]>' ' || (Buffer[NRead]==' ' && !NonSpaces)) ; NRead++)
-			if (Buffer[NRead]!=' ') NonSpaces=true;
-		if (NRead>=FSize) break;
-		Delim=Buffer[NRead];
-		Buffer[NRead]='\0';
-		if (*Ptr) ValidColumns+=StrToDouble(Ptr,&Value) ? 1 : 0;
-		Column++;
-		if (Column>=MAX_COLUMN)
+		while (NRead<FSize && (Buffer[NRead]=='\r' || Buffer[NRead]=='\n')) NRead++;
+		if (Buffer[NRead]=='%' || Buffer[NRead]==';') //comment till end of line
 		{
-			WriteMsg(__FILE__,__LINE__,"Too many columns in file. Reading aborted.");
-			break;
+			while (NRead<FSize && Buffer[NRead]!='\r' && Buffer[NRead]!='\n') NRead++;
+			continue;
 		}
-		if (Delim=='\r' || Delim=='\n')
+		Delim='\0';
+		Column=0;
+		ValidColumns=0;
+		while (NRead<FSize && Delim!='\r' && Delim!='\n')
 		{
-			if (!NColumn)
+			char *Number=Buffer+NRead;
+			if (NStoredLines<NSTORED_LINES) StoredColumns[NStoredLines][Column]=Number;
+			NonSpaces=false;
+			for ( ; NRead<FSize && ((unsigned char)Buffer[NRead]>' ' || (Buffer[NRead]==' ' && !NonSpaces)) ; NRead++)
+				if (Buffer[NRead]!=' ') NonSpaces=true;
+			if (NRead>=FSize) break;
+			Delim=Buffer[NRead];
+			Buffer[NRead++]='\0';
+			if (*Number) ValidColumns+=StrToDouble(Number,&Value) ? 1 : 0;
+			Column++;
+			if (Column>=MAX_COLUMN)
 			{
-				if (ValidColumns>0 || Line>1)
+				WriteMsg(__FILE__,__LINE__,tr("Too many columns in file. Reading aborted."));
+				return(false);
+			}
+		}
+		if (!NColumn)
+		{
+			if (ValidColumns>0 || Line>1)
+			{
+				NColumn=Column;
+				if (!GetColumns(NColumn,XColumn,YColumn) || YColumn<0)
 				{
-					NColumn=Column;
-					if (!GetColumns(NColumn,XColumn,YColumn) || YColumn<0)
+					if (NColumn==1)
 					{
-						if (NColumn==1)
-						{
-							ConfigFile->Config_WriteString("Columns",Item,"-1,0");
-							XColumn=-1;
-							YColumn=0;
-						}
-						else if (NColumn==2)
-						{
-							ConfigFile->Config_WriteString("Columns",Item,"0,1");
-							XColumn=0;
-							YColumn=1;
-						}
-						else
-						{
-							SelectingColumns=true;
-						}
+						ConfigFile->Config_WriteString("Columns",Item,"-1,0");
+						XColumn=-1;
+						YColumn=0;
 					}
-					if (XColumn>=NColumn)
+					else if (NColumn==2)
 					{
-						WriteMsg(__FILE__,__LINE__,QString("Invalid X column for a file containing %1 columns").arg(NColumn));
-						break;
+						ConfigFile->Config_WriteString("Columns",Item,"0,1");
+						XColumn=0;
+						YColumn=1;
 					}
-					if (YColumn>=NColumn)
+					else
 					{
-						WriteMsg(__FILE__,__LINE__,QString("Invalid Y column for a file containing %1 columns").arg(NColumn));
-						break;
+						SelectingColumns=true;
 					}
 				}
-				else
+				if (XColumn>=NColumn)
 				{
-					SelectingColumns=true;
+					WriteMsg(__FILE__,__LINE__,tr("Invalid X column for a file containing %1 columns").arg(NColumn));
+					return(false);
+				}
+				if (YColumn>=NColumn)
+				{
+					WriteMsg(__FILE__,__LINE__,tr("Invalid Y column for a file containing %1 columns").arg(NColumn));
+					return(false);
 				}
 			}
 			else
 			{
-				if (NColumn!=Column)
-				{
-					if (ValidColumns>0) WriteMsg(__FILE__,__LINE__,QString("Inconsistant number of columns in the file at line %1").arg(Line));
-					break;
-				}
+				SelectingColumns=true;
 			}
-
-			if (SelectingColumns)
-			{
-				int Result;
-
-				if ((ValidColumns>0 || Line>1) && ++NStoredLines>=NSTORED_LINES)
-				{
-					SelectColumn ColSel(this);
-					ColSel.PrepareList(NColumn);
-					for (i=0 ; i<NStoredLines ; i++)
-						ColSel.AddLine(StoredColumns[i],NColumn);
-
-					Result=ColSel.exec();
-					if (Result==QDialog::Accepted)
-						ColSel.GetColumn(XColumn,YColumn);
-					if (Result!=QDialog::Accepted) break;
-					SelectingColumns=false;
-					for (i=0 ; i<NStoredLines ; i++)
-					{
-						if (!AddDataPoint(StoredColumns[i],&XData,&YData,NPoints,NAllocated,InData,XColumn,YColumn,i)) break;
-					}
-					if (i<NStoredLines) break;
-					NStoredLines=0;
-				}
-			}
-			else
-			{
-				if (!AddDataPoint(StoredColumns[0],&XData,&YData,NPoints,NAllocated,InData,XColumn,YColumn,Line)) break;
-			}
-			Column=0;
-			ValidColumns=0;
-			if (Delim=='\r' && Buffer[NRead+1]=='\n') NRead++;
-			Line++;
 		}
+		else
+		{
+			if (NColumn!=Column)
+			{
+				if (ValidColumns>0) WriteMsg(__FILE__,__LINE__,tr("Inconsistant number of columns in the file at line %1").arg(Line));
+				return(false);
+			}
+		}
+
+		if (SelectingColumns)
+		{
+			int Result;
+
+			if ((ValidColumns>0 || Line>1) && ++NStoredLines>=NSTORED_LINES)
+			{
+				SelectColumn ColSel(this);
+				ColSel.PrepareList(NColumn);
+				for (i=0 ; i<NStoredLines ; i++)
+					ColSel.AddLine(StoredColumns[i],NColumn);
+
+				Result=ColSel.exec();
+				if (Result==QDialog::Accepted)
+					ColSel.GetColumn(XColumn,YColumn);
+				if (Result!=QDialog::Accepted) break;
+				SelectingColumns=false;
+				for (i=0 ; i<NStoredLines ; i++)
+				{
+					if (!AddDataPoint(StoredColumns[i],&XData,&YData,NPoints,NAllocated,InData,XColumn,YColumn,i))
+						return(false);
+				}
+				if (i<NStoredLines)
+					return(false);
+				NStoredLines=0;
+			}
+		}
+		else
+		{
+			if (!AddDataPoint(StoredColumns[0],&XData,&YData,NPoints,NAllocated,InData,XColumn,YColumn,Line))
+				return(false);
+		}
+		Line++;
 	}
 	return(true);
 }
@@ -479,21 +488,21 @@ void MainScreen::on_LoadMenu_triggered()
 		QFile hFile(FileName);
 		if (!hFile.open(QIODevice::ReadOnly))
 		{
-			WriteMsg(__FILE__,__LINE__,QString("Cannot open %1").arg(FileName));
+			WriteMsg(__FILE__,__LINE__,tr("Cannot open %1").arg(FileName));
 			return;
 		}
 		FSize=hFile.size();
 		if (FSize==0)
 		{
 			hFile.close();
-			WriteMsg(__FILE__,__LINE__,"File is empty");
+			WriteMsg(__FILE__,__LINE__,tr("File is empty"));
 			return;
 		}
 		Buffer=(char *)malloc(FSize);
 		if (!Buffer)
 		{
 			hFile.close();
-			WriteMsg(__FILE__,__LINE__,"Not enough memory to load the file");
+			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
 			return;
 		}
 		NRead=hFile.read(Buffer,FSize);
@@ -501,7 +510,7 @@ void MainScreen::on_LoadMenu_triggered()
 		{
 			free(Buffer);
 			hFile.close();
-			WriteMsg(__FILE__,__LINE__,"Cannot read file");
+			WriteMsg(__FILE__,__LINE__,tr("Cannot read file"));
 			return;
 		}
 		hFile.close();
@@ -532,7 +541,9 @@ void MainScreen::on_LoadMenu_triggered()
 	int Column=0;
 	int ValidLine=0,ValidColumn=0;
 	int NDots=0,NSigns=0,NExp=0;
-	int MultiSpaces=0;
+	bool MultiSpaces=false;
+	bool LineBegin=true;
+	bool CommentedLine=false;
 	for (unsigned int i=0 ; i<FSize ; i++ , Ptr++)
 	{
 		if (*Ptr=='\t' || *Ptr=='\r' || *Ptr=='\n' || *Ptr==' ')
@@ -540,11 +551,13 @@ void MainScreen::on_LoadMenu_triggered()
 			if (!MultiSpaces)
 			{
 				if (Column>0) ValidColumn++;
-				if (*Ptr!='\t' || *Ptr==' ')
+				if (*Ptr=='\r' || *Ptr=='\n')
 				{
-					MultiSpaces++;
+					MultiSpaces=true;
 					if (ValidColumn>0) ValidLine++;
 					ValidColumn=0;
+					LineBegin=true;
+					CommentedLine=false;
 				}
 				Column=0;
 				NDots=0;
@@ -553,7 +566,14 @@ void MainScreen::on_LoadMenu_triggered()
 			}
 			continue;
 		}
-		MultiSpaces=0;
+		MultiSpaces=false;
+		if (LineBegin)
+		{
+			if (*Ptr=='%' || *Ptr==';') //comment till end of line
+				CommentedLine=true;
+			LineBegin=false;
+		}
+		if (CommentedLine) continue;
 		if (Column>=0)
 		{
 			if (*Ptr=='.' || *Ptr==',')
@@ -585,12 +605,11 @@ void MainScreen::on_LoadMenu_triggered()
 			else
 				Column=-1;
 		}
-		if (!(isdigit(*Ptr) || *Ptr=='.' || *Ptr==',' || *Ptr=='\r' ||
-			  *Ptr=='\n' || *Ptr=='-' || *Ptr=='+' || toupper(*Ptr)=='E' ||
-			  *Ptr=='/' || *Ptr==':' || *Ptr=='A' || *Ptr=='P' || *Ptr=='M' ||
+		if (!(isdigit(*Ptr) || *Ptr=='.' || *Ptr==',' || *Ptr=='-' || *Ptr=='+' || toupper(*Ptr)=='E' || //number
+			  *Ptr=='/' || *Ptr==':' || *Ptr=='A' || *Ptr=='P' || *Ptr=='M' || //date
 			  *Ptr==' '))
 			NonText++;
-		if ((unsigned char)*Ptr<' ' && *Ptr!='\n' && *Ptr!='\r' && *Ptr!='\t')
+		if ((unsigned char)*Ptr<' ')
 			InvalidText++;
 	}
 	if ((InvalidText || NonText>10) && ValidLine<20)
