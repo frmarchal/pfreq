@@ -843,6 +843,68 @@ void GraphImage::mouseReleaseEvent(QMouseEvent *event)
 
 /*=============================================================================*/
 /*!
+  Allow the wheel to zoom in or out of the graph.
+
+  \date 2012-08-04
+ */
+/*=============================================================================*/
+void GraphImage::wheelEvent(QWheelEvent *event)
+{
+	int X=event->x();
+	int Y=event->y();
+	if (X<GLeft || X>GRight || Y<GTop || Y>GBottom)
+	{
+		event->ignore();
+		return;
+	}
+	double Scale=event->delta()/8.; //wheel rotation in degrees (15=1 wheel step)
+	if (Scale>0.)
+		Scale=Scale/15.*2./3.;
+	else
+		Scale=-Scale/15.*3./2.;
+
+	double ZoomWidth=(PlotXMax-PlotXMin)*Scale;
+	double ZoomHeight=(PlotYMax-PlotYMin)*Scale;
+	if (ZoomWidth>fabs(DispXMax-DispXMin)) ZoomWidth=fabs(DispXMax-DispXMax);
+	if (ZoomHeight>fabs(DispYMax-DispYMin)) ZoomHeight=fabs(DispYMax-DispYMax);
+	double zx=((double)X-bx)/ax;
+	double zy=((double)Y-by)/ay;
+	double zx0=(double)zx-ZoomWidth/2.;
+	double zx1=(double)zx+ZoomWidth/2.;
+	double zy0=(double)zy-ZoomHeight/2.;
+	double zy1=(double)zy+ZoomHeight/2.;
+	if (zx0<DispXMin)
+	{
+		zx0=DispXMin;
+		zx1=zx0+ZoomWidth;
+	}
+	else if (zx1>DispXMax)
+	{
+		zx1=DispXMax;
+		zx0=zx1-ZoomWidth;
+	}
+	if (zy0<DispYMin)
+	{
+		zy0=DispYMin;
+		zy1=zy0+ZoomHeight;
+	}
+	else if (zy1>DispYMax)
+	{
+		zy1=DispYMax;
+		zy0=zy1-ZoomHeight;
+	}
+	if (fabs(zx1-zx0)<MIN_ZOOM_FACTOR*fabs(DispXMax-DispXMin) ||
+			fabs(zy1-zy0)<MIN_ZOOM_FACTOR*fabs(DispYMax-DispYMin))
+	{
+		event->ignore();
+		return;
+	}
+	SetZoom(zx0,zx1,zy0,zy1);
+	update();
+}
+
+/*=============================================================================*/
+/*!
   Delete one curve of the graphic.
 
   \date 2001-12-01
