@@ -46,6 +46,7 @@ private slots:
 	void on_RawSmoothButton_clicked();
 	void on_SavGolButton_clicked();
 	void on_CutMenu_triggered();
+	void on_AboutMenu_triggered();
 
 	void on_XFrequency_editingFinished();
 	void on_XTime0_editingFinished();
@@ -106,7 +107,6 @@ private:
 	void WriteXFreq(double XFreq);
 	void WriteXTime0(double XTime);
 	void SetGraphSize(GraphImage *Control,int Width,int Height);
-	void AddMemoLine(const QString &Text);
 
 public:		// Déclarations de l'utilisateur
 	int NPoints;

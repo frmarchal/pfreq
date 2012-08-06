@@ -15,6 +15,7 @@
 #include "selectcolumn.h"
 #include "xrange.h"
 #include "config.h"
+#include "about.h"
 
 #define PROG_VERSION 2
 #define PROG_REVISION 0
@@ -59,9 +60,6 @@ MainScreen::MainScreen(QWidget *parent) :
 	YDerv=NULL;
 	LastTrackSrc=true;
 	ExitProgram=false;
-
-	Text.sprintf("PFreq v%d.%02d",PROG_VERSION,PROG_REVISION);
-	ui->ProgVersionLabel->setText(Text);
 
 	DefaultFileName=ConfigFile->Config_GetFileName("Input","FileName","*");
 
@@ -113,6 +111,12 @@ MainScreen::MainScreen(QWidget *parent) :
 	ui->SavGolNeighCtrl->setText(Text);
 	LastSGPoly=-1.;
 	LastSGNeigh=-1;
+
+	ui->ViewPanelsMenu->addAction(ui->XAxisDock->toggleViewAction());
+	ui->ViewPanelsMenu->addAction(ui->YAxisDock->toggleViewAction());
+	ui->ViewPanelsMenu->addAction(ui->TrackDock->toggleViewAction());
+	ui->ViewPanelsMenu->addAction(ui->SmoothDock->toggleViewAction());
+	ui->ViewPanelsMenu->addAction(ui->DeriveDock->toggleViewAction());
 
 	//Top=0;
 	//Left=0;
@@ -710,20 +714,6 @@ void MainScreen::on_LoadMenu_triggered()
 
 /*==========================================================================*/
 /*!
-  Add a string to the memo.
-
-  \param Text The text to add.
- */
-/*==========================================================================*/
-void MainScreen::AddMemoLine(const QString &Text)
-{
-	QTextCursor Cursor=ui->Memo1->textCursor();
-	Cursor.insertText(Text);
-	ui->Memo1->setTextCursor(Cursor);
-}
-
-/*==========================================================================*/
-/*!
   Recalculate the graphic with the data in memory.
 
   \date
@@ -733,16 +723,11 @@ void MainScreen::AddMemoLine(const QString &Text)
 void MainScreen::RecalculateGraphics()
 {
 	int i;
-	QElapsedTimer t0;
 	double NextX,Slope,x,SMax;
 	double Offset,Bkgr;
 	QString Text;
 
 	if (!YData || NPoints<=0) return;
-	t0.start();
-	QTextDocument *Doc=ui->Memo1->document();
-	Doc->clear();
-	AddMemoLine("Clear:"+QString::number(t0.elapsed())+"\n");
 
 	if (XData)
 	{
@@ -773,7 +758,6 @@ void MainScreen::RecalculateGraphics()
 	}
 	else
 		ui->MainGraphCtrl->DeleteCurve(2);
-	AddMemoLine("Data:"+QString::number(t0.elapsed())+"\n");
 
 	//***** redraw smoothed curve *****
 	QLineEdit *SmoothMaxCtrl=NULL;
@@ -841,7 +825,6 @@ void MainScreen::RecalculateGraphics()
 	else
 		Text.clear();
 	if (SmoothMaxCtrl) SmoothMaxCtrl->setText(Text);
-	AddMemoLine("Smooth:"+QString::number(t0.elapsed())+"\n");
 
 	//***** redraw derivative curve *****
 	if (YDerv)
@@ -900,7 +883,6 @@ void MainScreen::RecalculateGraphics()
 	else
 		Text.clear();
 	ui->DervMaxCtrl->setText(Text);
-	AddMemoLine("Derivative:"+QString::number(t0.elapsed())+"\n");
 }
 
 /*==========================================================================*/
@@ -932,7 +914,6 @@ void MainScreen::UpdateGraphics()
 	}
 	ui->TrackSmooth->setEnabled(YSmooth!=NULL);
 	ui->TrackDerv->setEnabled(YDerv!=NULL);
-	AddMemoLine("Total:"+QString::number(t0.elapsed())+"\n");
 }
 
 /*==========================================================================*/
@@ -2059,3 +2040,17 @@ void MainScreen::TrackMouseMove(bool InGraph,double x,double y)
 	}
 }
 
+/*=============================================================================*/
+/*!
+  Display the about window.
+
+  \date 2012-08-06
+ */
+/*=============================================================================*/
+void MainScreen::on_AboutMenu_triggered()
+{
+	About form(this);
+
+	form.Version(PROG_VERSION,PROG_REVISION);
+	form.exec();
+}

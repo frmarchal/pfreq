@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     selectcolumn.cpp \
     background.cpp \
     seloutfile.cpp \
-    xrange.cpp
+    xrange.cpp \
+    about.cpp
 
 HEADERS  += mainscreen.h \
     Savgol.h \
@@ -35,12 +36,14 @@ HEADERS  += mainscreen.h \
     selectcolumn.h \
     background.h \
     seloutfile.h \
-    xrange.h
+    xrange.h \
+    about.h
 
 FORMS    += mainscreen.ui \
     selectcolumn.ui \
     background.ui \
     seloutfile.ui \
-    xrange.ui
+    xrange.ui \
+    about.ui
 
 RC_FILE = mafico.rc
