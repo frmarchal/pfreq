@@ -51,6 +51,9 @@ private slots:
 	void on_XTime0_editingFinished();
 	void on_GaussWidthCtrl_editingFinished();
 	void on_GaussNeighCtrl_editingFinished();
+	void on_SavGolSPolyCtrl_editingFinished();
+	void on_SavGolSNeighCtrl_editingFinished();
+	void on_SmoothTab_currentChanged(int Index);
 	void on_YGainCtrl_editingFinished();
 	void on_YOffsetCtrl_editingFinished();
 	void on_SavGolPolyCtrl_editingFinished();
@@ -79,6 +82,12 @@ private:
 	int GaussNeigh;
 	double LastGWidth;
 	int LastGNeigh;
+	//! The degree of the polynomial for the Savitsky-Golay smoohting.
+	int SavGolSmoothPoly;
+	//! The number of neighbour for the Savitsky-Golay smoothing.
+	int SavGolSmoothNeigh;
+	int LastSGSPoly;
+	int LastSGSNeigh;
 	int SavGolPoly;
 	int SavGolNeigh;
 	double *Derive;

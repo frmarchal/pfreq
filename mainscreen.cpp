@@ -79,6 +79,9 @@ MainScreen::MainScreen(QWidget *parent) :
 	Text.sprintf("%lf",YOffset);
 	ui->YOffsetCtrl->setText(Text);
 
+	int SmoothAlgo=ConfigFile->Config_GetInt("Smoothing","Algorithm",0);
+	ui->SmoothTab->setCurrentIndex(SmoothAlgo);
+
 	GaussWidth=ConfigFile->Config_GetDouble("Gauss","Width",10.);
 	Text.sprintf("%.3lf",GaussWidth);
 	ui->GaussWidthCtrl->setText(Text);
@@ -87,6 +90,15 @@ MainScreen::MainScreen(QWidget *parent) :
 	ui->GaussNeighCtrl->setText(Text);
 	LastGWidth=-1.;
 	LastGNeigh=-1;
+
+	SavGolSmoothPoly=ConfigFile->Config_GetInt("SavGolSmooth","Degree",4);
+	Text.sprintf("%d",SavGolSmoothPoly);
+	ui->SavGolSPolyCtrl->setText(Text);
+	SavGolSmoothNeigh=ConfigFile->Config_GetInt("SavGolSmooth","Neigh",50);
+	Text.sprintf("%d",SavGolSmoothNeigh);
+	ui->SavGolSNeighCtrl->setText(Text);
+	LastSGSPoly=-1.;
+	LastSGSNeigh=-1;
 
 	Selection=ConfigFile->Config_GetInt("Derive","Mode",0);
 	if (Selection==0)
@@ -132,7 +144,12 @@ MainScreen::~MainScreen()
 	ConfigFile->Config_WriteDouble("Axis","YOffset",YOffset);
 
 	ConfigFile->Config_WriteDouble("Gauss","Width",GaussWidth);
-	ConfigFile->Config_WriteDouble("Gauss","Neigh",GaussNeigh);
+	ConfigFile->Config_WriteInt("Gauss","Neigh",GaussNeigh);
+
+	ConfigFile->Config_WriteInt("SavGolSmooth","Degree",SavGolSmoothPoly);
+	ConfigFile->Config_WriteInt("SavGolSmooth","Neigh",SavGolSmoothNeigh);
+
+	ConfigFile->Config_WriteInt("Smoothing","Algorithm",ui->SmoothTab->currentIndex());
 
 	if (ui->RawSmoothButton->isChecked())
 		Selection=0;
@@ -759,11 +776,32 @@ void MainScreen::RecalculateGraphics()
 	AddMemoLine("Data:"+QString::number(t0.elapsed())+"\n");
 
 	//***** redraw smoothed curve *****
-	if (YSmooth && (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh))
+	QLineEdit *SmoothMaxCtrl=NULL;
+	if (YSmooth)
 	{
-		CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
-		LastGWidth=GaussWidth;
-		LastGNeigh=GaussNeigh;
+		if (ui->SmoothTab->currentWidget()==ui->GaussianSmooth && (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh))
+		{
+			CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
+			LastGWidth=GaussWidth;
+			LastGNeigh=GaussNeigh;
+			SmoothMaxCtrl=ui->SmoothMaxCtrl;
+		}
+		if (ui->SmoothTab->currentWidget()==ui->SavGolSmooth && (SavGolSmoothPoly!=LastSGSPoly || SavGolSmoothNeigh!=LastSGSNeigh))
+		{
+			if (!Smooth)
+			{
+				Smooth=(double *)malloc(NPoints*sizeof(double));
+				if (!Smooth)
+				{
+					WriteMsg(__FILE__,__LINE__,tr("Not enough memory to smooth the data"));
+					return;
+				}
+			}
+			SavGolSmooth(YData,Smooth,NPoints,SavGolSmoothPoly,SavGolSmoothNeigh);
+			LastSGSPoly=SavGolSmoothPoly;
+			LastSGSNeigh=SavGolSmoothNeigh;
+			SmoothMaxCtrl=ui->SavGolSMaxCtrl;
+		}
 	}
 	if (YSmooth && Smooth)
 	{
@@ -802,7 +840,7 @@ void MainScreen::RecalculateGraphics()
 	}
 	else
 		Text.clear();
-	ui->SmoothMaxCtrl->setText(Text);
+	if (SmoothMaxCtrl) SmoothMaxCtrl->setText(Text);
 	AddMemoLine("Smooth:"+QString::number(t0.elapsed())+"\n");
 
 	//***** redraw derivative curve *****
@@ -1024,6 +1062,74 @@ void MainScreen::on_GaussNeighCtrl_editingFinished()
 	QString Text;
 	Text.sprintf("%d",GaussNeigh);
 	ui->GaussNeighCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user changed the value of the polynomial for the Savitsky-Golay smoothing.
+
+  \date 2012-08-06
+*/
+/*=============================================================================*/
+void MainScreen::on_SavGolSPolyCtrl_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->SavGolSPolyCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==SavGolSmoothPoly) return;
+	if (Value>0.) SavGolSmoothPoly=Value;
+
+	QString Text;
+	Text.sprintf("%d",SavGolSmoothPoly);
+	ui->SavGolSPolyCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The user edited the number of neighbour to use in the Savitsky-Golay smoothing.
+
+  \date 2012-08-06
+ */
+/*=============================================================================*/
+void MainScreen::on_SavGolSNeighCtrl_editingFinished()
+{
+	int Value;
+	bool Ok=false;
+
+	Value=ui->SavGolSNeighCtrl->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==SavGolSmoothNeigh) return;
+	if (Value>0) SavGolSmoothNeigh=Value;
+
+	QString Text;
+	Text.sprintf("%d",SavGolSmoothNeigh);
+	ui->SavGolSNeighCtrl->setText(Text);
+	UpdateGraphics();
+}
+
+/*=============================================================================*/
+/*!
+  The smoothing algorithm is changed.
+
+  \date 2012-08-06
+ */
+/*=============================================================================*/
+void MainScreen::on_SmoothTab_currentChanged(int Index)
+{
+	if (Index==0)//gaussian
+	{
+		LastGWidth=-1;
+		LastGNeigh=-1;
+	}
+	else if (Index==1)//savitsky-golay
+	{
+		LastSGSPoly=-1;
+		LastSGSNeigh=-1;
+	}
 	UpdateGraphics();
 }
 
