@@ -86,31 +86,31 @@ void BackgroundForm::Configure()
 /*=============================================================================*/
 void BackgroundForm::AddPoint(double x, double y)
 {
-	QString Text;
-	int i,j;
+	int i;
 
 	if (ui->BackgroundMode->currentWidget()==ui->AutomaticSheet) return;
 	if (NPoints>=MAX_BKGRPOINTS) return;
 	AutoDefined=false;  //disable automatic background
 	BackgroundOk=false;
 	for (i=0 ; i<NPoints && x>XData[i] ; i++);
-	if (i<NPoints && fabs(y-YData[i])<1e20*fabs(x-XData[i]))
+	if (i>=NPoints || fabs(y-YData[i])<1e20*fabs(x-XData[i]))
 	{                                   //add the point only if the resoluting slope is not too big
-		for (j=NPoints ; j>i ; j--)         //in the other case, replace the existing point
+		for (int j=NPoints ; j>i ; j--)         //in the other case, replace the existing point
 		{
 			XData[j]=XData[j-1];
 			YData[j]=YData[j-1];
 		}
+		NPoints++;
 	}
 	XData[i]=x;
 	YData[i]=y;
-	NPoints++;
 
-	if (i>=ui->BkgrPointsList->rowCount())
+	if (NPoints>ui->BkgrPointsList->rowCount())
 	{
 		ui->BkgrPointsList->insertRow(i);
 	}
 
+	QString Text;
 	Text.sprintf("%.3lg",x);
 	QTableWidgetItem *XListItem=new QTableWidgetItem(Text);
 	ui->BkgrPointsList->setItem(i,0,XListItem);
