@@ -659,13 +659,9 @@ void GraphImage::DeleteAllCurves()
 /*=============================================================================*/
 void GraphImage::mousePressEvent(QMouseEvent *event)
 {
-	double x,y;
-
 	int X=event->x();
 	int Y=event->y();
 	if (X<GLeft || X>GRight || Y<GTop || Y>GBottom) return;
-	x=((double)X-bx)/ax;
-	y=((double)Y-by)/ay;
 	Qt::MouseButton Button=event->button();
 	if (Button==Qt::LeftButton) emit LeftMouseClick(event);
 	if (Button==Qt::RightButton) emit RightMouseClick(event);

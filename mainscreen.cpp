@@ -1482,12 +1482,17 @@ void MainScreen::SetBgMouseClick(bool Active)
 /*==========================================================================*/
 void MainScreen::BkgrLeftClick(QMouseEvent *event)
 {
-	BgForm->AddPoint(event->x(),event->y());
-	if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
-		ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
-	else
-		ui->MainGraphCtrl->DeleteCurve(2);
-	UpdateGraphics();
+	double x,y;
+
+	if (ui->MainGraphCtrl->GetMousePos(event->x(),event->y(),&x,&y))
+	{
+		BgForm->AddPoint(x,y);
+		if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+			ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+		else
+			ui->MainGraphCtrl->DeleteCurve(2);
+		UpdateGraphics();
+	}
 }
 
 /*==========================================================================*/
@@ -1501,12 +1506,17 @@ void MainScreen::BkgrLeftClick(QMouseEvent *event)
 /*==========================================================================*/
 void MainScreen::BkgrRightClick(QMouseEvent *event)
 {
-	BgForm->RemovePoint(event->x(),event->y());
-	if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
-		ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
-	else
-		ui->MainGraphCtrl->DeleteCurve(2);
-	UpdateGraphics();
+	double x,y;
+
+	if (ui->MainGraphCtrl->GetMousePos(event->x(),event->y(),&x,&y))
+	{
+		BgForm->RemovePoint(x,y);
+		if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+			ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+		else
+			ui->MainGraphCtrl->DeleteCurve(2);
+		UpdateGraphics();
+	}
 }
 
 /*==========================================================================*/
