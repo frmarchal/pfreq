@@ -1,6 +1,7 @@
 #include "GraphImage.h"
 #include <math.h>
 #include <limits.h>
+#include <limits>
 #include <values.h>
 
 #define MIN_ZOOM_AREA 5  //minimum size of the zoom area in pixels
@@ -127,8 +128,8 @@ void GraphImage::Redraw()
 		x=XData[j];
 		y=YData[j];
 		PCanvas.setPen(CData[j]);
-		ox0=MAXDOUBLE;
-		oy0=MAXDOUBLE;
+		ox0=std::numeric_limits<double>::max();
+		oy0=std::numeric_limits<double>::max();
 		ix1=0;
 		iy1=0;
 		NPts=0;

@@ -117,7 +117,7 @@ public:		// Déclarations de l'utilisateur
 	double *XPlot,*YPlot;  //buffer to store the calculated curves
 	double *YSmooth,*YDerv;
 
-	void RecalculateGraphics(void);
+	void RecalculateGraphics();
 
 	void SetBgMouseClick(bool Active);
 	static void TrackMouseMove(void *Parent,bool InGraph,double x,double y);

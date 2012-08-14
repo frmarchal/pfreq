@@ -484,7 +484,6 @@ bool BackgroundForm::CalculateAutoBackground(void)
 	int i,NPts,i0,i1;
 	double sx,sy,sxx,sxy;
 	double a,b,den,*XdData,*YdData,nx;
-	QString Text;
 
 	if (ui->BackgroundMode->currentWidget()==ui->ManualSheet) return(false);
 	if (!AutoDefined) return(false);
