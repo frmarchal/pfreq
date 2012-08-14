@@ -199,7 +199,7 @@ void GraphImage::Redraw()
 			}
 			else
 			{
-				if (NPts>0) PCanvas.drawPolyline(MultiPoint,NPts-1);
+				if (NPts>0) PCanvas.drawPolyline(MultiPoint,NPts);
 				NPts=0;
 				wts(xx0, yy0, &ix0, &iy0);
 				if (ix0>GRight) ix0=GRight;
@@ -219,13 +219,13 @@ void GraphImage::Redraw()
 			{
 				if (NPts>=(int)(sizeof(MultiPoint)/sizeof(MultiPoint[0])))
 				{
-					PCanvas.drawPolyline(MultiPoint,NPts-1);
+					PCanvas.drawPolyline(MultiPoint,NPts);
 					NPts=0;
 				}
 				MultiPoint[NPts++]=QPoint(ix1,iy1);
 			}
 		}
-		if (NPts>0) PCanvas.drawPolyline(MultiPoint,NPts-1);
+		if (NPts>0) PCanvas.drawPolyline(MultiPoint,NPts);
 	}
 
 }
