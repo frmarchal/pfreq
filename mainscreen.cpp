@@ -1439,7 +1439,7 @@ void MainScreen::on_BackgroundMenu_triggered()
 		BgForm=new BackgroundForm(this);
 		BgForm->setModal(false);
 		connect(BgForm,SIGNAL(UpdateGraphics()),this,SLOT(UpdateGraphics()));
-		BgForm->open();
+		BgForm->show();
 	}
 	else if (BgForm->isVisible())
 	{
