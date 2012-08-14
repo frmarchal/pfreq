@@ -121,7 +121,7 @@ QFrame {
      <x>0</x>
      <y>0</y>
      <width>821</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -681,7 +681,7 @@ QFrame {
   </widget>
   <action name="LoadMenu">
    <property name="text">
-    <string>Load</string>
+    <string>Load...</string>
    </property>
    <property name="shortcut">
     <string>F2</string>
@@ -689,7 +689,7 @@ QFrame {
   </action>
   <action name="SaveDataMenu">
    <property name="text">
-    <string>Data</string>
+    <string>Data as...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -738,7 +738,7 @@ QFrame {
   </action>
   <action name="BackgroundMenu">
    <property name="text">
-    <string>Background</string>
+    <string>Background...</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
@@ -746,12 +746,12 @@ QFrame {
   </action>
   <action name="CutMenu">
    <property name="text">
-    <string>Cut</string>
+    <string>Cut...</string>
    </property>
   </action>
   <action name="SelectOutputFile">
    <property name="text">
-    <string>Output files</string>
+    <string>Output files...</string>
    </property>
   </action>
   <action name="ViewTrackerMenu">
@@ -771,7 +771,7 @@ QFrame {
   </action>
   <action name="AboutMenu">
    <property name="text">
-    <string>About</string>
+    <string>About...</string>
    </property>
   </action>
  </widget>
