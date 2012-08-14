@@ -65,10 +65,11 @@ private slots:
 	void on_XTracker_editingFinished();
 	void on_YTracker_editingFinished();
 
-public slots:
-	void UpdateGraphics();
 	void BkgrLeftClick(QMouseEvent *event);
 	void BkgrRightClick(QMouseEvent *event);
+
+public slots:
+	void UpdateGraphics();
 	void TrackMouseMove(bool InGraph,double x,double y);
 
 private:
