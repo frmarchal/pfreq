@@ -4,6 +4,7 @@
 #include <qtextstream.h>
 #include <qfileinfo.h>
 #include <qclipboard.h>
+#include <qtimer.h>
 #include <math.h>
 #include "mainscreen.h"
 #include "ui_mainscreen.h"
@@ -118,6 +119,9 @@ MainScreen::MainScreen(QWidget *parent) :
 	ui->ViewPanelsMenu->addAction(ui->SmoothDock->toggleViewAction());
 	ui->ViewPanelsMenu->addAction(ui->DeriveDock->toggleViewAction());
 
+	restoreGeometry(ConfigFile->Config_GetBytes("Window","Geometry",QByteArray()));
+	restoreState(ConfigFile->Config_GetBytes("Window","State",QByteArray()));
+
 	//Top=0;
 	//Left=0;
 	//BackgroundForm=new TBackgroundForm(this);
@@ -173,6 +177,18 @@ MainScreen::~MainScreen()
 	Purge(YSmooth);
 	Purge(YDerv);
 	delete ui;
+}
+
+/*==========================================================================*/
+/*!
+  Function called when the window is closed.
+ */
+/*==========================================================================*/
+void MainScreen::closeEvent(QCloseEvent *event)
+{
+	ConfigFile->Config_Write("Window","Geometry",saveGeometry());
+	ConfigFile->Config_Write("Window","State",saveState());
+	QMainWindow::closeEvent(event);
 }
 
 /*==========================================================================*/

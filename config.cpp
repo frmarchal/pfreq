@@ -1020,9 +1020,7 @@ QStringList ConfigObject::Config_GetSectionNoWrite(const QString &Section)
   \param Item Item to fetch in the configuration file.
   \param Default Default string to write in the configuration file and to return to the caller
          if the item could not be found.
-  \param Value Buffer to store the string from the item.
-  \param ValueLen Length of the buffer Value.
-  \param ConfigFile Configuration file were the item is to be retrieved.
+  \param Comment An optional comment to write before the entry in the configuration file.
  
   \retval 1 The item was read.
   \retval 0 It has been added to the configuration file if \a Default is not NULL.
@@ -1233,6 +1231,40 @@ QFileInfo ConfigObject::Config_GetFileName(const QString &Section,const QString 
 
 /*=============================================================================*/
 /*!
+  Read one item in the configuration file and add a default value to the configuration
+  file if the item is missing.
+
+  \param Section Section of the configuration file to get the item.
+  \param Item Item to fetch in the configuration file.
+  \param Default Default string to write in the configuration file and to return to the caller
+         if the item could not be found.
+  \param Comment An optional comment to write before the entry in the configuration file.
+
+  \retval 1 The item was read.
+  \retval 0 It has been added to the configuration file if \a Default is not NULL.
+  \retval -1 No configuration file name or requested valud too small.
+
+  \author F. Marchal
+  \date 2000-05-11
+ */
+/*=============================================================================*/
+QByteArray ConfigObject::Config_GetBytes(const QString &Section,const QString &Item,const QByteArray &Default,const QString &Comment)
+{
+	Load();
+
+	QString HexDefault(Default.toHex());
+	AccessLock.lockForRead();
+	EntryObject *EObj=ConfigFile.GetOrCreate(Section,Item,HexDefault);
+	if (EObj->New && !Comment.isEmpty()) EObj->Comment=FormatComment(Comment);
+	QString StrVal=EObj->Value;
+	AccessLock.unlock();
+
+	QByteArray Val=QByteArray::fromHex(StrVal.toAscii());
+	return(Val);
+}
+
+/*=============================================================================*/
+/*!
   Get a whole section from the configuration file. If the section is empty and
   a default value is provided, it is written to the configuration file.
   
@@ -1429,6 +1461,26 @@ void ConfigObject::Config_WriteFileName(const QString &Section,const QString &It
 	Load();
 	AccessLock.lockForWrite();
 	ConfigFile.Store(Section,Item,BasePath.relativeFilePath(Value));
+	AccessLock.unlock();
+}
+
+/*==============================================================================*/
+/*!
+  Write a string of bytes into the configuration file.
+
+  \param Section The section with the file name.
+  \param Item The item to write.
+  \param Value The string of bytes to store.
+
+  \date 2007-05-31
+ */
+/*==============================================================================*/
+void ConfigObject::Config_Write(const QString &Section,const QString &Item,const QByteArray &Value)
+{
+	QString Hex(Value.toHex());
+	Load();
+	AccessLock.lockForWrite();
+	ConfigFile.Store(Section,Item,Hex);
 	AccessLock.unlock();
 }
 

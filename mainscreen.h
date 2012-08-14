@@ -25,6 +25,9 @@ public:
 private:
     Ui::MainScreen *ui;
 
+protected:
+	void closeEvent(QCloseEvent * event);
+
 private slots:
 	void on_ExitMenu_triggered();
 	void on_LoadMenu_triggered();

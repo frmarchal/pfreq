@@ -33,6 +33,7 @@ public:
 	double Config_GetDouble(const QString &Section,const QString &Item, double Default,const QString &Comment="");
 	QFileInfo Config_GetFileName(const QString &Section,const QString &Item, const QString &Default,const QString &Comment="");
 	QStringList Config_GetSection(const QString Section);
+	QByteArray Config_GetBytes(const QString &Section,const QString &Item,const QByteArray &Default,const QString &Comment="");
 
 	bool Config_IsEmpty(const QString &Section, const QString &Item);
 
@@ -50,6 +51,7 @@ public:
 	void Config_WriteDouble(const QString &Section,const QString &Item,double Value);
 	void Config_WriteFileName(const QString &Section,const QString &Item,const QFileInfo &Value);
 	void Config_WriteFileName(const QString &Section,const QString &Item,const QString &Value);
+	void Config_Write(const QString &Section,const QString &Item,const QByteArray &Value);
 
 	class ConfigError : public QException
 	{
