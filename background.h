@@ -37,6 +37,8 @@ private slots:
 	void on_BackgroundMode_currentChanged(int Index);
 	void on_LRFirst_editingFinished();
 	void on_AverageStart_editingFinished();
+	void on_LinearRegButton_toggled(bool Checked);
+	void on_AverageButton_toggled(bool Checked);
 
 signals:
 	void UpdateGraphics();

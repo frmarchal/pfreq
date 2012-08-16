@@ -496,7 +496,9 @@ bool BackgroundForm::CalculateAutoBackground(void)
 			return(false);
 		}
 		bool Ok=false;
-		double FirstPercent=ui->LRFirst->text().toDouble(&Ok);
+		QString Value=ui->LRFirst->text();
+		if (Value.endsWith('%')) Value.chop(1);
+		double FirstPercent=Value.toDouble(&Ok);
 		if (!Ok)
 		{
 			WriteMsg(__FILE__,__LINE__,"Invalid starting point");
@@ -504,7 +506,9 @@ bool BackgroundForm::CalculateAutoBackground(void)
 			ui->LRFirst->setFocus();
 			return(false);
 		}
-		double LastPercent=ui->LRLast->text().toDouble(&Ok);
+		Value=ui->LRLast->text();
+		if (Value.endsWith('%')) Value.chop(1);
+		double LastPercent=Value.toDouble(&Ok);
 		if (!Ok)
 		{
 			WriteMsg(__FILE__,__LINE__,"Invalid ending point");
@@ -705,3 +709,42 @@ void BackgroundForm::on_BackgroundMode_currentChanged(int Index)
 	}
 }*/
 
+/*=============================================================================*/
+/*!
+  The linear regression button is checked or unchecked.
+
+  \param Checked The state of the button.
+ */
+/*=============================================================================*/
+void BackgroundForm::on_LinearRegButton_toggled(bool Checked)
+{
+	bool Signal;
+
+	Signal=ui->AverageButton->blockSignals(true);
+	ui->AverageButton->setChecked(false);
+	ui->AverageButton->blockSignals(Signal);
+
+	Signal=ui->LinearRegButton->blockSignals(true);
+	ui->LinearRegButton->setChecked(true);
+	ui->LinearRegButton->blockSignals(Signal);
+}
+
+/*=============================================================================*/
+/*!
+  The average button is checked or unchecked.
+
+  \param Checked The state of the button.
+ */
+/*=============================================================================*/
+void BackgroundForm::on_AverageButton_toggled(bool Checked)
+{
+	bool Signal;
+
+	Signal=ui->LinearRegButton->blockSignals(true);
+	ui->LinearRegButton->setChecked(false);
+	ui->LinearRegButton->blockSignals(Signal);
+
+	Signal=ui->AverageButton->blockSignals(true);
+	ui->AverageButton->setChecked(true);
+	ui->AverageButton->blockSignals(Signal);
+}
