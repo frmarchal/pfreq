@@ -19,7 +19,7 @@
 #include "about.h"
 
 #define PROG_VERSION 2
-#define PROG_REVISION 0
+#define PROG_REVISION 1
 
 //! Maximum number of columns in the file to load.
 #define MAX_COLUMN 30
