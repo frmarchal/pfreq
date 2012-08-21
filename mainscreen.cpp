@@ -288,6 +288,8 @@ bool MainScreen::GetColumns(int NColumn,int &XColumn,int &YColumn)
 	QString Item;
 	QString ColMark;
 
+	XColumn=-1;
+	YColumn=-1;
 	Item=QString::number(NColumn);
 	ColMark=ConfigFile->Config_GetStringNoWrite("Columns",Item,"-1,-1");
 	QRegExp ColRe("^(\\d+),(\\d+)$");
