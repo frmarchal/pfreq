@@ -320,7 +320,6 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 {
 #define NSTORED_LINES 25
 	char Delim;
-	QString Item;
 	char *StoredColumns[NSTORED_LINES][MAX_COLUMN];
 	double Value;
 	int i,XColumn,YColumn;
@@ -373,12 +372,14 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 				{
 					if (NColumn==1)
 					{
+						QString Item=QString::number(NColumn);
 						ConfigFile->Config_WriteString("Columns",Item,"-1,0");
 						XColumn=-1;
 						YColumn=0;
 					}
 					else if (NColumn==2)
 					{
+						QString Item=QString::number(NColumn);
 						ConfigFile->Config_WriteString("Columns",Item,"0,1");
 						XColumn=0;
 						YColumn=1;
