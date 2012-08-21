@@ -1799,7 +1799,7 @@ void MainScreen::on_YTracker_editingFinished()
 void MainScreen::TrackPosition(bool XSource)
 {
 	int i;
-	double XPosition,YPosition;
+	double XPosition,YPosition=0.;
 	double *XPtr,*YPtr,*XSrc,*YSrc;
 	QString Text;
 	bool Found;
@@ -1940,7 +1940,7 @@ void MainScreen::on_TrackMouse_clicked()
 /*==========================================================================*/
 void MainScreen::on_CutMenu_triggered()
 {
-	double XStart,XStop,StartTime;
+	double XStart,XStop,StartTime=0.;
 	double *TData;
 	int i,j;
 	QString Text;
