@@ -38,12 +38,12 @@ GraphImage::GraphImage(QWidget *Parent) :
 
 	//***** get default colors *****
 	CText=QColor(0x00,0x00,0x00);
-	CTextBg=QColor(0x80,0x80,0x80);
+	CTextBg=QColor(0xE0,0xE0,0xE0);
 	CFrame=QColor(0xFF,0x00,0x00);
 	CData[0]=QColor(0xFF,0x00,0x00);
 	CData[1]=QColor(0x00,0xFF,0x00);
 	CData[2]=QColor(0x00,0x00,0xFF);
-	CDataBg=QColor(0x00,0x00,0x00);
+	CDataBg=QColor(0xFF,0xFF,0xFF);
 
 	//***** get font size *****
 	const QFontMetrics &tm=fontMetrics();
@@ -282,17 +282,21 @@ void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 	{
 		ix = xoffset + (i - min) * ex;
 		PCanvas.setPen(CFrame);
-		PCanvas.drawLine((int)ix,(int)yoffset-1,(int)ix,(int)yoffset-GRAD);
-		PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
+		PCanvas.drawLine((int)ix,(int)yoffset+1,(int)ix,(int)yoffset+GRAD);
+		//PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
 		if (Deci)
 			val.sprintf("%.2f",i);
 		else
 			val.sprintf("%.0f",i);
-		PCanvas.setPen(CText);
 		Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
-		if (ix+Size.width()/2<ImageWidth) PCanvas.drawText(Size,Qt::AlignHCenter | Qt::AlignTop,val);
+		if (ix+Size.width()/2<ImageWidth)
+		{
+			PCanvas.setPen(CText);
+			PCanvas.drawText(Size,Qt::AlignHCenter | Qt::AlignTop,val);
+		}
 	}
 
+	PCanvas.setPen(CText);
 	Size=PCanvas.boundingRect(QRect(GRight,ImageHeight,0,0),Qt::AlignRight | Qt::AlignBottom,XName);
 	PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignBottom,XName);
 }
@@ -359,7 +363,7 @@ void GraphImage::ComputeGLeft(QPainter &PCanvas,double min,double max)
 	val.sprintf("%+02d",(int)y);
 	Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
 	Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
-	GLeft=Size.width()+Size1.width()+wmax;
+	GLeft=Size.width()+Size1.width()+wmax+GRAD;
 }
 
 /*=============================================================================*/
@@ -423,13 +427,14 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	{
 		iy = yoffset-((i - min) * ex);
 		PCanvas.setPen(CFrame);
-		PCanvas.drawLine((int)xoffset+1,(int)iy,(int)xoffset+GRAD,(int)iy);
-		PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
+		PCanvas.drawLine((int)xoffset-1,(int)iy,(int)xoffset-GRAD,(int)iy);
+		//PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
+
 		if (iy>GTop+3+3*FontHeight/2)
 		{
 			val.sprintf("%5ld",(long int)((i-Bottom) / y10));
 			PCanvas.setPen(CText);
-			Size=PCanvas.boundingRect(QRect(xoffset,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+			Size=PCanvas.boundingRect(QRect(xoffset-GRAD,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
 			PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
 		}
 	}
