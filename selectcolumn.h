@@ -16,7 +16,8 @@ public:
 	explicit SelectColumn(QWidget *parent = 0);
 	~SelectColumn();
 	
-	void GetColumn(int &XColumn, int &YColumn);
+    void SetColumn(int XColumn, int YColumn);
+    void GetColumn(int &XColumn, int &YColumn);
 	void PrepareList(int NColumns);
 	void AddLine(char **Columns,int NColumns);
 
@@ -32,6 +33,8 @@ private:
 	bool XDefine;
 
 	void ColumnClicked(int Column);
+    void SetXColumn(int Column);
+    void SetYColumn(int Column);
 };
 
 #endif // SELECTCOLUMN_H

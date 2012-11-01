@@ -424,6 +424,7 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 				ColSel.PrepareList(NColumn);
 				for (i=0 ; i<NStoredLines ; i++)
 					ColSel.AddLine(StoredColumns[i],NColumn);
+				ColSel.SetColumn(XColumn,YColumn);
 
 				Result=ColSel.exec();
 				if (Result==QDialog::Accepted)

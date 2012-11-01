@@ -23,10 +23,18 @@ SelectColumn::~SelectColumn()
 	delete ui;
 }
 
+void SelectColumn::SetColumn(int XColumn, int YColumn)
+{
+	this->XColumn=XColumn;
+	this->YColumn=YColumn;
+	SetXColumn(XColumn);
+	SetYColumn(YColumn);
+}
+
 void SelectColumn::GetColumn(int &XColumn, int &YColumn)
 {
-  XColumn=this->XColumn;
-  YColumn=this->YColumn;
+	XColumn=this->XColumn;
+	YColumn=this->YColumn;
 }
 
 void SelectColumn::PrepareList(int NColumns)
@@ -62,22 +70,33 @@ void SelectColumn::AddLine(char **Columns,int NColumns)
 
 void SelectColumn::ColumnClicked(int Column)
 {
-	QTreeWidgetItem *Header=ui->ColumnList->headerItem();
 	if (XDefine)
 	{
-		if (XColumn>=0) Header->setText(XColumn,"");
-		XColumn=Column;
-		if (XColumn==YColumn) YColumn=-1;
-		Header->setText(XColumn,"X");
+		SetXColumn(Column);
 	}
 	else
 	{
-		if (YColumn>=0) Header->setText(YColumn,"");
-		YColumn=Column;
-		if (XColumn==YColumn) XColumn=-1;
-		Header->setText(YColumn,"Y");
+		SetYColumn(Column);
 	}
 	XDefine=!XDefine;
+}
+
+void SelectColumn::SetXColumn(int Column)
+{
+	QTreeWidgetItem *Header=ui->ColumnList->headerItem();
+	if (XColumn>=0) Header->setText(XColumn,"");
+	XColumn=Column;
+	if (XColumn==YColumn) YColumn=-1;
+	Header->setText(XColumn,"X");
+}
+
+void SelectColumn::SetYColumn(int Column)
+{
+	QTreeWidgetItem *Header=ui->ColumnList->headerItem();
+	if (YColumn>=0) Header->setText(YColumn,"");
+	YColumn=Column;
+	if (XColumn==YColumn) XColumn=-1;
+	Header->setText(YColumn,"Y");
 }
 
 void SelectColumn::on_ColumnList_itemClicked(QTreeWidgetItem *item,int column)
