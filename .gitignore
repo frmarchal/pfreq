@@ -1,0 +1,9 @@
+*.exe
+*.ini
+*.zip
+*.o
+moc_*.cpp
+ui_*.h
+Makefile*
+pfreq
+pfreq.pro.user*
