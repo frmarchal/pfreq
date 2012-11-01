@@ -430,6 +430,7 @@ bool MainScreen::LoadCsvFile(char *Buffer,unsigned int FSize)
 				if (Result==QDialog::Accepted)
 					ColSel.GetColumn(XColumn,YColumn);
 				if (Result!=QDialog::Accepted) break;
+				if (YColumn<0) break;
 				SelectingColumns=false;
 				for (i=0 ; i<NStoredLines ; i++)
 				{
