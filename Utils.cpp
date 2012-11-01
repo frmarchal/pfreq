@@ -56,7 +56,17 @@ bool StrToDouble(const char *String,double *Value)
 {
 	char *Next;
 	double Val;
+	const char *Coma;
+	char Number[60];
 
+	Coma=strchr(String,',');
+	if (Coma)
+	{
+		strncpy(Number,String,sizeof(Number)-1);
+		Number[sizeof(Number)-1]='\0';
+		Number[Coma-String]='.';
+		String=Number;
+	}
 	Val=strtod(String,&Next);
 	if (*Next!='\0') return(false);
 	*Value=Val;
