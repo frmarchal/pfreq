@@ -1154,6 +1154,7 @@ void MainScreen::on_YGainCtrl_editingFinished()
 	YGain=Value;
 	Text.sprintf("%lf",YGain);
 	ui->YGainCtrl->setText(Text);
+	LastGNeigh=-1;
 	LastSGPoly=-1;
 	UpdateGraphics();
 }
