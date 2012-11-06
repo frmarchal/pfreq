@@ -825,8 +825,8 @@ void MainScreen::RecalculateGraphics()
 		{
 			YSmooth[i]=Smooth[i]*YGain+YOffset;
 			/*x=(double)i/XFreq+Time0;
-	if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
-	 BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+			if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+			 BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
 			if (XFreq>0.)
 			{
 				x=XPlot[i];

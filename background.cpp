@@ -318,7 +318,7 @@ void BackgroundForm::GetBackground(double XFreq,double *x,double *LocSlope,doubl
 	else
 	{
 		*LocSlope=0.;
-	  *LocOffset=0.;
+		*LocOffset=0.;
 	}
 		return;
 	}
