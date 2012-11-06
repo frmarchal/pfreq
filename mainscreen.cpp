@@ -1300,12 +1300,12 @@ void MainScreen::on_SaveDerivativeMenu_triggered()
 		if (XFreq>0.)
 		{
 			x=XPlot[i];
-			if (x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 		}
 		else
 		{
 			x=XPlot[NPoints-1-i];
-			if (x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 		}
 		Bkgr=Slope;
 		Out << YDerv[i]-Bkgr << endl;
@@ -1370,12 +1370,12 @@ void MainScreen::on_SaveSmoothMenu_triggered()
 		if (XFreq>0.)
 		{
 			x=XPlot[i];
-			if (x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 		}
 		else
 		{
 			x=XPlot[NPoints-1-i];
-			if (x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 		}
 		Bkgr=x*Slope+Offset;
 		Out << YSmooth[i]-Bkgr << endl;
