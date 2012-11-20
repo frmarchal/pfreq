@@ -16,7 +16,7 @@ extern MainScreen *MainForm;
  */
 /*=============================================================================*/
 BackgroundForm::BackgroundForm(QWidget *parent) :
-    QDialog(parent),
+	QDialog(parent,Qt::WindowMinimizeButtonHint),
     ui(new Ui::BackgroundForm)
 {
 	ui->setupUi(this);
