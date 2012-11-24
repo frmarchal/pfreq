@@ -750,22 +750,24 @@ void MainScreen::RecalculateGraphics()
 
 	if (!YData || NPoints<=0) return;
 
+	Text.sprintf("%.4lf",XFreq);
+	ui->XFrequency->blockSignals(true);
+	ui->XFrequency->setText(Text);
+	ui->XFrequency->setEnabled(XData==NULL);
+	ui->XFrequency->blockSignals(false);
+	Text.sprintf("%.4lf",Time0);
+	ui->XTime0->blockSignals(true);
+	ui->XTime0->setText(Text);
+	ui->XTime0->setEnabled(XData==NULL);
+	ui->XTime0->blockSignals(false);
 	if (XData)
 	{
-		ui->XFrequency->setEnabled(false);
-		ui->XTime0->setEnabled(false);
 		for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
 	}
 	else
 	{
-		ui->XFrequency->setEnabled(true);
-		ui->XTime0->setEnabled(true);
 		for (i=0 ; i<NPoints ; i++) XPlot[i]=(double)i/XFreq+Time0;
 	}
-	Text.sprintf("%.4lf",XFreq);
-	ui->XFrequency->setText(Text);
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
 
 	for (i=0 ; i<NPoints ; i++) YPlot[i]=YData[i]*YGain+YOffset;
 	ui->MainGraphCtrl->SetGraphic(0,XPlot,YPlot,NPoints);
