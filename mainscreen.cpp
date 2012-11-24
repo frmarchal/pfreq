@@ -713,7 +713,7 @@ void MainScreen::on_LoadMenu_triggered()
 		if (StepSize<1e-15)
 			XFreq=0.;
 		else
-			XFreq=1./StepSize;
+			XFreq=1/StepSize;
 		/*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
 	{
 	Purge(YSmooth);
@@ -750,7 +750,7 @@ void MainScreen::RecalculateGraphics()
 
 	if (!YData || NPoints<=0) return;
 
-	Text.sprintf("%.4lf",XFreq);
+	Text.sprintf("%.4lf",XFreq/1000);//display in KHz
 	ui->XFrequency->blockSignals(true);
 	ui->XFrequency->setText(Text);
 	ui->XFrequency->setEnabled(XData==NULL);
@@ -975,11 +975,12 @@ void MainScreen::on_XFrequency_editingFinished()
 
 	Value=ui->XFrequency->text().toDouble(&Ok);
 	if (!Ok) return;
+	Value*=1000;//KHz -> Hz
 	if (Value==XFreq) return;
 	if (Value>=0.001) XFreq=Value;
 
 	QString Text;
-	Text.sprintf("%.0lf",XFreq);
+	Text.sprintf("%.0lf",XFreq/1000);//display in KHz
 	ui->XFrequency->setText(Text);
 	LastSGPoly=-1;
 	WriteXFreq(XFreq);
