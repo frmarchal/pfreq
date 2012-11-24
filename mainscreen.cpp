@@ -786,27 +786,33 @@ void MainScreen::RecalculateGraphics()
 	QLineEdit *SmoothMaxCtrl=NULL;
 	if (YSmooth)
 	{
-		if (ui->SmoothTab->currentWidget()==ui->GaussianSmooth && (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh))
+		if (ui->SmoothTab->currentWidget()==ui->GaussianSmooth)
 		{
-			CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
-			LastGWidth=GaussWidth;
-			LastGNeigh=GaussNeigh;
+			if (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh)
+			{
+				CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
+				LastGWidth=GaussWidth;
+				LastGNeigh=GaussNeigh;
+			}
 			SmoothMaxCtrl=ui->SmoothMaxCtrl;
 		}
-		if (ui->SmoothTab->currentWidget()==ui->SavGolSmooth && (SavGolSmoothPoly!=LastSGSPoly || SavGolSmoothNeigh!=LastSGSNeigh))
+		if (ui->SmoothTab->currentWidget()==ui->SavGolSmooth)
 		{
-			if (!Smooth)
+			if (SavGolSmoothPoly!=LastSGSPoly || SavGolSmoothNeigh!=LastSGSNeigh)
 			{
-				Smooth=(double *)malloc(NPoints*sizeof(double));
 				if (!Smooth)
 				{
-					WriteMsg(__FILE__,__LINE__,tr("Not enough memory to smooth the data"));
-					return;
+					Smooth=(double *)malloc(NPoints*sizeof(double));
+					if (!Smooth)
+					{
+						WriteMsg(__FILE__,__LINE__,tr("Not enough memory to smooth the data"));
+						return;
+					}
 				}
+				SavGolSmooth(YData,Smooth,NPoints,SavGolSmoothPoly,SavGolSmoothNeigh);
+				LastSGSPoly=SavGolSmoothPoly;
+				LastSGSNeigh=SavGolSmoothNeigh;
 			}
-			SavGolSmooth(YData,Smooth,NPoints,SavGolSmoothPoly,SavGolSmoothNeigh);
-			LastSGSPoly=SavGolSmoothPoly;
-			LastSGSNeigh=SavGolSmoothNeigh;
 			SmoothMaxCtrl=ui->SavGolSMaxCtrl;
 		}
 	}
