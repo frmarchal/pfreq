@@ -20,7 +20,7 @@
 #include "selectcolors.h"
 
 #define PROG_VERSION 2
-#define PROG_REVISION 1
+#define PROG_REVISION 2
 
 //! Maximum number of columns in the file to load.
 #define MAX_COLUMN 30
