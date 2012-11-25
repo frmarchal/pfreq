@@ -37,6 +37,7 @@ private slots:
 	void on_SaveDataMenu_triggered();
 	void on_BackgroundMenu_triggered();
 	void on_SelectOutputFile_triggered();
+	void on_SelectColors_triggered();
 	void on_CopyData_triggered();
 	void on_CopyBkgrMenu_triggered();
 	void on_CopySmoothMenu_triggered();
@@ -111,6 +112,7 @@ private:
 	void WriteXFreq(double XFreq);
 	void WriteXTime0(double XTime);
 	void SetGraphSize(GraphImage *Control,int Width,int Height);
+	void ConfigureColors();
 
 public:		// Déclarations de l'utilisateur
 	int NPoints;
@@ -122,6 +124,17 @@ public:		// Déclarations de l'utilisateur
 	void SetBgMouseClick(bool Active);
 	static void TrackMouseMove(void *Parent,bool InGraph,double x,double y);
 	bool WriteToClipboard(const QString *Text);
+
+	QColor GetBackgroundColor();
+	void SetBackgroundColor(const QColor &Color);
+	QColor GetDataColor();
+	void SetDataColor(const QColor &Color);
+	QColor GetSmoothColor();
+	void SetSmoothColor(const QColor &Color);
+	QColor GetDervColor();
+	void SetDervColor(const QColor &Color);
+	QColor GetBkgrColor();
+	void SetBkgrColor(const QColor &Color);
 };
 
 #endif // MAINSCREEN_H

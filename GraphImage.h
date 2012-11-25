@@ -73,6 +73,10 @@ public:
 	void DeleteAllCurves();
     void DeleteCurve(int Curve);
     bool GetMousePos(int X, int Y,double *XPos,double *YPos);
+	QColor GetBackgroundColor();
+	void SetBackgroundColor(const QColor &Color);
+	QColor GetCurveColor(int Curve);
+	void SetCurveColor(int Curve,const QColor &Color);
 };
 
 #endif //GRAPHIMAGE_HEADER
