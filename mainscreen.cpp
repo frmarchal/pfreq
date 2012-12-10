@@ -864,7 +864,7 @@ void MainScreen::RecalculateGraphics()
 		if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
 		{
 			SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
-			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq;
+			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq/1000.; // Frequency in KHz
 			LastSGPoly=SavGolPoly;
 			LastSGNeigh=SavGolNeigh;
 		}
@@ -879,7 +879,7 @@ void MainScreen::RecalculateGraphics()
 			}
 			else
 			{
-				x=0.5*XFreq;
+				x=0.5*XFreq/1000; // frequency in KHz
 				for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
 				*Derive=Derive[1];
 				Derive[NPoints-1]=Derive[NPoints-2];
