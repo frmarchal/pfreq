@@ -720,6 +720,8 @@ void BackgroundForm::on_LinearRegButton_toggled(bool Checked)
 {
 	bool Signal;
 
+	(void)Checked; //compiler pacifier
+
 	Signal=ui->AverageButton->blockSignals(true);
 	ui->AverageButton->setChecked(false);
 	ui->AverageButton->blockSignals(Signal);
@@ -739,6 +741,8 @@ void BackgroundForm::on_LinearRegButton_toggled(bool Checked)
 void BackgroundForm::on_AverageButton_toggled(bool Checked)
 {
 	bool Signal;
+
+	(void)Checked;//compiler pacifier
 
 	Signal=ui->LinearRegButton->blockSignals(true);
 	ui->LinearRegButton->setChecked(false);
