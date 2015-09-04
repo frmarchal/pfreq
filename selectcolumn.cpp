@@ -10,7 +10,7 @@ SelectColumn::SelectColumn(QWidget *parent) :
 
 	bool Success=connect(ui->ColumnList->header(),SIGNAL(sectionClicked(int)),this,SLOT(HeaderClicked(int)));
 	if (Success)
-		ui->ColumnList->header()->setClickable(true);
+		ui->ColumnList->header()->setSectionsClickable(true);
 	else
 		WriteMsg(__FILE__,__LINE__,tr("Cannot detect clicks on headers"));
 
