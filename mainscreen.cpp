@@ -716,7 +716,7 @@ void MainScreen::on_LoadMenu_triggered()
 		if (StepSize<1e-15)
 			XFreq=0.;
 		else
-			XFreq=1./StepSize;
+			XFreq=1/StepSize;
 		/*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
 	{
 	Purge(YSmooth);
@@ -753,22 +753,24 @@ void MainScreen::RecalculateGraphics()
 
 	if (!YData || NPoints<=0) return;
 
+	Text.sprintf("%.4lf",XFreq/1000);//display in KHz
+	ui->XFrequency->blockSignals(true);
+	ui->XFrequency->setText(Text);
+	ui->XFrequency->setEnabled(XData==NULL);
+	ui->XFrequency->blockSignals(false);
+	Text.sprintf("%.4lf",Time0);
+	ui->XTime0->blockSignals(true);
+	ui->XTime0->setText(Text);
+	ui->XTime0->setEnabled(XData==NULL);
+	ui->XTime0->blockSignals(false);
 	if (XData)
 	{
-		ui->XFrequency->setEnabled(false);
-		ui->XTime0->setEnabled(false);
 		for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
 	}
 	else
 	{
-		ui->XFrequency->setEnabled(true);
-		ui->XTime0->setEnabled(true);
 		for (i=0 ; i<NPoints ; i++) XPlot[i]=(double)i/XFreq+Time0;
 	}
-	Text.sprintf("%.4lf",XFreq);
-	ui->XFrequency->setText(Text);
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
 
 	for (i=0 ; i<NPoints ; i++) YPlot[i]=YData[i]*YGain+YOffset;
 	ui->MainGraphCtrl->SetGraphic(0,XPlot,YPlot,NPoints);
@@ -856,7 +858,7 @@ void MainScreen::RecalculateGraphics()
 		if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
 		{
 			SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
-			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq;
+			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq/1000.; // Frequency in KHz
 			LastSGPoly=SavGolPoly;
 			LastSGNeigh=SavGolNeigh;
 		}
@@ -871,7 +873,7 @@ void MainScreen::RecalculateGraphics()
 			}
 			else
 			{
-				x=0.5*XFreq;
+				x=0.5*XFreq/1000; // frequency in KHz
 				for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
 				*Derive=Derive[1];
 				Derive[NPoints-1]=Derive[NPoints-2];
@@ -970,11 +972,12 @@ void MainScreen::on_XFrequency_editingFinished()
 
 	Value=ui->XFrequency->text().toDouble(&Ok);
 	if (!Ok) return;
+	Value*=1000;//KHz -> Hz
 	if (Value==XFreq) return;
 	if (Value>=0.001) XFreq=Value;
 
 	QString Text;
-	Text.sprintf("%.0lf",XFreq);
+	Text.sprintf("%.0lf",XFreq/1000);//display in KHz
 	ui->XFrequency->setText(Text);
 	LastSGPoly=-1;
 	WriteXFreq(XFreq);
