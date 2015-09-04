@@ -1259,7 +1259,7 @@ QByteArray ConfigObject::Config_GetBytes(const QString &Section,const QString &I
 	QString StrVal=EObj->Value;
 	AccessLock.unlock();
 
-	QByteArray Val=QByteArray::fromHex(StrVal.toAscii());
+	QByteArray Val=QByteArray::fromHex(StrVal.toLocal8Bit());
 	return(Val);
 }
 

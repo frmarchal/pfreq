@@ -2,7 +2,7 @@
 #include <math.h>
 #include <limits.h>
 #include <limits>
-#include <values.h>
+//#include <values.h>
 
 #define MIN_ZOOM_AREA 5  //minimum size of the zoom area in pixels
 #define MIN_ZOOM_FACTOR 1E-10  //zoom area must be bigger than MIN_ZOOM_FACTOR*(Full axis range of unzoomed data)
@@ -942,4 +942,61 @@ bool GraphImage::GetMousePos(int X, int Y,double *XPos,double *YPos)
 	if (XPos) *XPos=((double)X-bx)/ax;
 	if (YPos) *YPos=((double)Y-by)/ay;
 	return(true);
+}
+
+/*=============================================================================*/
+/*!
+  Get the data background color.
+
+  \return The background color.
+ */
+/*=============================================================================*/
+QColor GraphImage::GetBackgroundColor()
+{
+	return(CDataBg);
+}
+
+/*=============================================================================*/
+/*!
+  Set the data background color.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void GraphImage::SetBackgroundColor(const QColor &Color)
+{
+	if (CDataBg!=Color)
+	{
+		CDataBg=Color;
+		update();
+	}
+}
+
+/*=============================================================================*/
+/*!
+  Get the data curve color.
+
+  \return The curve color.
+ */
+/*=============================================================================*/
+QColor GraphImage::GetCurveColor(int Curve)
+{
+	if (Curve<0 || Curve>=MAX_CURVES) return(Qt::white);
+	return(CData[Curve]);
+}
+
+/*=============================================================================*/
+/*!
+  Set the data curve color.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void GraphImage::SetCurveColor(int Curve,const QColor &Color)
+{
+	if (Curve>=0 && Curve<MAX_CURVES && CData[Curve]!=Color)
+	{
+		CData[Curve]=Color;
+		update();
+	}
 }
