@@ -7,3 +7,5 @@ ui_*.h
 Makefile*
 pfreq
 pfreq.pro.user*
+object_script.*
+*.swp
