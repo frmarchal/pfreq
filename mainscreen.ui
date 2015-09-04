@@ -121,7 +121,7 @@ QFrame {
      <x>0</x>
      <y>0</y>
      <width>821</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -164,6 +164,7 @@ QFrame {
      <string>Options</string>
     </property>
     <addaction name="SelectOutputFile"/>
+    <addaction name="SelectColors"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -413,8 +414,8 @@ QFrame {
    </property>
    <property name="minimumSize">
     <size>
-     <width>175</width>
-     <height>139</height>
+     <width>192</width>
+     <height>141</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -772,6 +773,11 @@ QFrame {
   <action name="AboutMenu">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="SelectColors">
+   <property name="text">
+    <string>Colors...</string>
    </property>
   </action>
  </widget>

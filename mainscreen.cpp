@@ -17,6 +17,7 @@
 #include "xrange.h"
 #include "config.h"
 #include "about.h"
+#include "selectcolors.h"
 
 #define PROG_VERSION 2
 #define PROG_REVISION 1
@@ -121,6 +122,8 @@ MainScreen::MainScreen(QWidget *parent) :
 
 	restoreGeometry(ConfigFile->Config_GetBytes("Window","Geometry",QByteArray()));
 	restoreState(ConfigFile->Config_GetBytes("Window","State",QByteArray()));
+
+	ConfigureColors();
 
 	//Top=0;
 	//Left=0;
@@ -1541,6 +1544,20 @@ void MainScreen::on_SelectOutputFile_triggered()
 
 /*==========================================================================*/
 /*!
+  Display the dialog box to select the colors.
+
+  \date
+	\arg 2012-11-25 created by Frederic
+ */
+/*==========================================================================*/
+void MainScreen::on_SelectColors_triggered()
+{
+	SelectColors Form(this);
+	Form.exec();
+}
+
+/*==========================================================================*/
+/*!
   Copy some text to the clipboard.
 
   \return true if the text was copied on the clipboard or false in case
@@ -2085,4 +2102,159 @@ void MainScreen::on_AboutMenu_triggered()
 
 	form.Version(PROG_VERSION,PROG_REVISION);
 	form.exec();
+}
+
+/*==========================================================================*/
+/*!
+  Set the graphs colors.
+ */
+/*==========================================================================*/
+void MainScreen::ConfigureColors()
+{
+	QString Name=ConfigFile->Config_GetString("Colors","DispBg","#FFFFFF");
+	QColor Color(Name);
+	ui->MainGraphCtrl->SetBackgroundColor(Color);
+	ui->DervGraphCtrl->SetBackgroundColor(Color);
+
+	Name=ConfigFile->Config_GetString("Colors","Data","#FF0000");
+	Color.setNamedColor(Name);
+	ui->MainGraphCtrl->SetCurveColor(0,Color);
+
+	Name=ConfigFile->Config_GetString("Colors","Smooth","#00FF00");
+	Color.setNamedColor(Name);
+	ui->MainGraphCtrl->SetCurveColor(1,Color);
+
+	Name=ConfigFile->Config_GetString("Colors","Bkgr","#0000FF");
+	Color.setNamedColor(Name);
+	ui->MainGraphCtrl->SetCurveColor(2,Color);
+
+	Name=ConfigFile->Config_GetString("Colors","Derv","#FF0000");
+	Color.setNamedColor(Name);
+	ui->DervGraphCtrl->SetCurveColor(0,Color);
+}
+
+/*=============================================================================*/
+/*!
+  Get the background color of the graphs.
+
+  \return The background color.
+ */
+/*=============================================================================*/
+QColor MainScreen::GetBackgroundColor()
+{
+	return(ui->MainGraphCtrl->GetBackgroundColor());
+}
+
+/*=============================================================================*/
+/*!
+  Set the background color of the graphs.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void MainScreen::SetBackgroundColor(const QColor &Color)
+{
+	ui->MainGraphCtrl->SetBackgroundColor(Color);
+	ui->DervGraphCtrl->SetBackgroundColor(Color);
+	ConfigFile->Config_WriteString("Colors","DispBg",Color.name());
+}
+
+/*=============================================================================*/
+/*!
+  Get the color of the data curve.
+
+  \return The color.
+ */
+/*=============================================================================*/
+QColor MainScreen::GetDataColor()
+{
+	return(ui->MainGraphCtrl->GetCurveColor(0));
+}
+
+/*=============================================================================*/
+/*!
+  Set the data curve color of the graphs.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void MainScreen::SetDataColor(const QColor &Color)
+{
+	ui->MainGraphCtrl->SetCurveColor(0,Color);
+	ConfigFile->Config_WriteString("Colors","Data",Color.name());
+}
+
+/*=============================================================================*/
+/*!
+  Get the color of the smoothed data curve.
+
+  \return The color.
+ */
+/*=============================================================================*/
+QColor MainScreen::GetSmoothColor()
+{
+	return(ui->MainGraphCtrl->GetCurveColor(1));
+}
+
+/*=============================================================================*/
+/*!
+  Set the smoothed data curve color of the graphs.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void MainScreen::SetSmoothColor(const QColor &Color)
+{
+	ui->MainGraphCtrl->SetCurveColor(1,Color);
+	ConfigFile->Config_WriteString("Colors","Smooth",Color.name());
+}
+
+/*=============================================================================*/
+/*!
+  Get the color of the derivative data curve.
+
+  \return The color.
+ */
+/*=============================================================================*/
+QColor MainScreen::GetDervColor()
+{
+	return(ui->DervGraphCtrl->GetCurveColor(0));
+}
+
+/*=============================================================================*/
+/*!
+  Set the data curve color of the graphs.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void MainScreen::SetDervColor(const QColor &Color)
+{
+	ui->DervGraphCtrl->SetCurveColor(0,Color);
+	ConfigFile->Config_WriteString("Colors","Derv",Color.name());
+}
+
+/*=============================================================================*/
+/*!
+  Get the color of the background data curve.
+
+  \return The color.
+ */
+/*=============================================================================*/
+QColor MainScreen::GetBkgrColor()
+{
+	return(ui->MainGraphCtrl->GetCurveColor(2));
+}
+
+/*=============================================================================*/
+/*!
+  Set the data curve color of the graphs.
+
+  \param Color The new color.
+ */
+/*=============================================================================*/
+void MainScreen::SetBkgrColor(const QColor &Color)
+{
+	ui->MainGraphCtrl->SetCurveColor(2,Color);
+	ConfigFile->Config_WriteString("Colors","Bkgr",Color.name());
 }
