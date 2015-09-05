@@ -29,7 +29,7 @@ QException::~QException() throw()
 /*=============================================================================*/
 const char *QException::what() const throw()
 {
-	return(Message.toAscii().constData());
+	return(Message.toLocal8Bit().constData());
 }
 
 /*=============================================================================*/
