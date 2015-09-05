@@ -1612,8 +1612,8 @@ void MainScreen::CopyDataPoints(double *Data)
 	long i;
 	double x,Bkgr,NextX;
 	double Value;
-	double Slope;
-	double Offset;
+	double Slope=0;
+	double Offset=0;
 	QString TBuff;
 	QTextStream Buff(&TBuff);
 	QLocale l=QLocale::system();
