@@ -231,7 +231,7 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 		{
 			if (InData)
 			{
-				WriteMsg(__FILE__,__LINE__,QString("Column %1 contains an invalid number at line %2").arg(XColumn).arg(Line));
+				WriteMsg(__FILE__,__LINE__,tr("Column %1 contains an invalid number at line %2").arg(XColumn).arg(Line));
 				return(false);
 			}
 			return(true);
@@ -243,7 +243,7 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 	{
 		if (InData)
 		{
-			WriteMsg(__FILE__,__LINE__,QString("Column %1 contains an invalid number at line %2").arg(YColumn).arg(Line));
+			WriteMsg(__FILE__,__LINE__,tr("Column %1 contains an invalid number at line %2").arg(YColumn).arg(Line));
 			return(false);
 		}
 		return(true);
@@ -256,7 +256,7 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 		TData=(double *)realloc(*YData,NAllocated*sizeof(double));
 		if (!TData)
 		{
-			WriteMsg(__FILE__,__LINE__,QString("Not enough memory to load all the file. Some points after line %1 are missing").arg(Line));
+			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load all the file. Some points after line %1 are missing").arg(Line));
 			return(false);
 		}
 		*YData=TData;
@@ -265,7 +265,7 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 			TData=(double *)realloc(*XData,NAllocated*sizeof(double));
 			if (!TData)
 			{
-				WriteMsg(__FILE__,__LINE__,QString("Not enough memory to load all the file. Some points after line %1 are missing").arg(Line));
+				WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load all the file. Some points after line %1 are missing").arg(Line));
 				return(false);
 			}
 			*XData=TData;
@@ -667,7 +667,7 @@ void MainScreen::on_LoadMenu_triggered()
 	free(Buffer);
 	if (NPoints<2)
 	{
-		WriteMsg(__FILE__,__LINE__,QString("Only %1 data points in the file").arg(NPoints));
+		WriteMsg(__FILE__,__LINE__,tr("Only %1 data points in the file").arg(NPoints));
 		Purge(XData);
 		Purge(YData);
 		NPoints=0;
@@ -683,7 +683,7 @@ void MainScreen::on_LoadMenu_triggered()
 		XPlot=(double *)malloc(NPoints*sizeof(double));
 		if (!XPlot)
 		{
-			WriteMsg(__FILE__,__LINE__,"Not enough memory to load the file");
+			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
 			Purge(XData);
 			Purge(YData);
 			NPoints=0;
@@ -691,7 +691,7 @@ void MainScreen::on_LoadMenu_triggered()
 		YPlot=(double *)malloc(NPoints*sizeof(double));
 		if (!YPlot)
 		{
-			WriteMsg(__FILE__,__LINE__,"Not enough memory to load the file");
+			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
 			Purge(XData);
 			Purge(YData);
 			NPoints=0;
@@ -877,7 +877,7 @@ void MainScreen::RecalculateGraphics()
 			Derive=(double *)malloc(NPoints*sizeof(double));
 			if (Derive==NULL)
 			{
-				WriteMsg(__FILE__,__LINE__,"Derivative cannot be allocated");
+				WriteMsg(__FILE__,__LINE__,tr("Derivative cannot be allocated"));
 			}
 			else
 			{
@@ -1283,20 +1283,20 @@ void MainScreen::on_SaveDerivativeMenu_triggered()
 	if (!Derive) return;
 	if (!YDerv)
 	{
-		WriteMsg(__FILE__,__LINE__,"No derivative curve");
+		WriteMsg(__FILE__,__LINE__,tr("No derivative curve"));
 		return;
 	}
 	QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Derivative","");
 	if (FileName.filePath().isEmpty())
 	{
 		ConfigFile->Config_WriteFileName("Output","Derivative","derive.txt");
-		WriteMsg(__FILE__,__LINE__,"No output file in the config file");
+		WriteMsg(__FILE__,__LINE__,tr("No output file in the config file"));
 		return;
 	}
 	QFile fo(FileName.filePath());
 	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		WriteMsg(__FILE__,__LINE__,QString("Cannot save file %1").arg(FileName.filePath()));
+		WriteMsg(__FILE__,__LINE__,tr("Cannot save file %1").arg(FileName.filePath()));
 		return;
 	}
 	QTextStream Out(&fo);
@@ -1334,9 +1334,9 @@ void MainScreen::on_SaveDerivativeMenu_triggered()
 	}
 	fo.close();
 	if (Error)
-		WriteMsg(__FILE__,__LINE__,QString("Error while writting %1").arg(FileName.filePath()));
+		WriteMsg(__FILE__,__LINE__,tr("Error while writting %1").arg(FileName.filePath()));
 	else
-		WriteMsg(__FILE__,__LINE__,QString("Derivative saved in %1").arg(FileName.filePath()));
+		WriteMsg(__FILE__,__LINE__,tr("Derivative saved in %1").arg(FileName.filePath()));
 }
 
 /*=============================================================================*/
@@ -1353,20 +1353,20 @@ void MainScreen::on_SaveSmoothMenu_triggered()
 
 	if (!YSmooth)
 	{
-		WriteMsg(__FILE__,__LINE__,"No smoothed curve");
+		WriteMsg(__FILE__,__LINE__,tr("No smoothed curve"));
 		return;
 	}
 	QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Smooth","");
 	if (FileName.filePath().isEmpty())
 	{
 		ConfigFile->Config_WriteFileName("Output","Smooth","smooth.txt");
-		WriteMsg(__FILE__,__LINE__,"No output file in the config file");
+		WriteMsg(__FILE__,__LINE__,tr("No output file in the config file"));
 		return;
 	}
 	QFile fo(FileName.filePath());
 	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		WriteMsg(__FILE__,__LINE__,QString("Cannot save file %1").arg(FileName.filePath()));
+		WriteMsg(__FILE__,__LINE__,tr("Cannot save file %1").arg(FileName.filePath()));
 		return;
 	}
 	QTextStream Out(&fo);
@@ -1402,9 +1402,9 @@ void MainScreen::on_SaveSmoothMenu_triggered()
 	}
 	fo.close();
 	if (Error)
-		WriteMsg(__FILE__,__LINE__,QString("Error while writting %1").arg(FileName.filePath()));
+		WriteMsg(__FILE__,__LINE__,tr("Error while writting %1").arg(FileName.filePath()));
 	else
-		WriteMsg(__FILE__,__LINE__,QString("Smoothed curve saved in %1").arg(FileName.filePath()));
+		WriteMsg(__FILE__,__LINE__,tr("Smoothed curve saved in %1").arg(FileName.filePath()));
 }
 
 /*==========================================================================*/
@@ -1421,7 +1421,7 @@ void MainScreen::on_SaveDataMenu_triggered()
 
 	if (!XPlot || !YPlot)
 	{
-		WriteMsg(__FILE__,__LINE__,"No data to save");
+		WriteMsg(__FILE__,__LINE__,tr("No data to save"));
 		return;
 	}
 	QFileInfo SrcName(DefaultFileName);
@@ -1434,7 +1434,7 @@ void MainScreen::on_SaveDataMenu_triggered()
 	QFile fo(FileName);
 	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		WriteMsg(__FILE__,__LINE__,QString("Cannot open output file %1 for writting").arg(FileName));
+		WriteMsg(__FILE__,__LINE__,tr("Cannot open output file %1 for writting").arg(FileName));
 		return;
 	}
 	QTextStream Out(&fo);
@@ -1937,7 +1937,7 @@ void MainScreen::on_CutMenu_triggered()
 	}
 	if (XStart==XStop)
 	{
-		WriteMsg(__FILE__,__LINE__,"XStart and XStop must be different");
+		WriteMsg(__FILE__,__LINE__,tr("XStart and XStop must be different"));
 		return;
 	}
 	if (!XData)
@@ -1945,7 +1945,7 @@ void MainScreen::on_CutMenu_triggered()
 		XData=(double *)malloc(NPoints*sizeof(double));
 		if (!XData)
 		{
-			WriteMsg(__FILE__,__LINE__,"Not enough memory to store XData");
+			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to store XData"));
 			return;
 		}
 		for (i=0 ; i<NPoints ; i++) XData[i]=(double)i/XFreq+Time0;
@@ -1976,7 +1976,7 @@ void MainScreen::on_CutMenu_triggered()
 	}
 	if (j<2)
 	{
-		WriteMsg(__FILE__,__LINE__,"Those limits would remove every data points. Cut not performed");
+		WriteMsg(__FILE__,__LINE__,tr("Those limits would remove every data points. Cut not performed"));
 		return;
 	}
 	NPoints=j;

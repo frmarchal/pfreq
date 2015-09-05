@@ -1,9 +1,13 @@
+#include <qcoreapplication.h>
 #include <stdlib.h>
 #include <math.h>
 #include <algorithm>
 #include "Savgol.h"
 #include "Utils.h"
 #include "convlv.h"
+
+//! Name of this module to group the strings to translate in a meaningful section.
+#define TRANSLATION_MODULE "SavGol"
 
 /*=============================================================================*/
 /*=============================================================================*/
@@ -50,7 +54,7 @@ int ludcmp(double **a, int n, int *indx,double *d)
 			if ((temp=fabs(a[i][j])) > big) big=temp;
 		if (big == 0.0)
 		{
-			WriteMsg(SavGolDervCalc,__LINE__,"E0064: Singular matrix in routine LUDCMP");
+			WriteMsg(SavGolDervCalc,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0064: Singular matrix in routine LUDCMP"));
 			return(-1);
 		}
 		vv[i]=1.0/big;
@@ -125,7 +129,7 @@ int savgol(double *c, long int np, int nl, int nr, int ld, int m)
 
 	if (np<nl+nr+1 || nl<0 || nr<0 || ld>m || nl+nr<m)
 	{
-		WriteMsg(SavGolDervCalc,__LINE__,"E0065: Bad args in savgol");
+		WriteMsg(SavGolDervCalc,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0065: Bad args in savgol"));
 		return(-1);
 	}
 	indx=(int *)malloc((m+2)*sizeof(int))-1;
@@ -180,7 +184,7 @@ int SavGolDervCalc(double *Data,double **Derv,int NPoint,int POrder,int Neigh)
 	*Derv=(double *)malloc(NPoint*sizeof(double));
 	if (*Derv==NULL)
 	{
-		WriteMsg(__FILE__,__LINE__,"Derivative cannot be allocated");
+		WriteMsg(__FILE__,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"Derivative cannot be allocated"));
 		return(-1);
 	}
 
@@ -190,20 +194,20 @@ int SavGolDervCalc(double *Data,double **Derv,int NPoint,int POrder,int Neigh)
 
 	if ((Filter = (double *)calloc(ipow2, sizeof(double)))==NULL)
 	{
-		WriteMsg(__FILE__,__LINE__,"E0066: Filter cannot be allocated");
+		WriteMsg(__FILE__,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0066: Filter cannot be allocated"));
 		return(-1);
 	}
 	if ((Resp = (double *)calloc(2*ipow2, sizeof(double)))==NULL)
 	{
 		free(Filter);
-		WriteMsg(__FILE__,__LINE__,"E0067: Resp cannot be allocated");
+		WriteMsg(__FILE__,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0067: Resp cannot be allocated"));
 		return(-1);
 	}
 	if ((Temp = (double *)calloc(2*ipow2, sizeof(double)))==NULL)
 	{
 		free(Resp);
 		free(Filter);
-		WriteMsg(__FILE__,__LINE__,"E0068: Temp cannot be allocated");
+		WriteMsg(__FILE__,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0068: Temp cannot be allocated"));
 		return(-1);
 	}
 
@@ -255,20 +259,20 @@ int SavGolSmooth(double *data,double *dest,int NPoint,int POrder,int Neigh)
 
 	if ((Filter = (double *)calloc(ipow2, sizeof(double)))==NULL)
 	{
-		WriteMsg("SavGolDervCalc",__LINE__,"E0066: Filter cannot be allocated");
+		WriteMsg("SavGolDervCalc",__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0066: Filter cannot be allocated"));
 		return(-1);
 	}
 	if ((Resp = (double *)calloc(2*ipow2, sizeof(double)))==NULL)
 	{
 		free(Filter);
-		WriteMsg("SavGolDervCalc",__LINE__,"R0067: Resp cannot be allocated");
+		WriteMsg("SavGolDervCalc",__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"R0067: Resp cannot be allocated"));
 		return(-1);
 	}
 	if ((Temp = (double *)calloc(2*ipow2, sizeof(double)))==NULL)
 	{
 		free(Resp);
 		free(Filter);
-		WriteMsg("SavGolDervCalc",__LINE__,"E0068: Temp cannot be allocated");
+		WriteMsg("SavGolDervCalc",__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0068: Temp cannot be allocated"));
 		return(-1);
 	}
 

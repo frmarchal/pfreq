@@ -1,7 +1,11 @@
+#include <qcoreapplication.h>
 #include <stdlib.h>
 #include <math.h>
 #include "GaussSmth.h"
 #include "Utils.h"
+
+//! Name of this module to group the strings to translate in a meaningful section.
+#define TRANSLATION_MODULE "GaussSmooth"
 
 /*=============================================================================*/
 /*!
@@ -19,7 +23,7 @@ int CalcGaussSmooth(double *Data,double XFreq,double **Smooth,int NPoints,double
 	*Smooth=(double *)malloc(NPoints*sizeof(double));
 	if (*Smooth==NULL)
 	{
-		WriteMsg(__FILE__,__LINE__,"GaussData cannot be allocated");
+		WriteMsg(__FILE__,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"GaussData cannot be allocated"));
 		return(-1);
 	}
 	if (Neigh>NPoints) Neigh=NPoints;
@@ -27,7 +31,7 @@ int CalcGaussSmooth(double *Data,double XFreq,double **Smooth,int NPoints,double
 	if (ExpTbl==NULL)
 	{
 		Purge(*Smooth);
-		WriteMsg(__FILE__,__LINE__,"GaussData cannot be allocated");
+		WriteMsg(__FILE__,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"GaussData cannot be allocated"));
 		return(-1);
 	}
 	XCoef=1./Width/XFreq;

@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <qtranslator.h>
 #include "mainscreen.h"
 #include "config.h"
 
@@ -24,7 +25,14 @@ int Run(QApplication &a)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+	QApplication a(argc, argv);
+	QCoreApplication::setOrganizationName("fmarchal");
+	QCoreApplication::setApplicationName("PFreq");
+
+	QTranslator translator;
+	qDebug("Locale is %s",qPrintable(QLocale::system().name()));
+	translator.load(QString("pfreq-")+QLocale::system().name());
+	a.installTranslator(&translator);
 
 	// locale must be C to parse numbers with decimal dots
 	setlocale(LC_NUMERIC,"C");

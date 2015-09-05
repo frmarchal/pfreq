@@ -53,3 +53,5 @@ FORMS    += mainscreen.ui \
     settings.ui
 
 RC_FILE = mafico.rc
+
+TRANSLATIONS = pfreq-fr.ts

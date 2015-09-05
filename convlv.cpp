@@ -1,7 +1,11 @@
+#include <qcoreapplication.h>
 #include <math.h>
 #include <stdlib.h>
 #include "convlv.h"
 #include "Utils.h"
+
+//! Name of this module to group the strings to translate in a meaningful section.
+#define TRANSLATION_MODULE "Convolv"
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 
@@ -184,7 +188,7 @@ int convlv(double *data, long int n, double *respns, long int m, int isign, doub
 		{
 			if ((mag2=SQR(ans[i-1])+SQR(ans[i])) == 0.0)
 			{
-				WriteMsg(FuncName,__LINE__,"E0069: Deconvolving at response zero in CONVLV");
+				WriteMsg(FuncName,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0069: Deconvolving at response zero in CONVLV"));
 				return(-1);
 			}
 			ans[i-1]=(fft[i-1]*(dum=ans[i-1])+fft[i]*ans[i])/mag2/no2;
@@ -192,7 +196,7 @@ int convlv(double *data, long int n, double *respns, long int m, int isign, doub
 		}
 		else
 		{
-			WriteMsg(FuncName,__LINE__,"E0070: No meaning for ISIGN in CONVLV");
+			WriteMsg(FuncName,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0070: No meaning for ISIGN in CONVLV"));
 			return(-1);
 		}
 	}

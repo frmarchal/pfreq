@@ -460,7 +460,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 	{
 		if (!MainForm || !MainForm->XPlot || !MainForm->YPlot || MainForm->NPoints<2)
 		{
-			WriteMsg(__FILE__,__LINE__,"No data to calculate the linear regression");
+			WriteMsg(__FILE__,__LINE__,tr("No data to calculate the linear regression"));
 			return(false);
 		}
 		bool Ok=false;
@@ -469,7 +469,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		double FirstPercent=Value.toDouble(&Ok);
 		if (!Ok)
 		{
-			WriteMsg(__FILE__,__LINE__,"Invalid starting point");
+			WriteMsg(__FILE__,__LINE__,tr("Invalid starting point"));
 			ui->LRFirst->selectAll();
 			ui->LRFirst->setFocus();
 			return(false);
@@ -479,7 +479,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		double LastPercent=Value.toDouble(&Ok);
 		if (!Ok)
 		{
-			WriteMsg(__FILE__,__LINE__,"Invalid ending point");
+			WriteMsg(__FILE__,__LINE__,tr("Invalid ending point"));
 			ui->LRLast->selectAll();
 			ui->LRLast->setFocus();
 			return(false);
@@ -491,7 +491,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		i1=(int)((NPts-1)*LastPercent/100.);
 		if (i0<0 || i1>=NPts || i1-i0<2)
 		{
-			WriteMsg(__FILE__,__LINE__,"Invalid range for the linear regression");
+			WriteMsg(__FILE__,__LINE__,tr("Invalid range for the linear regression"));
 			return(false);
 		}
 		sx=sxx=sy=sxy=0.;
@@ -508,7 +508,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		den=nx*sxx-sx*sx;
 		if (fabs(a)>=1e6*fabs(den) || fabs(b)>=256.*fabs(den))
 		{
-			WriteMsg(__FILE__,__LINE__,"Cannot calculate linear regression");
+			WriteMsg(__FILE__,__LINE__,tr("Cannot calculate linear regression"));
 			return(false);
 		}
 		Slope=a/den;
@@ -527,7 +527,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 	{
 		if (!MainForm || !MainForm->XPlot || !MainForm->YPlot || MainForm->NPoints<2)
 		{
-			WriteMsg(__FILE__,__LINE__,"No data to calculate the average");
+			WriteMsg(__FILE__,__LINE__,tr("No data to calculate the average"));
 			return(false);
 		}
 		XdData=MainForm->XPlot;
@@ -537,7 +537,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		double AvgStart=ui->AverageStart->text().toDouble(&Ok);
 		if (!Ok)
 		{
-			WriteMsg(__FILE__,__LINE__,"Invalid starting point");
+			WriteMsg(__FILE__,__LINE__,tr("Invalid starting point"));
 			ui->AverageStart->selectAll();
 			ui->AverageStart->setFocus();
 			return(false);
@@ -545,7 +545,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		double AvgNPoints=ui->AverageNPoints->text().toDouble(&Ok);
 		if (!Ok)
 		{
-			WriteMsg(__FILE__,__LINE__,"Invalid number of point");
+			WriteMsg(__FILE__,__LINE__,tr("Invalid number of point"));
 			ui->AverageNPoints->selectAll();
 			ui->AverageNPoints->setFocus();
 			return(false);
@@ -555,7 +555,7 @@ bool BackgroundForm::CalculateAutoBackground(void)
 		i1=i0+AvgNPoints;
 		if (i0<0 || i1>=NPts || i1-i0<2)
 		{
-			WriteMsg(__FILE__,__LINE__,"Invalid range for the average");
+			WriteMsg(__FILE__,__LINE__,tr("Invalid range for the average"));
 			return(false);
 		}
 		sy=0.;
