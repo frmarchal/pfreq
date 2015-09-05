@@ -18,6 +18,7 @@
 #include "config.h"
 #include "about.h"
 #include "selectcolors.h"
+#include "settings.h"
 
 #define PROG_VERSION 2
 #define PROG_REVISION 3
@@ -64,6 +65,7 @@ MainScreen::MainScreen(QWidget *parent) :
 	ExitProgram=false;
 
 	DefaultFileName=ConfigFile->Config_GetFileName("Input","FileName","*");
+	NumbersWithDot=(ConfigFile->Config_GetInt("Settings","NumbersWithDot",0)!=0);
 
 	XFreq=ConfigFile->Config_GetDouble("Axis","XFreq",250.);
 	Text.sprintf("%.4lf",XFreq);
@@ -1567,6 +1569,23 @@ void MainScreen::on_SelectColors_triggered()
 
 /*==========================================================================*/
 /*!
+  Display the settings editor panel.
+ */
+/*==========================================================================*/
+void MainScreen::on_Settings_triggered()
+{
+	Settings Form(this);
+
+	Form.SetDecimalDot(NumbersWithDot);
+	if (Form.exec()==QDialog::Accepted)
+	{
+		NumbersWithDot=Form.GetDecimalDot();
+		ConfigFile->Config_WriteInt("Settings","NumbersWithDot",(NumbersWithDot) ? 1 : 0);
+	}
+}
+
+/*==========================================================================*/
+/*!
   Copy some text to the clipboard.
 
   \return true if the text was copied on the clipboard or false in case
@@ -1585,24 +1604,24 @@ bool MainScreen::WriteToClipboard(const QString *Text)
 
 /*==========================================================================*/
 /*!
-  Copy the data curve to the clipboard.
-
-  \date 2001-12-04
+  Copy a data curve to the clipboard.
  */
 /*==========================================================================*/
-void MainScreen::on_CopyData_triggered()
+void MainScreen::CopyDataPoints(double *Data)
 {
 	long i;
-	double x,Bkgr,NextX,Slope,Offset;
-	QString Text;
-
+	double x,Bkgr,NextX;
+	double Value;
+	double Slope;
+	double Offset;
 	QString TBuff;
 	QTextStream Buff(&TBuff);
+	QLocale l=QLocale::system();
 
-	if (XFreq<0.) //get last point if X axes reverted
-		NextX=XPlot[NPoints-1];
-	else
+	if (XFreq>0.)
 		NextX=XPlot[0];
+	else
+		NextX=XPlot[NPoints-1]; //get last point if X axes reverted
 	for (i=0 ; i<NPoints ; i++)
 	{
 		if (XFreq>0.)
@@ -1616,12 +1635,29 @@ void MainScreen::on_CopyData_triggered()
 			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
 		}
 		Bkgr=x*Slope+Offset;
-		Text.sprintf("%11.5g\t%11.5g", XPlot[i], YPlot[i]-Bkgr);
-		Buff << Text << endl;
+		if (Data)
+			Value=Data[i]-Bkgr;
+		else
+			Value=Bkgr;
+		if (NumbersWithDot)
+			Buff << QString::number(XPlot[i]) << "\t" << QString::number(Value) << "\n";
+		else
+			Buff << l.toString(XPlot[i]) << "\t" << l.toString(Value) << "\n";
 	}
 
 	WriteToClipboard(Buff.string());
-	return;
+}
+
+/*==========================================================================*/
+/*!
+  Copy the data curve to the clipboard.
+
+  \date 2001-12-04
+ */
+/*==========================================================================*/
+void MainScreen::on_CopyData_triggered()
+{
+	CopyDataPoints(YPlot);
 }
 
 /*==========================================================================*/
@@ -1634,36 +1670,7 @@ void MainScreen::on_CopyData_triggered()
 /*==========================================================================*/
 void MainScreen::on_CopyBkgrMenu_triggered()
 {
-	long i;
-	double x,Bkgr,NextX,Slope,Offset;
-	QString Text;
-
-	QString TBuff;
-	QTextStream Buff(&TBuff);
-
-	if (XFreq<0.) //get last point if X axes reverted
-		NextX=XPlot[NPoints-1];
-	else
-		NextX=XPlot[0];
-	for (i=0 ; i<NPoints ; i++)
-	{
-		if (XFreq>0.)
-		{
-			x=XPlot[i];
-			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		else
-		{
-			x=XPlot[NPoints-1-i];
-			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		Bkgr=x*Slope+Offset;
-		Text.sprintf("%11.5g\t%11.5g", XPlot[i], Bkgr);
-		Buff << Text << endl;
-	}
-
-	WriteToClipboard(Buff.string());
-	return;
+	CopyDataPoints(NULL);
 }
 
 /*==========================================================================*/
@@ -1676,42 +1683,12 @@ void MainScreen::on_CopyBkgrMenu_triggered()
 /*==========================================================================*/
 void MainScreen::on_CopySmoothMenu_triggered()
 {
-	long i;
-	double x,Bkgr,NextX,Slope,Offset;
-
 	if (!YSmooth)
 	{
-		WriteMsg(__FILE__,__LINE__,"No smoothed curve");
+		WriteMsg(__FILE__,__LINE__,tr("No smoothed curve"));
 		return;
 	}
-
-	QString Text;
-	QString TBuff;
-	QTextStream Buff(&TBuff);
-
-	if (XFreq<0.) //get last point if X axes reverted
-		NextX=XPlot[NPoints-1];
-	else
-		NextX=XPlot[0];
-	for (i=0 ; i<NPoints ; i++)
-	{
-		if (XFreq>0.)
-		{
-			x=XPlot[i];
-			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		else
-		{
-			x=XPlot[NPoints-1-i];
-			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		Bkgr=x*Slope+Offset;
-		Text.sprintf("%11.5g\t%11.5g", XPlot[i], YSmooth[i]-Bkgr);
-		Buff << Text << endl;
-	}
-
-	WriteToClipboard(Buff.string());
-	return;
+	CopyDataPoints(YSmooth);
 }
 
 /*==========================================================================*/
@@ -1724,42 +1701,12 @@ void MainScreen::on_CopySmoothMenu_triggered()
 /*==========================================================================*/
 void MainScreen::on_CopyDeriveMenu_triggered()
 {
-	long i;
-	double x,Bkgr,NextX,Slope,Offset;
-
 	if (!YDerv)
 	{
-		WriteMsg(__FILE__,__LINE__,"No derivative curve");
+		WriteMsg(__FILE__,__LINE__,tr("No derivative curve"));
 		return;
 	}
-
-	QString Text;
-	QString TBuff;
-	QTextStream Buff(&TBuff);
-
-	if (XFreq<0.) //get last point if X axes reverted
-		NextX=XPlot[NPoints-1];
-	else
-		NextX=XPlot[0];
-	for (i=0 ; i<NPoints ; i++)
-	{
-		if (XFreq>0.)
-		{
-			x=XPlot[i];
-			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		else
-		{
-			x=XPlot[NPoints-1-i];
-			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		Bkgr=Slope;
-		Text.sprintf("%11.5g\t%11.5g", XPlot[i], YDerv[i]-Bkgr);
-		Buff << Text << endl;
-	}
-
-	WriteToClipboard(Buff.string());
-	return;
+	CopyDataPoints(YDerv);
 }
 
 /*==========================================================================*/

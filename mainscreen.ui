@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>821</width>
-    <height>590</height>
+    <height>670</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,7 +61,16 @@ QFrame {
        <property name="spacing">
         <number>0</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -121,7 +130,7 @@ QFrame {
      <x>0</x>
      <y>0</y>
      <width>821</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -165,6 +174,7 @@ QFrame {
     </property>
     <addaction name="SelectOutputFile"/>
     <addaction name="SelectColors"/>
+    <addaction name="Settings"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -292,7 +302,16 @@ QFrame {
         <property name="verticalSpacing">
          <number>3</number>
         </property>
-        <property name="margin">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
          <number>4</number>
         </property>
         <item row="0" column="0">
@@ -414,8 +433,8 @@ QFrame {
    </property>
    <property name="minimumSize">
     <size>
-     <width>192</width>
-     <height>141</height>
+     <width>228</width>
+     <height>158</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -460,7 +479,16 @@ QFrame {
          <property name="verticalSpacing">
           <number>3</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item row="0" column="0">
@@ -510,7 +538,16 @@ QFrame {
          <property name="verticalSpacing">
           <number>3</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <item row="0" column="0">
@@ -778,6 +815,14 @@ QFrame {
   <action name="SelectColors">
    <property name="text">
     <string>Colors...</string>
+   </property>
+  </action>
+  <action name="Settings">
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Configure some parameters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </action>
  </widget>

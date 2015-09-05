@@ -38,6 +38,7 @@ private slots:
 	void on_BackgroundMenu_triggered();
 	void on_SelectOutputFile_triggered();
 	void on_SelectColors_triggered();
+	void on_Settings_triggered();
 	void on_CopyData_triggered();
 	void on_CopyBkgrMenu_triggered();
 	void on_CopySmoothMenu_triggered();
@@ -102,6 +103,7 @@ private:
 	bool LastTrackSrc;
 	bool HasBeenCut;
 	bool ExitProgram;
+	bool NumbersWithDot;
 
 	bool GetColumns(int NColumn,int &XColumn,int &YColumn);
 	bool LoadCsvFile(char *Buffer,unsigned int FSize);
@@ -113,6 +115,7 @@ private:
 	void WriteXTime0(double XTime);
 	void SetGraphSize(GraphImage *Control,int Width,int Height);
 	void ConfigureColors();
+	void CopyDataPoints(double *Data);
 
 public:		// Déclarations de l'utilisateur
 	int NPoints;
