@@ -20,7 +20,7 @@ void WriteMsg(const char *FuncName,int LineNum,const QString &Message)
 {
 	QMessageBox MsgBox;
 	QFileInfo FullName(FuncName);
-	MsgBox.setWindowTitle(QString(FullName.fileName())+" ("+QString::number(LineNum)+")");
+	MsgBox.setWindowTitle(FullName.fileName()+" ("+QString::number(LineNum)+")");
 	MsgBox.setText(Message);
 	MsgBox.exec();
 }
