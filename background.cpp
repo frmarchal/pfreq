@@ -227,31 +227,15 @@ bool BackgroundForm::PrepareBkgr(double Time0, double XFreq,int NPts)
 	return(true);
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: GetNextSlope
-//
-// Type: Function
-//
-// Applies To: TBackgroundForm
-//
-// Description: Get the slope of the background position x. x is updated to contains
-//              the next X position when the background slope will change.
-//
-// Usage: double TBackgroundForm::GetNextSlope(double * x)
-//
-// Returns: The slope of the background. Note that if there is no background the slope
-//          will be zero.
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 1/12/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Get the slope of the background position x. x is updated to contains
+  the next X position when the background slope will change.
+
+  \return The slope of the background. Note that if there is no background the slope
+          will be zero.
+ */
+/*=============================================================================*/
 double BackgroundForm::GetNextSlope(double * x)
 {
 	int i;
@@ -455,30 +439,14 @@ void BackgroundForm::on_AverageStart_editingFinished()
 	BackgroundOk=false;
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: CalculateAutoBackground
-//
-// Type: Function
-//
-// Applies To: TBackgroundForm
-//
-// Description: Calculate the background if the automatic mode is enabled.
-//
-// Usage: bool TBackgroundForm::CalculateAutoBackground(void)
-//
-// Returns: true if the main window should be redraw, or false if nothing has to be
-//          changed in the graphic.
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 3/12/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Calculate the background if the automatic mode is enabled.
+
+  \return \c true if the main window should be redraw, or \c false if nothing has to be
+          changed in the graphic.
+ */
+/*=============================================================================*/
 bool BackgroundForm::CalculateAutoBackground(void)
 {
 	int i,NPts,i0,i1;
@@ -611,29 +579,11 @@ bool BackgroundForm::CalculateAutoBackground(void)
 	return(false);
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: DeleteAllButtonClick
-//
-// Type: Function
-//
-// Applies To: TBackgroundForm
-//
-// Description: Delete all points in the manual background.
-//
-// Usage: void TBackgroundForm::DeleteAllButtonClick(void)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 3/12/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Delete all points in the manual background.
+ */
+/*=============================================================================*/
 void BackgroundForm::on_DeleteAllButton_clicked()
 {
 	NPoints=0;
@@ -645,30 +595,11 @@ void BackgroundForm::on_DeleteAllButton_clicked()
 	emit UpdateGraphics();
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: BackgroundModeChange
-//
-// Type: Function
-//
-// Applies To: TBackgroundForm
-//
-// Description: The user toggle between the automatic background and the manual
-//              background.
-//
-// Usage: void __fastcall TBackgroundForm::BackgroundModeChange(TObject *Sender)
-//
-// Returns:
-//
-// Remarks:
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 31/12/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  The user toggle between the automatic background and the manual background.
+ */
+/*=============================================================================*/
 void BackgroundForm::on_BackgroundMode_currentChanged(int Index)
 {
 	Index=Index;//compiler pacifier

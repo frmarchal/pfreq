@@ -5,8 +5,8 @@
 #include "Utils.h"
 #include "convlv.h"
 
-//===================================================================
-//===================================================================
+/*=============================================================================*/
+/*=============================================================================*/
 void lubksb(double **a,int n,int *indx,double *b)
 {
 	int i,ii=0,ip,j;
@@ -30,9 +30,10 @@ void lubksb(double **a,int n,int *indx,double *b)
 	}
 }
 
-//===================================================================
-//===================================================================
 #define TINY 1.0e-20;
+
+/*=============================================================================*/
+/*=============================================================================*/
 int ludcmp(double **a, int n, int *indx,double *d)
 {
 	int i,imax=0,j,k;
@@ -99,17 +100,21 @@ int ludcmp(double **a, int n, int *indx,double *d)
 }
 #undef TINY
 
-//===================================================================
-//= Smooth or differentiate the data
-//= >= c=pointer to the data to smooth
-//=    np=number of point to smooth
-//=    nl=number of neighbour to the left of the point
-//=    nr=number of neighbour to the right of the point
-//=    ld=0 for smoothing; 1 for derivative
-//=    m=order of the smoothing polynomial (m=2 or m=4)
-//= => ret=0 if ok; -1 if error
-//=    c=data smoothed or differentiated according to ld
-//===================================================================
+/*=============================================================================*/
+/*!
+  Smooth or differentiate the data
+
+  \param c pointer to the data to smooth. Upon success, the buffer contains the
+  smoothed data.
+  \param np number of point to smooth
+  \param nl number of neighbour to the left of the point
+  \param nr number of neighbour to the right of the point
+  \param ld 0 for smoothing; 1 for derivative
+  \param m order of the smoothing polynomial (m=2 or m=4)
+
+  \return 0 if ok; -1 if error
+ */
+/*=============================================================================*/
 int savgol(double *c, long int np, int nl, int nr, int ld, int m)
 {
 	long kk;
@@ -155,34 +160,12 @@ int savgol(double *c, long int np, int nl, int nr, int ld, int m)
 	return(0);
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: SavGolDervCalc
-//
-// Type: Function
-//
-// Applies To :
-//
-// Description: Calculate the derivative of a curve using the Savitsky and Golay
-//              algorithm.
-//
-//
-//
-// Usage: int SavGolDervCalc(double *data,double **dest,int NPoint,int POrder,int Neigh)
-//
-//
-// Returns:
-//
-// Remarks:
-//
-//
-// System: CVI - Win95
-// Author: Marchal F.
-//
-// Date : 23/10/1999
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Calculate the derivative of a curve using the Savitsky and Golay
+  algorithm.
+ */
+/*=============================================================================*/
 int SavGolDervCalc(double *Data,double **Derv,int NPoint,int POrder,int Neigh)
 {
 	double *Filter, *Resp, *Temp, intcp, slope;
@@ -257,33 +240,11 @@ int SavGolDervCalc(double *Data,double **Derv,int NPoint,int POrder,int Neigh)
 	return(0);
 }
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: SavGolSmooth
-//
-// Type: Function
-//
-// Applies To :
-//
-// Description: Smooth a curve using the Savitsky and Golay algorithm.
-//
-//
-//
-// Usage: int SavGolSmooth(double *data,double *dest,int NPoint,int POrder,int Neigh)
-//
-//
-// Returns:
-//
-// Remarks:
-//
-//
-// System: CVI - Win95
-// Author: Marchal F.
-//
-// Date : 23/10/1999
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Description: Smooth a curve using the Savitsky and Golay algorithm.
+ */
+/*=============================================================================*/
 int SavGolSmooth(double *data,double *dest,int NPoint,int POrder,int Neigh)
 {
 	double *Filter, *Resp, *Temp, intcp, slope;

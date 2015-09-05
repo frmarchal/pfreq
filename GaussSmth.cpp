@@ -3,33 +3,11 @@
 #include "GaussSmth.h"
 #include "Utils.h"
 
-////////////////////////// FUNCTION DOCUMENTATION ////////////////////////////
-// Name: CalcGaussSmooth
-//
-// Type: Function
-//
-// Applies To:
-//
-// Description: Smooth the data using a gaussian smooth algorithm.
-//
-//
-//
-// Usage: int CalcGaussSmooth(double *Data,double **Smooth,int NPoints,double Width,int Neigh)
-//
-//
-// Returns:
-//
-// Remarks:
-//
-//
-// System: Borland C++ Builder 4 - Win95
-// Author: Marchal F
-//
-// Date: 23/10/2001
-//
-// Revision:
-//
-//////////////////////////////////// EOD /////////////////////////////////////
+/*=============================================================================*/
+/*!
+  Smooth the data using a gaussian smooth algorithm.
+ */
+/*=============================================================================*/
 int CalcGaussSmooth(double *Data,double XFreq,double **Smooth,int NPoints,double Width,int Neigh)
 {
 	long i,j;

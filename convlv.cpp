@@ -5,8 +5,8 @@
 
 #define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
 
-//===================================================================
-//===================================================================
+/*=============================================================================*/
+/*=============================================================================*/
 void four1(double *data,long nn,int isign)
 {
 	long i,n,j,m,mmax,istep;
@@ -60,8 +60,8 @@ void four1(double *data,long nn,int isign)
 }
 #undef SWAP
 
-//===================================================================
-//===================================================================
+/*=============================================================================*/
+/*=============================================================================*/
 void realft(double *data, long n, int isign)
 {
 	long int i,i1,i2,i3,i4,n2p3;
@@ -112,8 +112,8 @@ void realft(double *data, long n, int isign)
 	}
 }
 
-//===================================================================
-//===================================================================
+/*=============================================================================*/
+/*=============================================================================*/
 void twofft(double *data1, double *data2 ,double *fft1, double *fft2, long n)
 {
 	long int nn3,nn2,jj,j;
@@ -148,17 +148,19 @@ void twofft(double *data1, double *data2 ,double *fft1, double *fft2, long n)
 static float sqrarg;
 #define SQR(a) (sqrarg=(a),sqrarg*sqrarg)
 
-//===================================================================
-//= Convolves or deconvolves a real data set data[1..n] (including any user-supplied zero padding)
-//= with a response function respns[1..n]. The response function must be stored in wrap around
-//= order in the first m elements of respns, where m is an odd integer <=n. Wrap around order
-//= means that the first half of the array respns contains the impulse response function at
-//= positive times, while he second half of the array contains the impulse response function at
-//= negative times, counting down from the highest element respns[m]. On input isign is +1
-//= for convolution, -1 for deconvoution. The answer is returned in the first n components of
-//= ans. However, ans must be supplied in the calling program with dimensions [1..2*n], for
-//= consistency with twofft. n must be an integer power of two. 
-//===================================================================
+/*=============================================================================*/
+/*!
+  Convolves or deconvolves a real data set data[1..n] (including any user-supplied zero padding)
+  with a response function respns[1..n]. The response function must be stored in wrap around
+  order in the first m elements of respns, where m is an odd integer <=n. Wrap around order
+  means that the first half of the array respns contains the impulse response function at
+  positive times, while he second half of the array contains the impulse response function at
+  negative times, counting down from the highest element respns[m]. On input isign is +1
+  for convolution, -1 for deconvoution. The answer is returned in the first n components of
+  ans. However, ans must be supplied in the calling program with dimensions [1..2*n], for
+  consistency with twofft. n must be an integer power of two.
+ */
+/*=============================================================================*/
 int convlv(double *data, long int n, double *respns, long int m, int isign, double *ans)
 {
 	long int i,no2;
