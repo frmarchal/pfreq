@@ -55,6 +55,7 @@ private slots:
 
 	void on_XFrequency_editingFinished();
 	void on_XTime0_editingFinished();
+	void on_XGain_editingFinished();
 	void on_GaussWidthCtrl_editingFinished();
 	void on_GaussNeighCtrl_editingFinished();
 	void on_SavGolSPolyCtrl_editingFinished();
@@ -82,8 +83,12 @@ private:
 	double YOffset;
 	double *Smooth;
 	double GaussWidth;
+	//! Sampling frequency in whatever units the user wants.
 	double XFreq;
+	//! Starting time in whatever units the user wants.
 	double Time0;
+	//! Scaling factor for the X axis.
+	double XGain;
 	double StoredXFreq;
 	double StoredTime0;
 	int GaussNeigh;
@@ -113,9 +118,13 @@ private:
 		 int &NAllocated,bool &InData,int XColumn,int YColumn,int Line);
 	void WriteXFreq(double XFreq);
 	void WriteXTime0(double XTime);
+	void WriteXGain(double XGain);
 	void SetGraphSize(GraphImage *Control,int Width,int Height);
 	void ConfigureColors();
 	void CopyDataPoints(double *Data);
+	void DisplayXFreq();
+	void DisplayTime0();
+	void DisplayXGain();
 
 public:		// Déclarations de l'utilisateur
 	int NPoints;

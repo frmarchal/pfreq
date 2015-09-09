@@ -68,11 +68,11 @@ MainScreen::MainScreen(QWidget *parent) :
 	NumbersWithDot=(ConfigFile->Config_GetInt("Settings","NumbersWithDot",0)!=0);
 
 	XFreq=ConfigFile->Config_GetDouble("Axis","XFreq",250.);
-	Text.sprintf("%.4lf",XFreq);
-	ui->XFrequency->setText(Text);
+	DisplayXFreq();
 	Time0=ConfigFile->Config_GetDouble("Axis","XTime0",-20.);
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
+	DisplayTime0();
+	XGain=ConfigFile->Config_GetDouble("Axis","XGain",1.);
+	DisplayXGain();
 
 	YGain=ConfigFile->Config_GetDouble("Axis","YGain",1.);
 	Text.sprintf("%lf",YGain);
@@ -705,6 +705,7 @@ void MainScreen::on_LoadMenu_triggered()
 		int i;
 		double StepSize,Diff,MinDiff,MaxDiff;
 
+		for (i=0 ; i<NPoints ; i++) XData[i]*=XGain;
 		Time0=XData[0];
 		Diff=XData[1]-XData[0];
 		MinDiff=MaxDiff=Diff;
@@ -719,11 +720,6 @@ void MainScreen::on_LoadMenu_triggered()
 			XFreq=0.;
 		else
 			XFreq=1/StepSize;
-		/*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
-	{
-	Purge(YSmooth);
-	Purge(YDerv);
-	}*/
 	}
 	else
 	{
@@ -755,16 +751,12 @@ void MainScreen::RecalculateGraphics()
 
 	if (!YData || NPoints<=0) return;
 
-	Text.sprintf("%.4lf",XFreq/1000);//display in KHz
-	ui->XFrequency->blockSignals(true);
-	ui->XFrequency->setText(Text);
+	DisplayXFreq();
 	ui->XFrequency->setEnabled(XData==NULL);
-	ui->XFrequency->blockSignals(false);
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->blockSignals(true);
-	ui->XTime0->setText(Text);
+	DisplayTime0();
 	ui->XTime0->setEnabled(XData==NULL);
-	ui->XTime0->blockSignals(false);
+	DisplayXGain();
+	ui->XGain->setEnabled(XData!=NULL);
 	if (XData)
 	{
 		for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
@@ -866,7 +858,7 @@ void MainScreen::RecalculateGraphics()
 		if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
 		{
 			SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
-			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq/1000.; // Frequency in KHz
+			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq;
 			LastSGPoly=SavGolPoly;
 			LastSGNeigh=SavGolNeigh;
 		}
@@ -877,11 +869,11 @@ void MainScreen::RecalculateGraphics()
 			Derive=(double *)malloc(NPoints*sizeof(double));
 			if (Derive==NULL)
 			{
-				WriteMsg(__FILE__,__LINE__,tr("Derivative cannot be allocated"));
+				WriteMsg(__FILE__,__LINE__,tr("Derivative buffer cannot be allocated"));
 			}
 			else
 			{
-				x=0.5*XFreq/1000; // frequency in KHz
+				x=0.5*XFreq;
 				for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
 				*Derive=Derive[1];
 				Derive[NPoints-1]=Derive[NPoints-2];
@@ -967,6 +959,20 @@ void MainScreen::WriteXFreq(double XFreq)
 
 /*==========================================================================*/
 /*!
+  Display the sampling frequency in KHz on the main window.
+ */
+/*==========================================================================*/
+void MainScreen::DisplayXFreq()
+{
+	QString Text;
+	Text.sprintf("%.3lf",XFreq);
+	bool block=ui->XFrequency->blockSignals(true);
+	ui->XFrequency->setText(Text);
+	ui->XFrequency->blockSignals(block);
+}
+
+/*==========================================================================*/
+/*!
   The user go to another control. Update the new value.
 
   \date
@@ -980,13 +986,10 @@ void MainScreen::on_XFrequency_editingFinished()
 
 	Value=ui->XFrequency->text().toDouble(&Ok);
 	if (!Ok) return;
-	Value*=1000;//KHz -> Hz
 	if (Value==XFreq) return;
-	if (Value>=0.001) XFreq=Value;
+	if (Value>=1E-3) XFreq=Value;
 
-	QString Text;
-	Text.sprintf("%.0lf",XFreq/1000);//display in KHz
-	ui->XFrequency->setText(Text);
+	DisplayXFreq();
 	LastSGPoly=-1;
 	WriteXFreq(XFreq);
 	UpdateGraphics();
@@ -1009,6 +1012,20 @@ void MainScreen::WriteXTime0(double Time0)
 
 /*==========================================================================*/
 /*!
+  Display the time offset in ms on the main window.
+ */
+/*==========================================================================*/
+void MainScreen::DisplayTime0()
+{
+	QString Text;
+	Text.sprintf("%.4lf",Time0);
+	bool block=ui->XTime0->blockSignals(true);
+	ui->XTime0->setText(Text);
+	ui->XTime0->blockSignals(block);
+}
+
+/*==========================================================================*/
+/*!
   The user pressed on the enter key while typing the start time.
 
   \date
@@ -1025,11 +1042,67 @@ void MainScreen::on_XTime0_editingFinished()
 	if (Value==Time0) return;
 	Time0=Value;
 
-	QString Text;
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
+	DisplayTime0();
 	LastSGPoly=-1;
 	WriteXTime0(Time0);
+	UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  Write the new modified XGain to the configuration file.
+
+  \param XGain Gain to write into the configuration file.
+ */
+/*==========================================================================*/
+void MainScreen::WriteXGain(double XGain)
+{
+	ConfigFile->Config_WriteDouble("Axis","XGain",XGain);
+}
+
+/*==========================================================================*/
+/*!
+  Display the time offset in ms on the main window.
+ */
+/*==========================================================================*/
+void MainScreen::DisplayXGain()
+{
+	QString Text;
+	Text.sprintf("%.4lf",XGain);
+	bool block=ui->XGain->blockSignals(true);
+	ui->XGain->setText(Text);
+	ui->XGain->blockSignals(block);
+}
+
+/*==========================================================================*/
+/*!
+  The user changed the X gain.
+ */
+/*==========================================================================*/
+void MainScreen::on_XGain_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->XGain->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==XGain) return;
+	if (Value!=0.)
+	{
+		if (XData && XGain!=0.)
+		{
+			double Scale=Value/XGain;
+			for (int i=0 ; i<NPoints ; i++)
+				XData[i]*=Scale;
+			XFreq/=Scale;
+			DisplayXFreq();
+		}
+		XGain=Value;
+	}
+
+	DisplayXGain();
+	LastSGPoly=-1;
+	WriteXGain(XGain);
 	UpdateGraphics();
 }
 
@@ -1922,7 +1995,6 @@ void MainScreen::on_CutMenu_triggered()
 	double XStart,XStop,StartTime=0.;
 	double *TData;
 	int i,j;
-	QString Text;
 
 	if (!YData) return;
 
@@ -1981,8 +2053,7 @@ void MainScreen::on_CutMenu_triggered()
 	}
 	NPoints=j;
 	Time0=StartTime;
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
+	DisplayTime0();
 	HasBeenCut=true;
 
 	ConfigFile->Config_WriteDouble("Cut","XStart",XStart);

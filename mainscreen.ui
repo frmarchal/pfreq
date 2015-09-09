@@ -217,7 +217,7 @@ QFrame {
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Frequency (KHz)</string>
+        <string>Frequency</string>
        </property>
       </widget>
      </item>
@@ -227,12 +227,26 @@ QFrame {
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Start time (ms)</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="XTime0"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="XGain">
+       <property name="toolTip">
+        <string>Multiplicative factor applied on the X axis. Changing this value changes the X axis and recompute the curves. The gain is applied on any loaded file with a X axis.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>Gain</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
