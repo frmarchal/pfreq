@@ -188,7 +188,6 @@ int SavGolDervCalc(double *Data,double **Derv,int NPoint,int POrder,int Neigh)
 		return(-1);
 	}
 
-
 	for (ipow2=8 ; ipow2<NPoint ; ipow2<<=1);
 	ipow2<<=1;
 
