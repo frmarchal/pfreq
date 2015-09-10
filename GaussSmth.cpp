@@ -35,7 +35,8 @@ int CalcGaussSmooth(double *Data,double XFreq,double **Smooth,int NPoints,double
 		return(-1);
 	}
 	XCoef=1./Width/XFreq;
-	for (i=0 ; i<Neigh ; i++)
+	//ExpTbl[0]=1; is not used
+	for (i=1 ; i<Neigh ; i++)
 	{
 		a=(double)i*XCoef;
 		ExpTbl[i]=exp(-a*a);
@@ -46,7 +47,7 @@ int CalcGaussSmooth(double *Data,double XFreq,double **Smooth,int NPoints,double
 	{
 		Num=Data[i];
 		Den=1.;
-		for (j=1 ; j<=Neigh ; j++)
+		for (j=1 ; j<Neigh ; j++)
 		{
 			if (i-j>=0)
 			{
