@@ -62,5 +62,6 @@ int CalcGaussSmooth(double *Data,double XFreq,double **Smooth,int NPoints,double
 		(*Smooth)[i]=Num/Den;
 	}
 
+	free(ExpTbl);
 	return(0);
 }
