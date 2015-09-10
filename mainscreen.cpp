@@ -21,7 +21,7 @@
 #include "settings.h"
 
 #define PROG_VERSION 2
-#define PROG_REVISION 3
+#define PROG_REVISION 4
 
 //! Maximum number of columns in the file to load.
 #define MAX_COLUMN 30
