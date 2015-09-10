@@ -63,6 +63,7 @@ MainScreen::MainScreen(QWidget *parent) :
 	YDerv=NULL;
 	LastTrackSrc=true;
 	ExitProgram=false;
+	HasBeenCut=false;
 
 	DefaultFileName=ConfigFile->Config_GetFileName("Input","FileName","*");
 	NumbersWithDot=(ConfigFile->Config_GetInt("Settings","NumbersWithDot",0)!=0);

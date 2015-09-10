@@ -50,8 +50,12 @@ GraphImage::GraphImage(QWidget *Parent) :
 	FontHeight = tm.height();
 	FontWidth = tm.maxWidth();
 
-	//***** set default view region *****
+	// set default view region with dummy value until the real values are known
 	SetZoom(0.,10.,0.,10.);
+	GTop=0;
+	GBottom=10;
+	GLeft=0;
+	GRight=10;
 	PlotXMin=0.;
 	PlotXMax=10.;
 	PlotYMin=0.;
