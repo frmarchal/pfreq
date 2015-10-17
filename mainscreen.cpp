@@ -746,9 +746,11 @@ void MainScreen::on_LoadMenu_triggered()
 void MainScreen::RecalculateGraphics()
 {
 	int i;
-	double NextX,Slope,x,SMax;
+	double NextX,Slope,x,SMin,SMax;
 	double Offset,Bkgr;
 	QString Text;
+	QString MinText;
+	QString MaxText;
 
 	if (!YData || NPoints<=0) return;
 
@@ -902,14 +904,23 @@ void MainScreen::RecalculateGraphics()
 			}
 		}
 		ui->DervGraphCtrl->SetGraphic(0,XPlot,YDerv,NPoints);
+		SMin=YDerv[0];
 		SMax=YDerv[0];
 		for (i=1 ; i<NPoints-1 ; i++)
+		{
+			if (YDerv[i]<SMin) SMin=YDerv[i];
 			if (YDerv[i]>SMax) SMax=YDerv[i];
-		Text.sprintf("%.7lg",SMax);
+		}
+		MinText.sprintf("%.7lg",SMin);
+		MaxText.sprintf("%.7lg",SMax);
 	}
 	else
-		Text.clear();
-	ui->DervMaxCtrl->setText(Text);
+	{
+		MinText.clear();
+		MaxText.clear();
+	}
+	ui->DervMinCtrl->setText(MinText);
+	ui->DervMaxCtrl->setText(MaxText);
 }
 
 /*==========================================================================*/
