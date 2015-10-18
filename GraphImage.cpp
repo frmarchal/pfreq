@@ -290,9 +290,9 @@ void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 		PCanvas.drawLine((int)ix,(int)yoffset+1,(int)ix,(int)yoffset+GRAD);
 		//PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
 		if (Deci)
-			val.sprintf("%.2f",i);
+			val.setNum(i,'f',2);
 		else
-			val.sprintf("%.0f",i);
+			val.setNum(i,'f',0);
 		Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
 		if (ix+Size.width()/2<ImageWidth)
 		{

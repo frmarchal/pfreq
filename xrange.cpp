@@ -15,9 +15,9 @@ XRange::XRange(QWidget *parent) :
 	XStart=ConfigFile->Config_GetDouble("Cut","XStart",0.);
 	XStop=ConfigFile->Config_GetInt("Cut","XStop",0.);
 
-	Text.sprintf("%.2f",XStart);
+	Text.setNum(XStart,'f',2);
 	ui->XStartText->setText(Text);
-	Text.sprintf("%.2f",XStop);
+	Text.setNum(XStop,'f',2);
 	ui->XStopText->setText(Text);
 }
 

@@ -76,29 +76,29 @@ MainScreen::MainScreen(QWidget *parent) :
 	DisplayXGain();
 
 	YGain=ConfigFile->Config_GetDouble("Axis","YGain",1.);
-	Text.sprintf("%lf",YGain);
+	Text.setNum(YGain);
 	ui->YGainCtrl->setText(Text);
 	YOffset=ConfigFile->Config_GetDouble("Axis","YOffset",0.);
-	Text.sprintf("%lf",YOffset);
+	Text.setNum(YOffset);
 	ui->YOffsetCtrl->setText(Text);
 
 	int SmoothAlgo=ConfigFile->Config_GetInt("Smoothing","Algorithm",0);
 	ui->SmoothTab->setCurrentIndex(SmoothAlgo);
 
 	GaussWidth=ConfigFile->Config_GetDouble("Gauss","Width",10.);
-	Text.sprintf("%.3lf",GaussWidth);
+	Text.setNum(GaussWidth,'f',3);
 	ui->GaussWidthCtrl->setText(Text);
 	GaussNeigh=ConfigFile->Config_GetInt("Gauss","Neigh",50);
-	Text.sprintf("%d",GaussNeigh);
+	Text.setNum(GaussNeigh);
 	ui->GaussNeighCtrl->setText(Text);
 	LastGWidth=-1.;
 	LastGNeigh=-1;
 
 	SavGolSmoothPoly=ConfigFile->Config_GetInt("SavGolSmooth","Degree",4);
-	Text.sprintf("%d",SavGolSmoothPoly);
+	Text.setNum(SavGolSmoothPoly);
 	ui->SavGolSPolyCtrl->setText(Text);
 	SavGolSmoothNeigh=ConfigFile->Config_GetInt("SavGolSmooth","Neigh",50);
-	Text.sprintf("%d",SavGolSmoothNeigh);
+	Text.setNum(SavGolSmoothNeigh);
 	ui->SavGolSNeighCtrl->setText(Text);
 	LastSGSPoly=-1.;
 	LastSGSNeigh=-1;
@@ -109,10 +109,10 @@ MainScreen::MainScreen(QWidget *parent) :
 	else
 		ui->SavGolButton->setChecked(true);
 	SavGolPoly=ConfigFile->Config_GetInt("Derive","Poly",2);
-	Text.sprintf("%d",SavGolPoly);
+	Text.setNum(SavGolPoly);
 	ui->SavGolPolyCtrl->setText(Text);
 	SavGolNeigh=ConfigFile->Config_GetInt("Derive","Neigh",50);
-	Text.sprintf("%d",SavGolNeigh);
+	Text.setNum(SavGolNeigh);
 	ui->SavGolNeighCtrl->setText(Text);
 	LastSGPoly=-1.;
 	LastSGNeigh=-1;
@@ -296,7 +296,7 @@ bool MainScreen::GetColumns(int NColumn,int &XColumn,int &YColumn)
 
 	XColumn=-1;
 	YColumn=-1;
-	Item=QString::number(NColumn);
+	Item.setNum(NColumn);
 	ColMark=ConfigFile->Config_GetStringNoWrite("Columns",Item,"-1,-1");
 	QRegExp ColRe("^(\\d+),(\\d+)$");
 	if (ColRe.indexIn(ColMark)<0) return(false);
@@ -849,7 +849,7 @@ void MainScreen::RecalculateGraphics()
 			if (YSmooth[i]-Bkgr>SMax) SMax=YSmooth[i]-Bkgr;
 		}
 		ui->MainGraphCtrl->SetGraphic(1,XPlot,YSmooth,NPoints);
-		Text.sprintf("%.7lg",SMax);
+		Text.setNum(SMax,'g',7);
 	}
 	else
 		Text.clear();
@@ -911,8 +911,8 @@ void MainScreen::RecalculateGraphics()
 			if (YDerv[i]<SMin) SMin=YDerv[i];
 			if (YDerv[i]>SMax) SMax=YDerv[i];
 		}
-		MinText.sprintf("%.7lg",SMin);
-		MaxText.sprintf("%.7lg",SMax);
+		MinText.setNum(SMin,'g',7);
+		MaxText.setNum(SMax,'g',7);
 	}
 	else
 	{
@@ -976,8 +976,7 @@ void MainScreen::WriteXFreq(double XFreq)
 /*==========================================================================*/
 void MainScreen::DisplayXFreq()
 {
-	QString Text;
-	Text.sprintf("%.3lf",XFreq);
+	QString Text=QString::number(XFreq,'f',3);
 	bool block=ui->XFrequency->blockSignals(true);
 	ui->XFrequency->setText(Text);
 	ui->XFrequency->blockSignals(block);
@@ -1029,8 +1028,7 @@ void MainScreen::WriteXTime0(double Time0)
 /*==========================================================================*/
 void MainScreen::DisplayTime0()
 {
-	QString Text;
-	Text.sprintf("%.4lf",Time0);
+	QString Text=QString::number(Time0,'f',4);
 	bool block=ui->XTime0->blockSignals(true);
 	ui->XTime0->setText(Text);
 	ui->XTime0->blockSignals(block);
@@ -1079,8 +1077,7 @@ void MainScreen::WriteXGain(double XGain)
 /*==========================================================================*/
 void MainScreen::DisplayXGain()
 {
-	QString Text;
-	Text.sprintf("%.4lf",XGain);
+	QString Text=QString::number(XGain,'f',4);
 	bool block=ui->XGain->blockSignals(true);
 	ui->XGain->setText(Text);
 	ui->XGain->blockSignals(block);
@@ -1136,8 +1133,7 @@ void MainScreen::on_GaussWidthCtrl_editingFinished()
 	if (Value==GaussWidth) return;
 	if (Value>0.) GaussWidth=Value;
 
-	QString Text;
-	Text.sprintf("%.3lf",GaussWidth);
+	QString Text=QString::number(GaussWidth,'f',3);
 	ui->GaussWidthCtrl->setText(Text);
 	UpdateGraphics();
 }
@@ -1160,8 +1156,7 @@ void MainScreen::on_GaussNeighCtrl_editingFinished()
 	if (Value==GaussNeigh) return;
 	if (Value>0) GaussNeigh=Value;
 
-	QString Text;
-	Text.sprintf("%d",GaussNeigh);
+	QString Text=QString::number(GaussNeigh);
 	ui->GaussNeighCtrl->setText(Text);
 	UpdateGraphics();
 }
@@ -1183,8 +1178,7 @@ void MainScreen::on_SavGolSPolyCtrl_editingFinished()
 	if (Value==SavGolSmoothPoly) return;
 	if (Value>0.) SavGolSmoothPoly=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolSmoothPoly);
+	QString Text=QString::number(SavGolSmoothPoly);
 	ui->SavGolSPolyCtrl->setText(Text);
 	UpdateGraphics();
 }
@@ -1206,8 +1200,7 @@ void MainScreen::on_SavGolSNeighCtrl_editingFinished()
 	if (Value==SavGolSmoothNeigh) return;
 	if (Value>0) SavGolSmoothNeigh=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolSmoothNeigh);
+	QString Text=QString::number(SavGolSmoothNeigh);
 	ui->SavGolSNeighCtrl->setText(Text);
 	UpdateGraphics();
 }
@@ -1251,7 +1244,7 @@ void MainScreen::on_YGainCtrl_editingFinished()
 	if (!Ok) return;
 	if (Value==YGain) return;
 	YGain=Value;
-	Text.sprintf("%lf",YGain);
+	Text.setNum(YGain,'f');
 	ui->YGainCtrl->setText(Text);
 	LastGNeigh=-1;
 	LastSGPoly=-1;
@@ -1275,8 +1268,7 @@ void MainScreen::on_YOffsetCtrl_editingFinished()
 	if (Value==YOffset) return;
 	YOffset=Value;
 
-	QString Text;
-	Text.sprintf("%lf",YOffset);
+	QString Text=QString::number(YOffset,'f');
 	ui->YOffsetCtrl->setText(Text);
 	LastSGPoly=-1;
 	UpdateGraphics();
@@ -1300,8 +1292,7 @@ void MainScreen::on_SavGolPolyCtrl_editingFinished()
 	if (Value==SavGolPoly) return;
 	SavGolPoly=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolPoly);
+	QString Text=QString::number(SavGolPoly);
 	ui->SavGolPolyCtrl->setText(Text);
 	UpdateGraphics();
 }
@@ -1324,8 +1315,7 @@ void MainScreen::on_SavGolNeighCtrl_editingFinished()
 	if (Value==SavGolNeigh) return;
 	SavGolNeigh=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolNeigh);
+	QString Text=QString::number(SavGolNeigh);
 	ui->SavGolNeighCtrl->setText(Text);
 	UpdateGraphics();
 }
@@ -1935,12 +1925,12 @@ void MainScreen::TrackPosition(bool XSource)
 	Text[0]=0;
 	if (XSource)
 	{
-		if (Found) Text.sprintf("%.7lg",YPosition);
+		if (Found) Text.setNum(YPosition,'g',7);
 		ui->YTracker->setText(Text);
 	}
 	else
 	{
-		if (Found) Text.sprintf("%.4lg",YPosition);
+		if (Found) Text.setNum(YPosition,'g',4);
 		ui->XTracker->setText(Text);
 	}
 }
@@ -2116,9 +2106,9 @@ void MainScreen::TrackMouseMove(bool InGraph,double x,double y)
 	if (!ui->TrackMouse->isChecked()) return;
 	if (InGraph)
 	{
-		Text.sprintf("%.7lg",x);
+		Text.setNum(x,'g',7);
 		ui->XTracker->setText(Text);
-		Text.sprintf("%.4lg",y);
+		Text.setNum(y,'g',4);
 		ui->YTracker->setText(Text);
 	}
 	else
