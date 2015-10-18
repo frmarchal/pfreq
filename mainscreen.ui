@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>821</width>
-    <height>670</height>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainScreen</string>
+   <string>PFreq</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QLineEdit {
@@ -130,7 +130,7 @@ QFrame {
      <x>0</x>
      <y>0</y>
      <width>821</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -580,7 +580,7 @@ void MainScreen::on_LoadMenu_triggered()
 	Purge(YPlot);
 	Purge(YSmooth);
 	Purge(YDerv);
-	setWindowTitle("MainForm "+DefaultFileName.fileName());
+	setWindowTitle("PFreq "+DefaultFileName.fileName());
 
 	//***** test the type of the file *****
 	int NonText=0;
