@@ -393,6 +393,7 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	int nticks;
 	QString val;
 	QRect Size,Size1;
+	int Precision;
 
 	// compute scale
 	fen = max - min;
@@ -429,21 +430,27 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 	max10=max/y10;
 	start=ceil(min10);
 	if (start>=max10) start=min10;
-	if (min>=-3000 && max<=3000)
+	if (min>=-3000 && max<=3000 && fabs(y)<5)
 	{
 		step*=y10;
 		min10*=y10;
+		max10*=y10;
 		start*=y10;
 		y=0;
 		y10=1;
 	}
 	ex=(double)(GBottom-GTop)/fen*y10;
-	nticks=floor((max10-start)/step);
-	if (nticks==0)
+	nticks=floor((max10-start)/step)+1;//+1 to include the starting tick
+	if (nticks==0 || nticks>100)
 	{
-		nticks=1;//draw at least the first tick
+		nticks=1;//draw only or at least the first tick
 	}
 	xoffset=GLeft;
+	if (step==floor(step)) Precision=0;
+	else if (step*10==floor(step*10)) Precision=1;
+	else if (step*100==floor(step*100)) Precision=2;
+	else if (step*1000==floor(step*1000)) Precision=3;
+	else Precision=4;
 
 	// display scale
 	PCanvas.setBrush(CTextBg);
@@ -457,9 +464,9 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 
 		if (iy>GTop+3+3*FontHeight/2)
 		{
-			val.sprintf("%5ld",(long int)(yval-Bottom));
+			val.setNum(yval-Bottom,'f',Precision);
 			PCanvas.setPen(CText);
-			Size=PCanvas.boundingRect(QRect(xoffset-GRAD,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+			Size=PCanvas.boundingRect(QRect(0,iy,xoffset-GRAD,0),Qt::AlignRight | Qt::AlignVCenter,val);
 			PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
 		}
 	}
