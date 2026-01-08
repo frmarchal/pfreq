@@ -181,7 +181,8 @@ int convlv(double *data, long int n, double *respns, long int m, int isign, doub
 	{
 		if (isign == 1)
 		{
-			ans[i-1]=(fft[i-1]*(dum=ans[i-1])-fft[i]*ans[i])/no2;
+			dum=ans[i-1];
+			ans[i-1]=(fft[i-1]*dum-fft[i]*ans[i])/no2;
 			ans[i]=(fft[i]*dum+fft[i-1]*ans[i])/no2;
 		}
 		else if (isign == -1)
@@ -191,7 +192,8 @@ int convlv(double *data, long int n, double *respns, long int m, int isign, doub
 				WriteMsg(FuncName,__LINE__,QCoreApplication::translate(TRANSLATION_MODULE,"E0069: Deconvolving at response zero in CONVLV"));
 				return(-1);
 			}
-			ans[i-1]=(fft[i-1]*(dum=ans[i-1])+fft[i]*ans[i])/mag2/no2;
+			dum=ans[i-1];
+			ans[i-1]=(fft[i-1]*dum+fft[i]*ans[i])/mag2/no2;
 			ans[i]=(fft[i]*dum-fft[i-1]*ans[i])/mag2/no2;
 		}
 		else

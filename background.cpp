@@ -49,19 +49,31 @@ void BackgroundForm::Configure()
     double dVal;
     int iVal;
 
-    dVal=ConfigFile->Config_GetDouble("Background","LRFirst",0.0);
-    Text = QString::asprintf("%.1lf%%",dVal);
+    dVal = ConfigFile->Config_GetDouble("Background", "LRFirst", 0.0);
+    Text = QString::number(dVal, 'f', 1) + QStringLiteral("%");
     ui->LRFirst->setText(Text);
-    dVal=ConfigFile->Config_GetDouble("Background","LRLast",10.0);
-    Text = QString::asprintf("%.1lf%%",dVal);
+    dVal = ConfigFile->Config_GetDouble("Background", "LRLast", 10.0);
+    Text = QString::number(dVal, 'f', 1) + QStringLiteral("%");
     ui->LRLast->setText(Text);
 
-    iVal=ConfigFile->Config_GetInt("Background","AverageStart",0);
-    Text = QString::asprintf("%d",iVal);
+    iVal = ConfigFile->Config_GetInt("Background", "AverageStart", 0);
+    Text.setNum(iVal);
     ui->AverageStart->setText(Text);
-    iVal=ConfigFile->Config_GetInt("Background","AverageNPoints",100);
-    Text = QString::asprintf("%d",iVal);
+    iVal = ConfigFile->Config_GetInt("Background", "AverageNPoints", 100);
+    Text.setNum(iVal);
     ui->AverageNPoints->setText(Text);
+
+    iVal = ConfigFile->Config_GetInt("Background", "Type", 1);
+    if (iVal == 0)
+    {
+        ui->AverageButton->setChecked(false);
+        ui->LinearRegButton->setChecked(true);
+    }
+    else if (iVal == 1)
+    {
+        ui->LinearRegButton->setChecked(false);
+        ui->AverageButton->setChecked(true);
+    }
 
     iVal=ConfigFile->Config_GetInt("Background","Type",1);
     if (iVal==0)
@@ -110,13 +122,13 @@ void BackgroundForm::AddPoint(double x, double y)
     }
 
     QString Text;
-    Text = QString::asprintf("%.3lg",x);
-    QTableWidgetItem *XListItem=new QTableWidgetItem(Text);
-    ui->BkgrPointsList->setItem(i,0,XListItem);
+    Text.setNum(x, 'g', 3);
+    QTableWidgetItem *XListItem = new QTableWidgetItem(Text);
+    ui->BkgrPointsList->setItem(i, 0, XListItem);
 
-    Text = QString::asprintf("%.3lg",y);
-    QTableWidgetItem *YListItem=new QTableWidgetItem(Text);
-    ui->BkgrPointsList->setItem(i,1,YListItem);
+    Text.setNum(y, 'g', 3);
+    QTableWidgetItem *YListItem = new QTableWidgetItem(Text);
+    ui->BkgrPointsList->setItem(i, 1, YListItem);
 }
 
 /*=============================================================================*/
@@ -400,18 +412,17 @@ void BackgroundForm::on_DeleteAutoButton_clicked()
 void BackgroundForm::on_LRFirst_editingFinished()
 {
     double Percent;
-    bool Ok=false;
+    bool Ok = false;
 
-    Percent=ui->LRFirst->text().toDouble(&Ok);
+    Percent = ui->LRFirst->text().toDouble(&Ok);
     if (!Ok) return;
     if (Percent<0.) Percent=0.;
     else if (Percent>100.) Percent=100.;
 
-    QString Text;
-    Text = QString::asprintf("%.1lf%%",Percent);
+    QString Text = QString::number(Percent, 'f', 1) + QStringLiteral("%");
     ui->LRFirst->setText(Text);
     ui->LRFirst->selectAll();
-    BackgroundOk=false;
+    BackgroundOk = false;
 }
 
 /*=============================================================================*/
@@ -425,17 +436,17 @@ void BackgroundForm::on_LRFirst_editingFinished()
 void BackgroundForm::on_AverageStart_editingFinished()
 {
     int Value;
-    bool Ok=false;
+    bool Ok = false;
 
     Value=ui->AverageStart->text().toDouble(&Ok);
     if (!Ok) return;
     if (Value<0) Value=0;
 
     QString Text;
-    Text = QString::asprintf("%d",Value);
+    Text.setNum(Value);
     ui->AverageStart->setText(Text);
     ui->AverageStart->selectAll();
-    BackgroundOk=false;
+    BackgroundOk = false;
 }
 
 /*=============================================================================*/

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <limits.h>
 #include <limits>
+#include <algorithm>
 //#include <values.h>
 
 #define MIN_ZOOM_AREA 5  //minimum size of the zoom area in pixels
@@ -50,8 +51,12 @@ GraphImage::GraphImage(QWidget *Parent) :
 	FontHeight = tm.height();
 	FontWidth = tm.maxWidth();
 
-	//***** set default view region *****
+	// set default view region with dummy value until the real values are known
 	SetZoom(0.,10.,0.,10.);
+	GTop=0;
+	GBottom=10;
+	GLeft=0;
+	GRight=10;
 	PlotXMin=0.;
 	PlotXMax=10.;
 	PlotYMin=0.;
@@ -285,9 +290,9 @@ void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
         PCanvas.drawLine((int)ix,(int)yoffset+1,(int)ix,(int)yoffset+GRAD);
         //PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
         if (Deci)
-            val = QString::asprintf("%.2f",i);
+            val.setNum(i, 'f', 2);
         else
-            val = QString::asprintf("%.0f",i);
+            val.setNum(i, 'f', 0);
         Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
         if (ix+Size.width()/2<ImageWidth)
         {
@@ -375,13 +380,20 @@ void GraphImage::ComputeGLeft(QPainter &PCanvas,double min,double max)
 /*=============================================================================*/
 void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 {
-    double ex, fen, del=0., i, y10,c,start;
-    double y, xoffset, yoffset, iy,Bottom=0.;
+    double ex, fen, step, y10,c,start;
+    double y, Bottom=0.;
+    double yval;
+    double min10;
+    double max10;
+    double maxlog;
+    int i;
+    int iy;
+    int xoffset;
+    int yoffset;
+    int nticks;
     QString val;
     QRect Size,Size1;
-
-    //if (min<0.) min=0.;
-    //if (max<0.) max=10.;
+    int Precision;
 
     // compute scale
     fen = max - min;
@@ -394,47 +406,67 @@ void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 
     if (fen<0.)
     {
-        i=max;
-        max=min;
-        min=i;
-        //fen=-fen;
-        yoffset = (double)GTop;
-        //ex = (double)(scr_l-scr_r)/fen;
+        std::swap(min,max);
+        yoffset=GTop;
     }
     else
     {
-        yoffset = (double)GBottom;
-        //ex = (double)(scr_r-scr_l)/fen;
+        yoffset=GBottom;
     }
 
-    ex = (double)(GBottom-GTop)/fen;
-    xoffset = (double)GLeft;
-    //yoffset = (double)scr_b;
+    maxlog=log10(fabs(max));
     c=log10(fabs(fen)/3.);
+    if (maxlog-c>5)
+    {
+        c=maxlog;
+    }
     y=floor(c);
+    if (c-y<.3) step=1.;
+    else if (c-y<.6) step=2.;
+    else if (c-y<.8) step=4.;
+    else step=5.;
     y10=pow(10.,y);
-    if (c-y<2.) del=5.*y10;
-    if (c-y<.8) del=4.*y10;
-    if (c-y<.6) del=2.*y10;
-    if (c-y<.3) del=1.*y10;
-    start=ceil(min/y10)*y10;
-    //y--;
-    y10=pow(10.,y);
+    min10=min/y10;
+    max10=max/y10;
+    start=ceil(min10);
+    if (start>=max10) start=min10;
+    if (min>=-3000 && max<=3000 && fabs(y)<5)
+    {
+        step*=y10;
+        min10*=y10;
+        max10*=y10;
+        start*=y10;
+        y=0;
+        y10=1;
+    }
+    ex=(double)(GBottom-GTop)/fen*y10;
+    nticks=floor((max10-start)/step)+1;//+1 to include the starting tick
+    if (nticks==0 || nticks>100)
+    {
+        nticks=1;//draw only or at least the first tick
+    }
+    xoffset=GLeft;
+    if (step==floor(step)) Precision=0;
+    else if (step*10==floor(step*10)) Precision=1;
+    else if (step*100==floor(step*100)) Precision=2;
+    else if (step*1000==floor(step*1000)) Precision=3;
+    else Precision=4;
 
     // display scale
     PCanvas.setBrush(CTextBg);
-    for (i = start ; i <= max ; i += del)
+    for (i=0 ; i<nticks ; i++)
     {
-        iy = yoffset-((i - min) * ex);
+        yval=start+(double)i*step;
+        iy=yoffset-(int)floor((yval-min10)*ex+0.5);
         PCanvas.setPen(CFrame);
-        PCanvas.drawLine((int)xoffset-1,(int)iy,(int)xoffset-GRAD,(int)iy);
+        PCanvas.drawLine(xoffset-1,iy,xoffset-GRAD,iy);
         //PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
 
         if (iy>GTop+3+3*FontHeight/2)
         {
-            val = QString::asprintf("%5ld",(long int)((i-Bottom) / y10));
+            val.setNum(yval-Bottom,'f',Precision);
             PCanvas.setPen(CText);
-            Size=PCanvas.boundingRect(QRect(xoffset-GRAD,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+            Size=PCanvas.boundingRect(QRect(0,iy,xoffset-GRAD,0),Qt::AlignRight | Qt::AlignVCenter,val);
             PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
         }
     }

@@ -13,8 +13,7 @@ About::~About()
     delete ui;
 }
 
-void About::Version(int Version,int Revision)
+void About::Version(int Version, int Revision)
 {
-    QString Text = QString::asprintf("v%d.%02d",Version,Revision);
-    ui->Version->setText(Text);
+    ui->Version->setText(QStringLiteral("v%1.%2").arg(Version).arg(Revision, 2, 10, QChar('0')));
 }

@@ -63,41 +63,42 @@ MainScreen::MainScreen(QWidget *parent) :
     YDerv=NULL;
     LastTrackSrc=true;
     ExitProgram=false;
+    HasBeenCut=false;
 
     DefaultFileName=ConfigFile->Config_GetFileName("Input","FileName","*");
     NumbersWithDot=(ConfigFile->Config_GetInt("Settings","NumbersWithDot",0)!=0);
 
-    XFreq=ConfigFile->Config_GetDouble("Axis","XFreq",250.);
-    Text = QString::asprintf("%.4lf",XFreq);
-    ui->XFrequency->setText(Text);
-    Time0=ConfigFile->Config_GetDouble("Axis","XTime0",-20.);
-    Text = QString::asprintf("%.4lf",Time0);
-    ui->XTime0->setText(Text);
+    XFreq = ConfigFile->Config_GetDouble("Axis", "XFreq", 250.);
+    DisplayXFreq();
+    Time0 = ConfigFile->Config_GetDouble("Axis", "XTime0", -20.);
+    DisplayTime0();
+    XGain = ConfigFile->Config_GetDouble("Axis", "XGain", 1.);
+    DisplayXGain();
 
-    YGain=ConfigFile->Config_GetDouble("Axis","YGain",1.);
-    Text = QString::asprintf("%lf",YGain);
+    YGain = ConfigFile->Config_GetDouble("Axis", "YGain", 1.);
+    Text.setNum(YGain);
     ui->YGainCtrl->setText(Text);
-    YOffset=ConfigFile->Config_GetDouble("Axis","YOffset",0.);
-    Text = QString::asprintf("%lf",YOffset);
+    YOffset = ConfigFile->Config_GetDouble("Axis", "YOffset", 0.);
+    Text.setNum(YOffset);
     ui->YOffsetCtrl->setText(Text);
 
     int SmoothAlgo=ConfigFile->Config_GetInt("Smoothing","Algorithm",0);
     ui->SmoothTab->setCurrentIndex(SmoothAlgo);
 
     GaussWidth=ConfigFile->Config_GetDouble("Gauss","Width",10.);
-    Text = QString::asprintf("%.3lf",GaussWidth);
+    Text.setNum(GaussWidth,'f',3);
     ui->GaussWidthCtrl->setText(Text);
     GaussNeigh=ConfigFile->Config_GetInt("Gauss","Neigh",50);
-    Text = QString::asprintf("%d",GaussNeigh);
+    Text.setNum(GaussNeigh);
     ui->GaussNeighCtrl->setText(Text);
     LastGWidth=-1.;
     LastGNeigh=-1;
 
     SavGolSmoothPoly=ConfigFile->Config_GetInt("SavGolSmooth","Degree",4);
-    Text = QString::asprintf("%d",SavGolSmoothPoly);
+    Text.setNum(SavGolSmoothPoly);
     ui->SavGolSPolyCtrl->setText(Text);
     SavGolSmoothNeigh=ConfigFile->Config_GetInt("SavGolSmooth","Neigh",50);
-    Text = QString::asprintf("%d",SavGolSmoothNeigh);
+    Text.setNum(SavGolSmoothNeigh);
     ui->SavGolSNeighCtrl->setText(Text);
     LastSGSPoly=-1.;
     LastSGSNeigh=-1;
@@ -108,10 +109,10 @@ MainScreen::MainScreen(QWidget *parent) :
     else
         ui->SavGolButton->setChecked(true);
     SavGolPoly=ConfigFile->Config_GetInt("Derive","Poly",2);
-    Text = QString::asprintf("%d",SavGolPoly);
+    Text.setNum(SavGolPoly);
     ui->SavGolPolyCtrl->setText(Text);
     SavGolNeigh=ConfigFile->Config_GetInt("Derive","Neigh",50);
-    Text = QString::asprintf("%d",SavGolNeigh);
+    Text.setNum(SavGolNeigh);
     ui->SavGolNeighCtrl->setText(Text);
     LastSGPoly=-1.;
     LastSGNeigh=-1;
@@ -295,7 +296,7 @@ bool MainScreen::GetColumns(int NColumn,int &XColumn,int &YColumn)
 
     XColumn=-1;
     YColumn=-1;
-    Item=QString::number(NColumn);
+    Item.setNum(NColumn);
     ColMark=ConfigFile->Config_GetStringNoWrite("Columns",Item,"-1,-1");
     QRegularExpression ColRe("^(\\d+),(\\d+)$");
     QRegularExpressionMatch match = ColRe.match(ColMark);
@@ -580,7 +581,7 @@ void MainScreen::on_LoadMenu_triggered()
     Purge(YPlot);
     Purge(YSmooth);
     Purge(YDerv);
-    setWindowTitle("MainForm "+DefaultFileName.fileName());
+    setWindowTitle("PFreq "+DefaultFileName.fileName());
 
     //***** test the type of the file *****
     int NonText=0;
@@ -706,6 +707,7 @@ void MainScreen::on_LoadMenu_triggered()
         int i;
         double StepSize,Diff,MinDiff,MaxDiff;
 
+        for (i=0 ; i<NPoints ; i++) XData[i]*=XGain;
         Time0=XData[0];
         Diff=XData[1]-XData[0];
         MinDiff=MaxDiff=Diff;
@@ -720,11 +722,6 @@ void MainScreen::on_LoadMenu_triggered()
             XFreq=0.;
         else
             XFreq=1/StepSize;
-        /*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
-    {
-    Purge(YSmooth);
-    Purge(YDerv);
-    }*/
     }
     else
     {
@@ -750,22 +747,20 @@ void MainScreen::on_LoadMenu_triggered()
 void MainScreen::RecalculateGraphics()
 {
     int i;
-    double NextX,Slope,x,SMax;
+    double NextX,Slope,x,SMin,SMax;
     double Offset,Bkgr;
     QString Text;
+    QString MinText;
+    QString MaxText;
 
     if (!YData || NPoints<=0) return;
 
-    Text = QString::asprintf("%.4lf",XFreq/1000);//display in KHz
-    ui->XFrequency->blockSignals(true);
-    ui->XFrequency->setText(Text);
+    DisplayXFreq();
     ui->XFrequency->setEnabled(XData==NULL);
-    ui->XFrequency->blockSignals(false);
-    Text = QString::asprintf("%.4lf",Time0);
-    ui->XTime0->blockSignals(true);
-    ui->XTime0->setText(Text);
+    DisplayTime0();
     ui->XTime0->setEnabled(XData==NULL);
-    ui->XTime0->blockSignals(false);
+    DisplayXGain();
+    ui->XGain->setEnabled(XData!=NULL);
     if (XData)
     {
         for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
@@ -855,7 +850,7 @@ void MainScreen::RecalculateGraphics()
             if (YSmooth[i]-Bkgr>SMax) SMax=YSmooth[i]-Bkgr;
         }
         ui->MainGraphCtrl->SetGraphic(1,XPlot,YSmooth,NPoints);
-        Text = QString::asprintf("%.7lg",SMax);
+        Text.setNum(SMax,'g',7);
     }
     else
         Text.clear();
@@ -867,7 +862,7 @@ void MainScreen::RecalculateGraphics()
         if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
         {
             SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
-            for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq/1000.; // Frequency in KHz
+            for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq;
             LastSGPoly=SavGolPoly;
             LastSGNeigh=SavGolNeigh;
         }
@@ -878,11 +873,11 @@ void MainScreen::RecalculateGraphics()
             Derive=(double *)malloc(NPoints*sizeof(double));
             if (Derive==NULL)
             {
-                WriteMsg(__FILE__,__LINE__,tr("Derivative cannot be allocated"));
+                WriteMsg(__FILE__,__LINE__,tr("Derivative buffer cannot be allocated"));
             }
             else
             {
-                x=0.5*XFreq/1000; // frequency in KHz
+                x=0.5*XFreq;
                 for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
                 *Derive=Derive[1];
                 Derive[NPoints-1]=Derive[NPoints-2];
@@ -910,14 +905,23 @@ void MainScreen::RecalculateGraphics()
             }
         }
         ui->DervGraphCtrl->SetGraphic(0,XPlot,YDerv,NPoints);
+        SMin=YDerv[0];
         SMax=YDerv[0];
         for (i=1 ; i<NPoints-1 ; i++)
+        {
+            if (YDerv[i]<SMin) SMin=YDerv[i];
             if (YDerv[i]>SMax) SMax=YDerv[i];
-        Text = QString::asprintf("%.7lg",SMax);
+        }
+        MinText.setNum(SMin,'g',7);
+        MaxText.setNum(SMax,'g',7);
     }
     else
-        Text.clear();
-    ui->DervMaxCtrl->setText(Text);
+    {
+        MinText.clear();
+        MaxText.clear();
+    }
+    ui->DervMinCtrl->setText(MinText);
+    ui->DervMaxCtrl->setText(MaxText);
 }
 
 /*==========================================================================*/
@@ -968,6 +972,19 @@ void MainScreen::WriteXFreq(double XFreq)
 
 /*==========================================================================*/
 /*!
+  Display the sampling frequency in KHz on the main window.
+ */
+/*==========================================================================*/
+void MainScreen::DisplayXFreq()
+{
+	QString Text=QString::number(XFreq,'f',3);
+	bool block=ui->XFrequency->blockSignals(true);
+	ui->XFrequency->setText(Text);
+	ui->XFrequency->blockSignals(block);
+}
+
+/*==========================================================================*/
+/*!
   The user go to another control. Update the new value.
 
   \date
@@ -981,13 +998,10 @@ void MainScreen::on_XFrequency_editingFinished()
 
     Value=ui->XFrequency->text().toDouble(&Ok);
     if (!Ok) return;
-    Value*=1000;//KHz -> Hz
     if (Value==XFreq) return;
-    if (Value>=0.001) XFreq=Value;
+    if (Value>=1E-3) XFreq=Value;
 
-    QString Text;
-    Text = QString::asprintf("%.0lf",XFreq/1000);//display in KHz
-    ui->XFrequency->setText(Text);
+    DisplayXFreq();
     LastSGPoly=-1;
     WriteXFreq(XFreq);
     UpdateGraphics();
@@ -1010,6 +1024,19 @@ void MainScreen::WriteXTime0(double Time0)
 
 /*==========================================================================*/
 /*!
+  Display the time offset in ms on the main window.
+ */
+/*==========================================================================*/
+void MainScreen::DisplayTime0()
+{
+	QString Text=QString::number(Time0,'f',4);
+	bool block=ui->XTime0->blockSignals(true);
+	ui->XTime0->setText(Text);
+	ui->XTime0->blockSignals(block);
+}
+
+/*==========================================================================*/
+/*!
   The user pressed on the enter key while typing the start time.
 
   \date
@@ -1026,12 +1053,67 @@ void MainScreen::on_XTime0_editingFinished()
     if (Value==Time0) return;
     Time0=Value;
 
-    QString Text;
-    Text = QString::asprintf("%.4lf",Time0);
-    ui->XTime0->setText(Text);
+    DisplayTime0();
     LastSGPoly=-1;
     WriteXTime0(Time0);
     UpdateGraphics();
+}
+
+/*==========================================================================*/
+/*!
+  Write the new modified XGain to the configuration file.
+
+  \param XGain Gain to write into the configuration file.
+ */
+/*==========================================================================*/
+void MainScreen::WriteXGain(double XGain)
+{
+	ConfigFile->Config_WriteDouble("Axis","XGain",XGain);
+}
+
+/*==========================================================================*/
+/*!
+  Display the time offset in ms on the main window.
+ */
+/*==========================================================================*/
+void MainScreen::DisplayXGain()
+{
+	QString Text=QString::number(XGain,'f',4);
+	bool block=ui->XGain->blockSignals(true);
+	ui->XGain->setText(Text);
+	ui->XGain->blockSignals(block);
+}
+
+/*==========================================================================*/
+/*!
+  The user changed the X gain.
+ */
+/*==========================================================================*/
+void MainScreen::on_XGain_editingFinished()
+{
+	double Value;
+	bool Ok=false;
+
+	Value=ui->XGain->text().toDouble(&Ok);
+	if (!Ok) return;
+	if (Value==XGain) return;
+	if (Value!=0.)
+	{
+		if (XData && XGain!=0.)
+		{
+			double Scale=Value/XGain;
+			for (int i=0 ; i<NPoints ; i++)
+				XData[i]*=Scale;
+			XFreq/=Scale;
+			DisplayXFreq();
+		}
+		XGain=Value;
+	}
+
+	DisplayXGain();
+	LastSGPoly=-1;
+	WriteXGain(XGain);
+	UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1047,13 +1129,12 @@ void MainScreen::on_GaussWidthCtrl_editingFinished()
     double Value;
     bool Ok=false;
 
-    Value=ui->GaussWidthCtrl->text().toDouble(&Ok);
+    Value = ui->GaussWidthCtrl->text().toDouble(&Ok);
     if (!Ok) return;
-    if (Value==GaussWidth) return;
-    if (Value>0.) GaussWidth=Value;
+    if (Value == GaussWidth) return;
+    if (Value > 0.) GaussWidth=Value;
 
-    QString Text;
-    Text = QString::asprintf("%.3lf",GaussWidth);
+    QString Text = QString::number(GaussWidth, 'f', 3);
     ui->GaussWidthCtrl->setText(Text);
     UpdateGraphics();
 }
@@ -1076,8 +1157,7 @@ void MainScreen::on_GaussNeighCtrl_editingFinished()
     if (Value==GaussNeigh) return;
     if (Value>0) GaussNeigh=Value;
 
-    QString Text;
-    Text = QString::asprintf("%d",GaussNeigh);
+    QString Text=QString::number(GaussNeigh);
     ui->GaussNeighCtrl->setText(Text);
     UpdateGraphics();
 }
@@ -1099,8 +1179,7 @@ void MainScreen::on_SavGolSPolyCtrl_editingFinished()
     if (Value==SavGolSmoothPoly) return;
     if (Value>0.) SavGolSmoothPoly=Value;
 
-    QString Text;
-    Text = QString::asprintf("%d",SavGolSmoothPoly);
+    QString Text=QString::number(SavGolSmoothPoly);
     ui->SavGolSPolyCtrl->setText(Text);
     UpdateGraphics();
 }
@@ -1122,8 +1201,7 @@ void MainScreen::on_SavGolSNeighCtrl_editingFinished()
     if (Value==SavGolSmoothNeigh) return;
     if (Value>0) SavGolSmoothNeigh=Value;
 
-    QString Text;
-    Text = QString::asprintf("%d",SavGolSmoothNeigh);
+    QString Text=QString::number(SavGolSmoothNeigh);
     ui->SavGolSNeighCtrl->setText(Text);
     UpdateGraphics();
 }
@@ -1167,7 +1245,7 @@ void MainScreen::on_YGainCtrl_editingFinished()
     if (!Ok) return;
     if (Value==YGain) return;
     YGain=Value;
-    Text = QString::asprintf("%lf",YGain);
+    Text.setNum(YGain,'f');
     ui->YGainCtrl->setText(Text);
     LastGNeigh=-1;
     LastSGPoly=-1;
@@ -1191,8 +1269,7 @@ void MainScreen::on_YOffsetCtrl_editingFinished()
     if (Value==YOffset) return;
     YOffset=Value;
 
-    QString Text;
-    Text = QString::asprintf("%lf",YOffset);
+    QString Text=QString::number(YOffset,'f');
     ui->YOffsetCtrl->setText(Text);
     LastSGPoly=-1;
     UpdateGraphics();
@@ -1216,8 +1293,7 @@ void MainScreen::on_SavGolPolyCtrl_editingFinished()
     if (Value==SavGolPoly) return;
     SavGolPoly=Value;
 
-    QString Text;
-    Text = QString::asprintf("%d",SavGolPoly);
+    QString Text=QString::number(SavGolPoly);
     ui->SavGolPolyCtrl->setText(Text);
     UpdateGraphics();
 }
@@ -1240,8 +1316,7 @@ void MainScreen::on_SavGolNeighCtrl_editingFinished()
     if (Value==SavGolNeigh) return;
     SavGolNeigh=Value;
 
-    QString Text;
-    Text = QString::asprintf("%d",SavGolNeigh);
+    QString Text=QString::number(SavGolNeigh);
     ui->SavGolNeighCtrl->setText(Text);
     UpdateGraphics();
 }
@@ -1853,12 +1928,12 @@ void MainScreen::TrackPosition(bool XSource)
     Text = "";
     if (XSource)
     {
-        if (Found) Text = QString::asprintf("%.7lg",YPosition);
+        if (Found) Text.setNum(YPosition,'g',7);
         ui->YTracker->setText(Text);
     }
     else
     {
-        if (Found) Text = QString::asprintf("%.4lg",YPosition);
+        if (Found) Text.setNum(YPosition,'g',4);
         ui->XTracker->setText(Text);
     }
 }
@@ -1925,7 +2000,6 @@ void MainScreen::on_CutMenu_triggered()
     double XStart,XStop,StartTime=0.;
     double *TData;
     int i,j;
-    QString Text;
 
     if (!YData) return;
 
@@ -1984,8 +2058,7 @@ void MainScreen::on_CutMenu_triggered()
     }
     NPoints=j;
     Time0=StartTime;
-    Text = QString::asprintf("%.4lf",Time0);
-    ui->XTime0->setText(Text);
+    DisplayTime0();
     HasBeenCut=true;
 
     ConfigFile->Config_WriteDouble("Cut","XStart",XStart);
@@ -2036,9 +2109,9 @@ void MainScreen::TrackMouseMove(bool InGraph,double x,double y)
     if (!ui->TrackMouse->isChecked()) return;
     if (InGraph)
     {
-        Text = QString::asprintf("%.7lg",x);
+        Text.setNum(x,'g',7);
         ui->XTracker->setText(Text);
-        Text = QString::asprintf("%.4lg",y);
+        Text.setNum(y,'g',4);
         ui->YTracker->setText(Text);
     }
     else

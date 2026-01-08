@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>821</width>
-    <height>670</height>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainScreen</string>
+   <string>PFreq</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QLineEdit {
@@ -52,10 +52,10 @@ QFrame {
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0,1">
        <property name="spacing">
@@ -91,10 +91,10 @@ QFrame {
        <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
+          <enum>QSizePolicy::Policy::Expanding</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -130,7 +130,7 @@ QFrame {
      <x>0</x>
      <y>0</y>
      <width>821</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -201,7 +201,7 @@ QFrame {
   </widget>
   <widget class="QDockWidget" name="XAxisDock">
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::DockWidgetArea::AllDockWidgetAreas</set>
    </property>
    <property name="windowTitle">
     <string>X axis</string>
@@ -217,7 +217,7 @@ QFrame {
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Frequency (KHz)</string>
+        <string>Frequency</string>
        </property>
       </widget>
      </item>
@@ -227,12 +227,29 @@ QFrame {
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Start time (ms)</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="XTime0"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="XGain">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>Multiplicative factor applied on the X axis. Changing this value changes the X axis and recompute the curves. The gain is applied on any loaded file with a X axis.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>Gain</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -274,7 +291,7 @@ QFrame {
   </widget>
   <widget class="QDockWidget" name="TrackDock">
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::DockWidgetArea::AllDockWidgetAreas</set>
    </property>
    <property name="windowTitle">
     <string>Tracker</string>
@@ -293,10 +310,10 @@ QFrame {
         </sizepolicy>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QFormLayout" name="formLayout_3">
         <property name="verticalSpacing">
@@ -366,10 +383,10 @@ QFrame {
         </sizepolicy>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
@@ -443,11 +460,8 @@ QFrame {
      <height>524287</height>
     </size>
    </property>
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
    <property name="allowedAreas">
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::TopDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea|Qt::DockWidgetArea::TopDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Smooth</string>
@@ -593,7 +607,7 @@ QFrame {
   </widget>
   <widget class="QDockWidget" name="DeriveDock">
    <property name="allowedAreas">
-    <set>Qt::AllDockWidgetAreas</set>
+    <set>Qt::DockWidgetArea::AllDockWidgetAreas</set>
    </property>
    <property name="windowTitle">
     <string>Derivative</string>
@@ -609,10 +623,10 @@ QFrame {
      <item>
       <widget class="QFrame" name="frame_5">
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
@@ -662,10 +676,10 @@ QFrame {
      <item>
       <widget class="QFrame" name="frame_6">
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QFormLayout" name="formLayout_5">
         <property name="verticalSpacing">
@@ -697,17 +711,27 @@ QFrame {
         <item row="1" column="1">
          <widget class="QLineEdit" name="SavGolNeighCtrl"/>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_12">
           <property name="text">
            <string>Maximum</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QLineEdit" name="DervMaxCtrl">
           <property name="readOnly">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="DervMinCtrl"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>Minimum</string>
           </property>
          </widget>
         </item>
