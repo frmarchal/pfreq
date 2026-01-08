@@ -4,14 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT += core gui widgets
 
 TARGET = pfreq
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
-        mainscreen.cpp \
+    mainscreen.cpp \
     Savgol.cpp \
     GaussSmth.cpp \
     Utils.cpp \
@@ -27,7 +26,7 @@ SOURCES += main.cpp\
     selectcolors.cpp \
     settings.cpp
 
-HEADERS  += mainscreen.h \
+HEADERS += mainscreen.h \
     Savgol.h \
     GaussSmth.h \
     Utils.h \
@@ -43,7 +42,7 @@ HEADERS  += mainscreen.h \
     selectcolors.h \
     settings.h
 
-FORMS    += mainscreen.ui \
+FORMS += mainscreen.ui \
     selectcolumn.ui \
     background.ui \
     seloutfile.ui \
