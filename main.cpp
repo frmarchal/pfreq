@@ -8,10 +8,11 @@ ConfigObject *ConfigFile=NULL;
 
 void Configure()
 {
-	QString Name=QCoreApplication::applicationFilePath();
-	QFileInfo FName(Name);
-	QFileInfo ConfigName(FName.dir(),FName.completeBaseName()+".ini");
-	ConfigFile=new ConfigObject(ConfigName.filePath());
+    QString Name=QCoreApplication::applicationFilePath();
+    QFileInfo FName(Name);
+    QFileInfo ConfigName(FName.dir(),FName.completeBaseName()+".ini");
+    qDebug("Configuration file: %s", ConfigName.filePath().toLocal8Bit().data());
+    ConfigFile=new ConfigObject(ConfigName.filePath());
 }
 
 int Run(QApplication &a)

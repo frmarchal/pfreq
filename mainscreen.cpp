@@ -2070,26 +2070,22 @@ void MainScreen::on_AboutMenu_triggered()
 /*==========================================================================*/
 void MainScreen::ConfigureColors()
 {
-    QString Name=ConfigFile->Config_GetString("Colors","DispBg","#FFFFFF");
+    QString Name = ConfigFile->Config_GetString("Colors", "DispBg", "#FFFFFF");
     QColor Color(Name);
     ui->MainGraphCtrl->SetBackgroundColor(Color);
     ui->DervGraphCtrl->SetBackgroundColor(Color);
 
-    Name=ConfigFile->Config_GetString("Colors","Data","#FF0000");
-    Color.fromString(Name);
-    ui->MainGraphCtrl->SetCurveColor(0,Color);
+    Name = ConfigFile->Config_GetString("Colors", "Data", "#FF0000");
+    ui->MainGraphCtrl->SetCurveColor(0, QColor::fromString(Name));
 
-    Name=ConfigFile->Config_GetString("Colors","Smooth","#00FF00");
-    Color.fromString(Name);
-    ui->MainGraphCtrl->SetCurveColor(1,Color);
+    Name = ConfigFile->Config_GetString("Colors", "Smooth", "#00FF00");
+    ui->MainGraphCtrl->SetCurveColor(1, QColor::fromString(Name));
 
-    Name=ConfigFile->Config_GetString("Colors","Bkgr","#0000FF");
-    Color.fromString(Name);
-    ui->MainGraphCtrl->SetCurveColor(2,Color);
+    Name = ConfigFile->Config_GetString("Colors", "Bkgr", "#0000FF");
+    ui->MainGraphCtrl->SetCurveColor(2, QColor::fromString(Name));
 
-    Name=ConfigFile->Config_GetString("Colors","Derv","#FF0000");
-    Color.fromString(Name);
-    ui->DervGraphCtrl->SetCurveColor(0,Color);
+    Name = ConfigFile->Config_GetString("Colors", "Derv", "#FF0000");
+    ui->DervGraphCtrl->SetCurveColor(0, QColor::fromString(Name));
 }
 
 /*=============================================================================*/
