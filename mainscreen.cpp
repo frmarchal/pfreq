@@ -46,91 +46,91 @@ MainScreen::MainScreen(QWidget *parent) :
     ui(new Ui::MainScreen)
 {
     ui->setupUi(this);
-	MainForm=this;
+    MainForm=this;
 
-	QString Text;
-	int Selection;
+    QString Text;
+    int Selection;
 
-	//***** initialize variables *****
-	NPoints=0;
-	XData=NULL;
-	YData=NULL;
-	Smooth=NULL;
-	Derive=NULL;
-	XPlot=NULL;
-	YPlot=NULL;
-	YSmooth=NULL;
-	YDerv=NULL;
-	LastTrackSrc=true;
-	ExitProgram=false;
+    //***** initialize variables *****
+    NPoints=0;
+    XData=NULL;
+    YData=NULL;
+    Smooth=NULL;
+    Derive=NULL;
+    XPlot=NULL;
+    YPlot=NULL;
+    YSmooth=NULL;
+    YDerv=NULL;
+    LastTrackSrc=true;
+    ExitProgram=false;
 
-	DefaultFileName=ConfigFile->Config_GetFileName("Input","FileName","*");
-	NumbersWithDot=(ConfigFile->Config_GetInt("Settings","NumbersWithDot",0)!=0);
+    DefaultFileName=ConfigFile->Config_GetFileName("Input","FileName","*");
+    NumbersWithDot=(ConfigFile->Config_GetInt("Settings","NumbersWithDot",0)!=0);
 
-	XFreq=ConfigFile->Config_GetDouble("Axis","XFreq",250.);
-	Text.sprintf("%.4lf",XFreq);
-	ui->XFrequency->setText(Text);
-	Time0=ConfigFile->Config_GetDouble("Axis","XTime0",-20.);
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
+    XFreq=ConfigFile->Config_GetDouble("Axis","XFreq",250.);
+    Text = QString::asprintf("%.4lf",XFreq);
+    ui->XFrequency->setText(Text);
+    Time0=ConfigFile->Config_GetDouble("Axis","XTime0",-20.);
+    Text = QString::asprintf("%.4lf",Time0);
+    ui->XTime0->setText(Text);
 
-	YGain=ConfigFile->Config_GetDouble("Axis","YGain",1.);
-	Text.sprintf("%lf",YGain);
-	ui->YGainCtrl->setText(Text);
-	YOffset=ConfigFile->Config_GetDouble("Axis","YOffset",0.);
-	Text.sprintf("%lf",YOffset);
-	ui->YOffsetCtrl->setText(Text);
+    YGain=ConfigFile->Config_GetDouble("Axis","YGain",1.);
+    Text = QString::asprintf("%lf",YGain);
+    ui->YGainCtrl->setText(Text);
+    YOffset=ConfigFile->Config_GetDouble("Axis","YOffset",0.);
+    Text = QString::asprintf("%lf",YOffset);
+    ui->YOffsetCtrl->setText(Text);
 
-	int SmoothAlgo=ConfigFile->Config_GetInt("Smoothing","Algorithm",0);
-	ui->SmoothTab->setCurrentIndex(SmoothAlgo);
+    int SmoothAlgo=ConfigFile->Config_GetInt("Smoothing","Algorithm",0);
+    ui->SmoothTab->setCurrentIndex(SmoothAlgo);
 
-	GaussWidth=ConfigFile->Config_GetDouble("Gauss","Width",10.);
-	Text.sprintf("%.3lf",GaussWidth);
-	ui->GaussWidthCtrl->setText(Text);
-	GaussNeigh=ConfigFile->Config_GetInt("Gauss","Neigh",50);
-	Text.sprintf("%d",GaussNeigh);
-	ui->GaussNeighCtrl->setText(Text);
-	LastGWidth=-1.;
-	LastGNeigh=-1;
+    GaussWidth=ConfigFile->Config_GetDouble("Gauss","Width",10.);
+    Text = QString::asprintf("%.3lf",GaussWidth);
+    ui->GaussWidthCtrl->setText(Text);
+    GaussNeigh=ConfigFile->Config_GetInt("Gauss","Neigh",50);
+    Text = QString::asprintf("%d",GaussNeigh);
+    ui->GaussNeighCtrl->setText(Text);
+    LastGWidth=-1.;
+    LastGNeigh=-1;
 
-	SavGolSmoothPoly=ConfigFile->Config_GetInt("SavGolSmooth","Degree",4);
-	Text.sprintf("%d",SavGolSmoothPoly);
-	ui->SavGolSPolyCtrl->setText(Text);
-	SavGolSmoothNeigh=ConfigFile->Config_GetInt("SavGolSmooth","Neigh",50);
-	Text.sprintf("%d",SavGolSmoothNeigh);
-	ui->SavGolSNeighCtrl->setText(Text);
-	LastSGSPoly=-1.;
-	LastSGSNeigh=-1;
+    SavGolSmoothPoly=ConfigFile->Config_GetInt("SavGolSmooth","Degree",4);
+    Text = QString::asprintf("%d",SavGolSmoothPoly);
+    ui->SavGolSPolyCtrl->setText(Text);
+    SavGolSmoothNeigh=ConfigFile->Config_GetInt("SavGolSmooth","Neigh",50);
+    Text = QString::asprintf("%d",SavGolSmoothNeigh);
+    ui->SavGolSNeighCtrl->setText(Text);
+    LastSGSPoly=-1.;
+    LastSGSNeigh=-1;
 
-	Selection=ConfigFile->Config_GetInt("Derive","Mode",0);
-	if (Selection==0)
-		ui->RawSmoothButton->setChecked(true);
-	else
-		ui->SavGolButton->setChecked(true);
-	SavGolPoly=ConfigFile->Config_GetInt("Derive","Poly",2);
-	Text.sprintf("%d",SavGolPoly);
-	ui->SavGolPolyCtrl->setText(Text);
-	SavGolNeigh=ConfigFile->Config_GetInt("Derive","Neigh",50);
-	Text.sprintf("%d",SavGolNeigh);
-	ui->SavGolNeighCtrl->setText(Text);
-	LastSGPoly=-1.;
-	LastSGNeigh=-1;
+    Selection=ConfigFile->Config_GetInt("Derive","Mode",0);
+    if (Selection==0)
+        ui->RawSmoothButton->setChecked(true);
+    else
+        ui->SavGolButton->setChecked(true);
+    SavGolPoly=ConfigFile->Config_GetInt("Derive","Poly",2);
+    Text = QString::asprintf("%d",SavGolPoly);
+    ui->SavGolPolyCtrl->setText(Text);
+    SavGolNeigh=ConfigFile->Config_GetInt("Derive","Neigh",50);
+    Text = QString::asprintf("%d",SavGolNeigh);
+    ui->SavGolNeighCtrl->setText(Text);
+    LastSGPoly=-1.;
+    LastSGNeigh=-1;
 
-	ui->ViewPanelsMenu->addAction(ui->XAxisDock->toggleViewAction());
-	ui->ViewPanelsMenu->addAction(ui->YAxisDock->toggleViewAction());
-	ui->ViewPanelsMenu->addAction(ui->TrackDock->toggleViewAction());
-	ui->ViewPanelsMenu->addAction(ui->SmoothDock->toggleViewAction());
-	ui->ViewPanelsMenu->addAction(ui->DeriveDock->toggleViewAction());
+    ui->ViewPanelsMenu->addAction(ui->XAxisDock->toggleViewAction());
+    ui->ViewPanelsMenu->addAction(ui->YAxisDock->toggleViewAction());
+    ui->ViewPanelsMenu->addAction(ui->TrackDock->toggleViewAction());
+    ui->ViewPanelsMenu->addAction(ui->SmoothDock->toggleViewAction());
+    ui->ViewPanelsMenu->addAction(ui->DeriveDock->toggleViewAction());
 
-	restoreGeometry(ConfigFile->Config_GetBytes("Window","Geometry",QByteArray()));
-	restoreState(ConfigFile->Config_GetBytes("Window","State",QByteArray()));
+    restoreGeometry(ConfigFile->Config_GetBytes("Window","Geometry",QByteArray()));
+    restoreState(ConfigFile->Config_GetBytes("Window","State",QByteArray()));
 
-	ConfigureColors();
+    ConfigureColors();
 
-	//Top=0;
-	//Left=0;
-	//BackgroundForm=new TBackgroundForm(this);
-	//BackgroundForm->Parent=this;
+    //Top=0;
+    //Left=0;
+    //BackgroundForm=new TBackgroundForm(this);
+    //BackgroundForm->Parent=this;
 }
 
 /*==========================================================================*/
@@ -290,23 +290,24 @@ bool MainScreen::AddDataPoint(char **ColumnsTxt,double **XData,double **YData,in
 /*==========================================================================*/
 bool MainScreen::GetColumns(int NColumn,int &XColumn,int &YColumn)
 {
-	QString Item;
-	QString ColMark;
+    QString Item;
+    QString ColMark;
 
-	XColumn=-1;
-	YColumn=-1;
-	Item=QString::number(NColumn);
-	ColMark=ConfigFile->Config_GetStringNoWrite("Columns",Item,"-1,-1");
-	QRegExp ColRe("^(\\d+),(\\d+)$");
-	if (ColRe.indexIn(ColMark)<0) return(false);
-	QStringList Match=ColRe.capturedTexts();
-	bool OkX=false;
-	XColumn=Match.at(1).toInt(&OkX);
-	bool OkY=false;
-	YColumn=Match.at(2).toInt(&OkY);
-	if (!OkX) return(false);
-	if (!OkY) return(false);
-	return(true);
+    XColumn=-1;
+    YColumn=-1;
+    Item=QString::number(NColumn);
+    ColMark=ConfigFile->Config_GetStringNoWrite("Columns",Item,"-1,-1");
+    QRegularExpression ColRe("^(\\d+),(\\d+)$");
+    QRegularExpressionMatch match = ColRe.match(ColMark);
+    if (!match.hasMatch()) return(false);
+    QStringList Match=match.capturedTexts();
+    bool OkX=false;
+    XColumn=Match.at(1).toInt(&OkX);
+    bool OkY=false;
+    YColumn=Match.at(2).toInt(&OkY);
+    if (!OkX) return false;
+    if (!OkY) return false;
+    return true;
 }
 
 /*==========================================================================*/
@@ -519,223 +520,223 @@ bool MainScreen::LoadTirFile(char *Buffer,unsigned int FSize)
 /*==========================================================================*/
 void MainScreen::on_LoadMenu_triggered()
 {
-	qint64 FSize,NRead;
-	char *Buffer;
+    qint64 FSize,NRead;
+    char *Buffer;
 
-	//***** get file name *****
-	QString FileName=QFileDialog::getOpenFileName(this, tr("Open File"),
-												  DefaultFileName.filePath(),
-												  tr("All (*.*)"));
-	if (FileName.isEmpty()) return;
-	DefaultFileName=FileName;
-	ConfigFile->Config_WriteFileName("Input","FileName",DefaultFileName);
+    //***** get file name *****
+    QString FileName=QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                  DefaultFileName.filePath(),
+                                                  tr("All (*.*)"));
+    if (FileName.isEmpty()) return;
+    DefaultFileName.setFile(FileName);
+    ConfigFile->Config_WriteFileName("Input","FileName",DefaultFileName);
 
-	//***** read file *****
-	{
-		QFile hFile(FileName);
-		if (!hFile.open(QIODevice::ReadOnly))
-		{
-			WriteMsg(__FILE__,__LINE__,tr("Cannot open %1").arg(FileName));
-			return;
-		}
-		FSize=hFile.size();
-		if (FSize==0)
-		{
-			hFile.close();
-			WriteMsg(__FILE__,__LINE__,tr("File is empty"));
-			return;
-		}
-		Buffer=(char *)malloc(FSize);
-		if (!Buffer)
-		{
-			hFile.close();
-			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
-			return;
-		}
-		NRead=hFile.read(Buffer,FSize);
-		if (NRead!=FSize)
-		{
-			free(Buffer);
-			hFile.close();
-			WriteMsg(__FILE__,__LINE__,tr("Cannot read file"));
-			return;
-		}
-		hFile.close();
-	}
+    //***** read file *****
+    {
+        QFile hFile(FileName);
+        if (!hFile.open(QIODevice::ReadOnly))
+        {
+            WriteMsg(__FILE__,__LINE__,tr("Cannot open %1").arg(FileName));
+            return;
+        }
+        FSize=hFile.size();
+        if (FSize==0)
+        {
+            hFile.close();
+            WriteMsg(__FILE__,__LINE__,tr("File is empty"));
+            return;
+        }
+        Buffer=(char *)malloc(FSize);
+        if (!Buffer)
+        {
+            hFile.close();
+            WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
+            return;
+        }
+        NRead=hFile.read(Buffer,FSize);
+        if (NRead!=FSize)
+        {
+            free(Buffer);
+            hFile.close();
+            WriteMsg(__FILE__,__LINE__,tr("Cannot read file"));
+            return;
+        }
+        hFile.close();
+    }
 
-	//***** parse file *****
-	if (!XData && !HasBeenCut)  //if no X currently in memory, store the paramters
-	{
-		StoredXFreq=XFreq;
-		StoredTime0=Time0;
-	}
-	ui->MainGraphCtrl->DeleteAllCurves();
-	ui->DervGraphCtrl->DeleteAllCurves();
-	NPoints=0;
-	HasBeenCut=false;
-	Purge(XData);
-	Purge(YData);
-	Purge(XPlot);
-	Purge(YPlot);
-	Purge(YSmooth);
-	Purge(YDerv);
-	setWindowTitle("MainForm "+DefaultFileName.fileName());
+    //***** parse file *****
+    if (!XData && !HasBeenCut)  //if no X currently in memory, store the paramters
+    {
+        StoredXFreq=XFreq;
+        StoredTime0=Time0;
+    }
+    ui->MainGraphCtrl->DeleteAllCurves();
+    ui->DervGraphCtrl->DeleteAllCurves();
+    NPoints=0;
+    HasBeenCut=false;
+    Purge(XData);
+    Purge(YData);
+    Purge(XPlot);
+    Purge(YPlot);
+    Purge(YSmooth);
+    Purge(YDerv);
+    setWindowTitle("MainForm "+DefaultFileName.fileName());
 
-	//***** test the type of the file *****
-	int NonText=0;
-	int InvalidText=0;
-	char *Ptr=Buffer;
-	int Column=0;
-	int ValidLine=0,ValidColumn=0;
-	int NDots=0,NSigns=0,NExp=0;
-	bool MultiSpaces=false;
-	bool LineBegin=true;
-	bool CommentedLine=false;
-	for (unsigned int i=0 ; i<FSize ; i++ , Ptr++)
-	{
-		if (*Ptr=='\t' || *Ptr=='\r' || *Ptr=='\n' || *Ptr==' ')
-		{
-			if (!MultiSpaces)
-			{
-				if (Column>0) ValidColumn++;
-				if (*Ptr=='\r' || *Ptr=='\n')
-				{
-					MultiSpaces=true;
-					if (ValidColumn>0) ValidLine++;
-					ValidColumn=0;
-					LineBegin=true;
-					CommentedLine=false;
-				}
-				Column=0;
-				NDots=0;
-				NSigns=0;
-				NExp=0;
-			}
-			continue;
-		}
-		MultiSpaces=false;
-		if (LineBegin)
-		{
-			if (*Ptr=='%' || *Ptr==';') //comment till end of line
-				CommentedLine=true;
-			LineBegin=false;
-		}
-		if (CommentedLine) continue;
-		if (Column>=0)
-		{
-			if (*Ptr=='.' || *Ptr==',')
-			{
-				if (NDots>0)
-					Column=-1;
-				else
-					NDots++;
-				continue;
-			}
-			if (*Ptr=='-' || *Ptr=='+')
-			{
-				if (NSigns>1)
-					Column=-1;
-				else
-					NSigns++;
-				continue;
-			}
-			if (*Ptr=='E' || *Ptr=='e')
-			{
-				if (NExp>0)
-					Column=-1;
-				else
-					NExp++;
-				continue;
-			}
-			if (isdigit(*Ptr))
-				Column++;
-			else
-				Column=-1;
-		}
-		if (!(isdigit(*Ptr) || *Ptr=='.' || *Ptr==',' || *Ptr=='-' || *Ptr=='+' || toupper(*Ptr)=='E' || //number
-			  *Ptr=='/' || *Ptr==':' || *Ptr=='A' || *Ptr=='P' || *Ptr=='M' || //date
-			  *Ptr==' '))
-			NonText++;
-		if ((unsigned char)*Ptr<' ')
-			InvalidText++;
-	}
-	if ((InvalidText || NonText>10) && ValidLine<20)
-		LoadTirFile(Buffer,FSize);
-	else
-		LoadCsvFile(Buffer,FSize);
+    //***** test the type of the file *****
+    int NonText=0;
+    int InvalidText=0;
+    char *Ptr=Buffer;
+    int Column=0;
+    int ValidLine=0,ValidColumn=0;
+    int NDots=0,NSigns=0,NExp=0;
+    bool MultiSpaces=false;
+    bool LineBegin=true;
+    bool CommentedLine=false;
+    for (unsigned int i=0 ; i<FSize ; i++ , Ptr++)
+    {
+        if (*Ptr=='\t' || *Ptr=='\r' || *Ptr=='\n' || *Ptr==' ')
+        {
+            if (!MultiSpaces)
+            {
+                if (Column>0) ValidColumn++;
+                if (*Ptr=='\r' || *Ptr=='\n')
+                {
+                    MultiSpaces=true;
+                    if (ValidColumn>0) ValidLine++;
+                    ValidColumn=0;
+                    LineBegin=true;
+                    CommentedLine=false;
+                }
+                Column=0;
+                NDots=0;
+                NSigns=0;
+                NExp=0;
+            }
+            continue;
+        }
+        MultiSpaces=false;
+        if (LineBegin)
+        {
+            if (*Ptr=='%' || *Ptr==';') //comment till end of line
+                CommentedLine=true;
+            LineBegin=false;
+        }
+        if (CommentedLine) continue;
+        if (Column>=0)
+        {
+            if (*Ptr=='.' || *Ptr==',')
+            {
+                if (NDots>0)
+                    Column=-1;
+                else
+                    NDots++;
+                continue;
+            }
+            if (*Ptr=='-' || *Ptr=='+')
+            {
+                if (NSigns>1)
+                    Column=-1;
+                else
+                    NSigns++;
+                continue;
+            }
+            if (*Ptr=='E' || *Ptr=='e')
+            {
+                if (NExp>0)
+                    Column=-1;
+                else
+                    NExp++;
+                continue;
+            }
+            if (isdigit(*Ptr))
+                Column++;
+            else
+                Column=-1;
+        }
+        if (!(isdigit(*Ptr) || *Ptr=='.' || *Ptr==',' || *Ptr=='-' || *Ptr=='+' || toupper(*Ptr)=='E' || //number
+              *Ptr=='/' || *Ptr==':' || *Ptr=='A' || *Ptr=='P' || *Ptr=='M' || //date
+              *Ptr==' '))
+            NonText++;
+        if ((unsigned char)*Ptr<' ')
+            InvalidText++;
+    }
+    if ((InvalidText || NonText>10) && ValidLine<20)
+        LoadTirFile(Buffer,FSize);
+    else
+        LoadCsvFile(Buffer,FSize);
 
-	free(Buffer);
-	if (NPoints<2)
-	{
-		WriteMsg(__FILE__,__LINE__,tr("Only %1 data points in the file").arg(NPoints));
-		Purge(XData);
-		Purge(YData);
-		NPoints=0;
-	}
+    free(Buffer);
+    if (NPoints<2)
+    {
+        WriteMsg(__FILE__,__LINE__,tr("Only %1 data points in the file").arg(NPoints));
+        Purge(XData);
+        Purge(YData);
+        NPoints=0;
+    }
 
-	//***** resize memory *****
-	if (NPoints>0 && YData)
-	{
-		double *TData;
+    //***** resize memory *****
+    if (NPoints>0 && YData)
+    {
+        double *TData;
 
-		TData=(double *)realloc(YData,NPoints*sizeof(double));
-		if (TData) YData=TData;
-		XPlot=(double *)malloc(NPoints*sizeof(double));
-		if (!XPlot)
-		{
-			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
-			Purge(XData);
-			Purge(YData);
-			NPoints=0;
-		}
-		YPlot=(double *)malloc(NPoints*sizeof(double));
-		if (!YPlot)
-		{
-			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
-			Purge(XData);
-			Purge(YData);
-			NPoints=0;
-		}
-		YSmooth=(double *)malloc(NPoints*sizeof(double));
-		YDerv=(double *)malloc(NPoints*sizeof(double));
-	}
+        TData=(double *)realloc(YData,NPoints*sizeof(double));
+        if (TData) YData=TData;
+        XPlot=(double *)malloc(NPoints*sizeof(double));
+        if (!XPlot)
+        {
+            WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
+            Purge(XData);
+            Purge(YData);
+            NPoints=0;
+        }
+        YPlot=(double *)malloc(NPoints*sizeof(double));
+        if (!YPlot)
+        {
+            WriteMsg(__FILE__,__LINE__,tr("Not enough memory to load the file"));
+            Purge(XData);
+            Purge(YData);
+            NPoints=0;
+        }
+        YSmooth=(double *)malloc(NPoints*sizeof(double));
+        YDerv=(double *)malloc(NPoints*sizeof(double));
+    }
 
-	if (XData)
-	{
-		int i;
-		double StepSize,Diff,MinDiff,MaxDiff;
+    if (XData)
+    {
+        int i;
+        double StepSize,Diff,MinDiff,MaxDiff;
 
-		Time0=XData[0];
-		Diff=XData[1]-XData[0];
-		MinDiff=MaxDiff=Diff;
-		for (i=2 ; i<NPoints ; i++)
-		{
-			Diff=XData[i]-XData[i-1];
-			if (MinDiff>Diff) MinDiff=Diff;
-			else if (MaxDiff<Diff) MaxDiff=Diff;
-		}
-		StepSize=fabs((XData[NPoints-1]-XData[0])/(NPoints-1));
-		if (StepSize<1e-15)
-			XFreq=0.;
-		else
-			XFreq=1/StepSize;
-		/*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
-	{
-	Purge(YSmooth);
-	Purge(YDerv);
-	}*/
-	}
-	else
-	{
-		XFreq=StoredXFreq;
-		Time0=StoredTime0;
-	}
+        Time0=XData[0];
+        Diff=XData[1]-XData[0];
+        MinDiff=MaxDiff=Diff;
+        for (i=2 ; i<NPoints ; i++)
+        {
+            Diff=XData[i]-XData[i-1];
+            if (MinDiff>Diff) MinDiff=Diff;
+            else if (MaxDiff<Diff) MaxDiff=Diff;
+        }
+        StepSize=fabs((XData[NPoints-1]-XData[0])/(NPoints-1));
+        if (StepSize<1e-15)
+            XFreq=0.;
+        else
+            XFreq=1/StepSize;
+        /*if (fabs(MaxDiff-MinDiff)>=1E-3*StepSize)
+    {
+    Purge(YSmooth);
+    Purge(YDerv);
+    }*/
+    }
+    else
+    {
+        XFreq=StoredXFreq;
+        Time0=StoredTime0;
+    }
 
-	LastGWidth=-1.;
-	LastGNeigh=-1;
-	LastSGPoly=-1;
-	LastSGNeigh=-1;
-	UpdateGraphics();
+    LastGWidth=-1.;
+    LastGNeigh=-1;
+    LastSGPoly=-1;
+    LastSGNeigh=-1;
+    UpdateGraphics();
 }
 
 /*==========================================================================*/
@@ -748,175 +749,175 @@ void MainScreen::on_LoadMenu_triggered()
 /*==========================================================================*/
 void MainScreen::RecalculateGraphics()
 {
-	int i;
-	double NextX,Slope,x,SMax;
-	double Offset,Bkgr;
-	QString Text;
+    int i;
+    double NextX,Slope,x,SMax;
+    double Offset,Bkgr;
+    QString Text;
 
-	if (!YData || NPoints<=0) return;
+    if (!YData || NPoints<=0) return;
 
-	Text.sprintf("%.4lf",XFreq/1000);//display in KHz
-	ui->XFrequency->blockSignals(true);
-	ui->XFrequency->setText(Text);
-	ui->XFrequency->setEnabled(XData==NULL);
-	ui->XFrequency->blockSignals(false);
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->blockSignals(true);
-	ui->XTime0->setText(Text);
-	ui->XTime0->setEnabled(XData==NULL);
-	ui->XTime0->blockSignals(false);
-	if (XData)
-	{
-		for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
-	}
-	else
-	{
-		for (i=0 ; i<NPoints ; i++) XPlot[i]=(double)i/XFreq+Time0;
-	}
+    Text = QString::asprintf("%.4lf",XFreq/1000);//display in KHz
+    ui->XFrequency->blockSignals(true);
+    ui->XFrequency->setText(Text);
+    ui->XFrequency->setEnabled(XData==NULL);
+    ui->XFrequency->blockSignals(false);
+    Text = QString::asprintf("%.4lf",Time0);
+    ui->XTime0->blockSignals(true);
+    ui->XTime0->setText(Text);
+    ui->XTime0->setEnabled(XData==NULL);
+    ui->XTime0->blockSignals(false);
+    if (XData)
+    {
+        for (i=0 ; i<NPoints ; i++) XPlot[i]=XData[i];
+    }
+    else
+    {
+        for (i=0 ; i<NPoints ; i++) XPlot[i]=(double)i/XFreq+Time0;
+    }
 
-	for (i=0 ; i<NPoints ; i++) YPlot[i]=YData[i]*YGain+YOffset;
-	ui->MainGraphCtrl->SetGraphic(0,XPlot,YPlot,NPoints);
-	if (BgForm)
-	{
-		BgForm->CalculateAutoBackground();
-		if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
-			ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
-		else
-			ui->MainGraphCtrl->DeleteCurve(2);
-	}
-	else
-		ui->MainGraphCtrl->DeleteCurve(2);
+    for (i=0 ; i<NPoints ; i++) YPlot[i]=YData[i]*YGain+YOffset;
+    ui->MainGraphCtrl->SetGraphic(0,XPlot,YPlot,NPoints);
+    if (BgForm)
+    {
+        BgForm->CalculateAutoBackground();
+        if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+            ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+        else
+            ui->MainGraphCtrl->DeleteCurve(2);
+    }
+    else
+        ui->MainGraphCtrl->DeleteCurve(2);
 
-	//***** redraw smoothed curve *****
-	QLineEdit *SmoothMaxCtrl=NULL;
-	if (YSmooth)
-	{
-		if (ui->SmoothTab->currentWidget()==ui->GaussianSmooth)
-		{
-			if (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh)
-			{
-				CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
-				LastGWidth=GaussWidth;
-				LastGNeigh=GaussNeigh;
-			}
-			SmoothMaxCtrl=ui->SmoothMaxCtrl;
-		}
-		if (ui->SmoothTab->currentWidget()==ui->SavGolSmooth)
-		{
-			if (SavGolSmoothPoly!=LastSGSPoly || SavGolSmoothNeigh!=LastSGSNeigh)
-			{
-				if (!Smooth)
-				{
-					Smooth=(double *)malloc(NPoints*sizeof(double));
-					if (!Smooth)
-					{
-						WriteMsg(__FILE__,__LINE__,tr("Not enough memory to smooth the data"));
-						return;
-					}
-				}
-				SavGolSmooth(YData,Smooth,NPoints,SavGolSmoothPoly,SavGolSmoothNeigh);
-				LastSGSPoly=SavGolSmoothPoly;
-				LastSGSNeigh=SavGolSmoothNeigh;
-			}
-			SmoothMaxCtrl=ui->SavGolSMaxCtrl;
-		}
-	}
-	if (YSmooth && Smooth)
-	{
-		//NextX=Time0;
-		//if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
-		if (XFreq<0.) //get last point if X axes reverted
-			NextX=XPlot[NPoints-1];
-		else
-			NextX=XPlot[0];
-		Slope=0.;
-		Offset=0.;
-		if (BgForm) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		Bkgr=Time0*Slope+Offset;
-		SMax=Smooth[0]*YGain+YOffset-Bkgr;
-		for (i=0 ; i<NPoints ; i++)
-		{
-			YSmooth[i]=Smooth[i]*YGain+YOffset;
-			/*x=(double)i/XFreq+Time0;
-			if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
-			 BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
-			if (XFreq>0.)
-			{
-				x=XPlot[i];
-				if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-			}
-			else
-			{
-				x=XPlot[NPoints-1-i];
-				if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-			}
-			Bkgr=x*Slope+Offset;
-			if (YSmooth[i]-Bkgr>SMax) SMax=YSmooth[i]-Bkgr;
-		}
-		ui->MainGraphCtrl->SetGraphic(1,XPlot,YSmooth,NPoints);
-		Text.sprintf("%.7lg",SMax);
-	}
-	else
-		Text.clear();
-	if (SmoothMaxCtrl) SmoothMaxCtrl->setText(Text);
+    //***** redraw smoothed curve *****
+    QLineEdit *SmoothMaxCtrl=NULL;
+    if (YSmooth)
+    {
+        if (ui->SmoothTab->currentWidget()==ui->GaussianSmooth)
+        {
+            if (GaussWidth!=LastGWidth || GaussNeigh!=LastGNeigh)
+            {
+                CalcGaussSmooth(YData,XFreq,&Smooth,NPoints,GaussWidth,GaussNeigh);
+                LastGWidth=GaussWidth;
+                LastGNeigh=GaussNeigh;
+            }
+            SmoothMaxCtrl=ui->SmoothMaxCtrl;
+        }
+        if (ui->SmoothTab->currentWidget()==ui->SavGolSmooth)
+        {
+            if (SavGolSmoothPoly!=LastSGSPoly || SavGolSmoothNeigh!=LastSGSNeigh)
+            {
+                if (!Smooth)
+                {
+                    Smooth=(double *)malloc(NPoints*sizeof(double));
+                    if (!Smooth)
+                    {
+                        WriteMsg(__FILE__,__LINE__,tr("Not enough memory to smooth the data"));
+                        return;
+                    }
+                }
+                SavGolSmooth(YData,Smooth,NPoints,SavGolSmoothPoly,SavGolSmoothNeigh);
+                LastSGSPoly=SavGolSmoothPoly;
+                LastSGSNeigh=SavGolSmoothNeigh;
+            }
+            SmoothMaxCtrl=ui->SavGolSMaxCtrl;
+        }
+    }
+    if (YSmooth && Smooth)
+    {
+        //NextX=Time0;
+        //if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
+        if (XFreq<0.) //get last point if X axes reverted
+            NextX=XPlot[NPoints-1];
+        else
+            NextX=XPlot[0];
+        Slope=0.;
+        Offset=0.;
+        if (BgForm) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+        Bkgr=Time0*Slope+Offset;
+        SMax=Smooth[0]*YGain+YOffset-Bkgr;
+        for (i=0 ; i<NPoints ; i++)
+        {
+            YSmooth[i]=Smooth[i]*YGain+YOffset;
+            /*x=(double)i/XFreq+Time0;
+            if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+             BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+            if (XFreq>0.)
+            {
+                x=XPlot[i];
+                if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+            }
+            else
+            {
+                x=XPlot[NPoints-1-i];
+                if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+            }
+            Bkgr=x*Slope+Offset;
+            if (YSmooth[i]-Bkgr>SMax) SMax=YSmooth[i]-Bkgr;
+        }
+        ui->MainGraphCtrl->SetGraphic(1,XPlot,YSmooth,NPoints);
+        Text = QString::asprintf("%.7lg",SMax);
+    }
+    else
+        Text.clear();
+    if (SmoothMaxCtrl) SmoothMaxCtrl->setText(Text);
 
-	//***** redraw derivative curve *****
-	if (YDerv)
-	{
-		if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
-		{
-			SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
-			for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq/1000.; // Frequency in KHz
-			LastSGPoly=SavGolPoly;
-			LastSGNeigh=SavGolNeigh;
-		}
-		if (ui->RawSmoothButton->isChecked() && Smooth)
-		{
-			LastSGPoly=-1;
-			Purge(Derive);
-			Derive=(double *)malloc(NPoints*sizeof(double));
-			if (Derive==NULL)
-			{
-				WriteMsg(__FILE__,__LINE__,tr("Derivative cannot be allocated"));
-			}
-			else
-			{
-				x=0.5*XFreq/1000; // frequency in KHz
-				for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
-				*Derive=Derive[1];
-				Derive[NPoints-1]=Derive[NPoints-2];
-			}
-		}
-	}
-	if (YDerv && Derive)
-	{
-		if (XFreq>0.)
-		{
-			NextX=Time0;
-			for (i=0 ; i<NPoints ; i++)
-			{
-				if (BgForm && XPlot[i]>=NextX) Slope=BgForm->GetNextSlope(&NextX);
-				YDerv[i]=Derive[i]*YGain-Slope;
-			}
-		}
-		else
-		{
-			NextX=(double)(NPoints-1)/XFreq+Time0;
-			for (i=NPoints-1 ; i>=0 ; i--)
-			{
-				if (BgForm && XPlot[i]>=NextX) Slope=BgForm->GetNextSlope(&NextX);
-				YDerv[i]=Derive[i]*YGain-Slope;
-			}
-		}
-		ui->DervGraphCtrl->SetGraphic(0,XPlot,YDerv,NPoints);
-		SMax=YDerv[0];
-		for (i=1 ; i<NPoints-1 ; i++)
-			if (YDerv[i]>SMax) SMax=YDerv[i];
-		Text.sprintf("%.7lg",SMax);
-	}
-	else
-		Text.clear();
-	ui->DervMaxCtrl->setText(Text);
+    //***** redraw derivative curve *****
+    if (YDerv)
+    {
+        if ((ui->SavGolButton->isChecked()) && (SavGolPoly!=LastSGPoly || SavGolNeigh!=LastSGNeigh))
+        {
+            SavGolDervCalc(YData,&Derive,NPoints,SavGolPoly,SavGolNeigh);
+            for (i=0 ; i<NPoints ; i++) Derive[i]*=XFreq/1000.; // Frequency in KHz
+            LastSGPoly=SavGolPoly;
+            LastSGNeigh=SavGolNeigh;
+        }
+        if (ui->RawSmoothButton->isChecked() && Smooth)
+        {
+            LastSGPoly=-1;
+            Purge(Derive);
+            Derive=(double *)malloc(NPoints*sizeof(double));
+            if (Derive==NULL)
+            {
+                WriteMsg(__FILE__,__LINE__,tr("Derivative cannot be allocated"));
+            }
+            else
+            {
+                x=0.5*XFreq/1000; // frequency in KHz
+                for (i=1 ; i<NPoints-1 ; i++) Derive[i]=(Smooth[i+1]-Smooth[i-1])*x;
+                *Derive=Derive[1];
+                Derive[NPoints-1]=Derive[NPoints-2];
+            }
+        }
+    }
+    if (YDerv && Derive)
+    {
+        if (XFreq>0.)
+        {
+            NextX=Time0;
+            for (i=0 ; i<NPoints ; i++)
+            {
+                if (BgForm && XPlot[i]>=NextX) Slope=BgForm->GetNextSlope(&NextX);
+                YDerv[i]=Derive[i]*YGain-Slope;
+            }
+        }
+        else
+        {
+            NextX=(double)(NPoints-1)/XFreq+Time0;
+            for (i=NPoints-1 ; i>=0 ; i--)
+            {
+                if (BgForm && XPlot[i]>=NextX) Slope=BgForm->GetNextSlope(&NextX);
+                YDerv[i]=Derive[i]*YGain-Slope;
+            }
+        }
+        ui->DervGraphCtrl->SetGraphic(0,XPlot,YDerv,NPoints);
+        SMax=YDerv[0];
+        for (i=1 ; i<NPoints-1 ; i++)
+            if (YDerv[i]>SMax) SMax=YDerv[i];
+        Text = QString::asprintf("%.7lg",SMax);
+    }
+    else
+        Text.clear();
+    ui->DervMaxCtrl->setText(Text);
 }
 
 /*==========================================================================*/
@@ -975,21 +976,21 @@ void MainScreen::WriteXFreq(double XFreq)
 /*==========================================================================*/
 void MainScreen::on_XFrequency_editingFinished()
 {
-	double Value;
-	bool Ok=false;
+    double Value;
+    bool Ok=false;
 
-	Value=ui->XFrequency->text().toDouble(&Ok);
-	if (!Ok) return;
-	Value*=1000;//KHz -> Hz
-	if (Value==XFreq) return;
-	if (Value>=0.001) XFreq=Value;
+    Value=ui->XFrequency->text().toDouble(&Ok);
+    if (!Ok) return;
+    Value*=1000;//KHz -> Hz
+    if (Value==XFreq) return;
+    if (Value>=0.001) XFreq=Value;
 
-	QString Text;
-	Text.sprintf("%.0lf",XFreq/1000);//display in KHz
-	ui->XFrequency->setText(Text);
-	LastSGPoly=-1;
-	WriteXFreq(XFreq);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%.0lf",XFreq/1000);//display in KHz
+    ui->XFrequency->setText(Text);
+    LastSGPoly=-1;
+    WriteXFreq(XFreq);
+    UpdateGraphics();
 }
 
 /*==========================================================================*/
@@ -1017,20 +1018,20 @@ void MainScreen::WriteXTime0(double Time0)
 /*==========================================================================*/
 void MainScreen::on_XTime0_editingFinished()
 {
-	double Value;
-	bool Ok=false;
+    double Value;
+    bool Ok=false;
 
-	Value=ui->XTime0->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==Time0) return;
-	Time0=Value;
+    Value=ui->XTime0->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==Time0) return;
+    Time0=Value;
 
-	QString Text;
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
-	LastSGPoly=-1;
-	WriteXTime0(Time0);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%.4lf",Time0);
+    ui->XTime0->setText(Text);
+    LastSGPoly=-1;
+    WriteXTime0(Time0);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1043,18 +1044,18 @@ void MainScreen::on_XTime0_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_GaussWidthCtrl_editingFinished()
 {
-	double Value;
-	bool Ok=false;
+    double Value;
+    bool Ok=false;
 
-	Value=ui->GaussWidthCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==GaussWidth) return;
-	if (Value>0.) GaussWidth=Value;
+    Value=ui->GaussWidthCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==GaussWidth) return;
+    if (Value>0.) GaussWidth=Value;
 
-	QString Text;
-	Text.sprintf("%.3lf",GaussWidth);
-	ui->GaussWidthCtrl->setText(Text);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%.3lf",GaussWidth);
+    ui->GaussWidthCtrl->setText(Text);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1067,18 +1068,18 @@ void MainScreen::on_GaussWidthCtrl_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_GaussNeighCtrl_editingFinished()
 {
-	int Value;
-	bool Ok=false;
+    int Value;
+    bool Ok=false;
 
-	Value=ui->GaussNeighCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==GaussNeigh) return;
-	if (Value>0) GaussNeigh=Value;
+    Value=ui->GaussNeighCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==GaussNeigh) return;
+    if (Value>0) GaussNeigh=Value;
 
-	QString Text;
-	Text.sprintf("%d",GaussNeigh);
-	ui->GaussNeighCtrl->setText(Text);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%d",GaussNeigh);
+    ui->GaussNeighCtrl->setText(Text);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1090,18 +1091,18 @@ void MainScreen::on_GaussNeighCtrl_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_SavGolSPolyCtrl_editingFinished()
 {
-	double Value;
-	bool Ok=false;
+    double Value;
+    bool Ok=false;
 
-	Value=ui->SavGolSPolyCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==SavGolSmoothPoly) return;
-	if (Value>0.) SavGolSmoothPoly=Value;
+    Value=ui->SavGolSPolyCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==SavGolSmoothPoly) return;
+    if (Value>0.) SavGolSmoothPoly=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolSmoothPoly);
-	ui->SavGolSPolyCtrl->setText(Text);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%d",SavGolSmoothPoly);
+    ui->SavGolSPolyCtrl->setText(Text);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1113,18 +1114,18 @@ void MainScreen::on_SavGolSPolyCtrl_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_SavGolSNeighCtrl_editingFinished()
 {
-	int Value;
-	bool Ok=false;
+    int Value;
+    bool Ok=false;
 
-	Value=ui->SavGolSNeighCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==SavGolSmoothNeigh) return;
-	if (Value>0) SavGolSmoothNeigh=Value;
+    Value=ui->SavGolSNeighCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==SavGolSmoothNeigh) return;
+    if (Value>0) SavGolSmoothNeigh=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolSmoothNeigh);
-	ui->SavGolSNeighCtrl->setText(Text);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%d",SavGolSmoothNeigh);
+    ui->SavGolSNeighCtrl->setText(Text);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1158,19 +1159,19 @@ void MainScreen::on_SmoothTab_currentChanged(int Index)
 /*=============================================================================*/
 void MainScreen::on_YGainCtrl_editingFinished()
 {
-	double Value;
-	QString Text;
-	bool Ok=false;
+    double Value;
+    QString Text;
+    bool Ok=false;
 
-	Value=ui->YGainCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==YGain) return;
-	YGain=Value;
-	Text.sprintf("%lf",YGain);
-	ui->YGainCtrl->setText(Text);
-	LastGNeigh=-1;
-	LastSGPoly=-1;
-	UpdateGraphics();
+    Value=ui->YGainCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==YGain) return;
+    YGain=Value;
+    Text = QString::asprintf("%lf",YGain);
+    ui->YGainCtrl->setText(Text);
+    LastGNeigh=-1;
+    LastSGPoly=-1;
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1182,19 +1183,19 @@ void MainScreen::on_YGainCtrl_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_YOffsetCtrl_editingFinished()
 {
-	double Value;
-	bool Ok=false;
+    double Value;
+    bool Ok=false;
 
-	Value=ui->YOffsetCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==YOffset) return;
-	YOffset=Value;
+    Value=ui->YOffsetCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==YOffset) return;
+    YOffset=Value;
 
-	QString Text;
-	Text.sprintf("%lf",YOffset);
-	ui->YOffsetCtrl->setText(Text);
-	LastSGPoly=-1;
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%lf",YOffset);
+    ui->YOffsetCtrl->setText(Text);
+    LastSGPoly=-1;
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1207,18 +1208,18 @@ void MainScreen::on_YOffsetCtrl_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_SavGolPolyCtrl_editingFinished()
 {
-	double Value;
-	bool Ok=false;
+    double Value;
+    bool Ok=false;
 
-	Value=ui->SavGolPolyCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==SavGolPoly) return;
-	SavGolPoly=Value;
+    Value=ui->SavGolPolyCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==SavGolPoly) return;
+    SavGolPoly=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolPoly);
-	ui->SavGolPolyCtrl->setText(Text);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%d",SavGolPoly);
+    ui->SavGolPolyCtrl->setText(Text);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1231,18 +1232,18 @@ void MainScreen::on_SavGolPolyCtrl_editingFinished()
 /*=============================================================================*/
 void MainScreen::on_SavGolNeighCtrl_editingFinished()
 {
-	int Value;
-	bool Ok=false;
+    int Value;
+    bool Ok=false;
 
-	Value=ui->SavGolNeighCtrl->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value==SavGolNeigh) return;
-	SavGolNeigh=Value;
+    Value=ui->SavGolNeighCtrl->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value==SavGolNeigh) return;
+    SavGolNeigh=Value;
 
-	QString Text;
-	Text.sprintf("%d",SavGolNeigh);
-	ui->SavGolNeighCtrl->setText(Text);
-	UpdateGraphics();
+    QString Text;
+    Text = QString::asprintf("%d",SavGolNeigh);
+    ui->SavGolNeighCtrl->setText(Text);
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -1277,66 +1278,66 @@ void MainScreen::on_SaveMenu_aboutToShow()
 /*=============================================================================*/
 void MainScreen::on_SaveDerivativeMenu_triggered()
 {
-	int i;
-	double NextX,Slope,Offset,x,Bkgr;
+    int i;
+    double NextX,Slope,Offset,x,Bkgr;
 
-	if (!Derive) return;
-	if (!YDerv)
-	{
-		WriteMsg(__FILE__,__LINE__,tr("No derivative curve"));
-		return;
-	}
-	QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Derivative","");
-	if (FileName.filePath().isEmpty())
-	{
-		ConfigFile->Config_WriteFileName("Output","Derivative","derive.txt");
-		WriteMsg(__FILE__,__LINE__,tr("No output file in the config file"));
-		return;
-	}
-	QFile fo(FileName.filePath());
-	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		WriteMsg(__FILE__,__LINE__,tr("Cannot save file %1").arg(FileName.filePath()));
-		return;
-	}
-	QTextStream Out(&fo);
-	//NextX=Time0;
-	//if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
-	if (XFreq<0.) //get last point if X axes reverted
-		NextX=XPlot[NPoints-1];
-	else
-		NextX=XPlot[0];
-	bool Error=false;
-	for (i=0 ; i<NPoints ; i++)
-	{
-		/*x=(double)i/XFreq+Time0;
-   if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
-	BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
-		if (XFreq>0.)
-		{
-			x=XPlot[i];
-			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		else
-		{
-			x=XPlot[NPoints-1-i];
-			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		Bkgr=Slope;
-		Out << YDerv[i]-Bkgr << endl;
-		//if (fprintf(fo,"%lf\n",YDerv[i]-Bkgr)==EOF) Error=true;
+    if (!Derive) return;
+    if (!YDerv)
+    {
+        WriteMsg(__FILE__,__LINE__,tr("No derivative curve"));
+        return;
+    }
+    QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Derivative","");
+    if (FileName.filePath().isEmpty())
+    {
+        ConfigFile->Config_WriteFileName("Output","Derivative","derive.txt");
+        WriteMsg(__FILE__,__LINE__,tr("No output file in the config file"));
+        return;
+    }
+    QFile fo(FileName.filePath());
+    if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        WriteMsg(__FILE__,__LINE__,tr("Cannot save file %1").arg(FileName.filePath()));
+        return;
+    }
+    QTextStream Out(&fo);
+    //NextX=Time0;
+    //if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
+    if (XFreq<0.) //get last point if X axes reverted
+        NextX=XPlot[NPoints-1];
+    else
+        NextX=XPlot[0];
+    bool Error=false;
+    for (i=0 ; i<NPoints ; i++)
+    {
+        /*x=(double)i/XFreq+Time0;
+    if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+    BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+        if (XFreq>0.)
+        {
+            x=XPlot[i];
+            if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+        }
+        else
+        {
+            x=XPlot[NPoints-1-i];
+            if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+        }
+        Bkgr=Slope;
+        Out << YDerv[i]-Bkgr << Qt::endl;
+        //if (fprintf(fo,"%lf\n",YDerv[i]-Bkgr)==EOF) Error=true;
 
-		if (Out.status()!=QTextStream::Ok)
-		{
-			Error=true;
-			break;
-		}
-	}
-	fo.close();
-	if (Error)
-		WriteMsg(__FILE__,__LINE__,tr("Error while writting %1").arg(FileName.filePath()));
-	else
-		WriteMsg(__FILE__,__LINE__,tr("Derivative saved in %1").arg(FileName.filePath()));
+        if (Out.status()!=QTextStream::Ok)
+        {
+            Error=true;
+            break;
+        }
+    }
+    fo.close();
+    if (Error)
+        WriteMsg(__FILE__,__LINE__,tr("Error while writting %1").arg(FileName.filePath()));
+    else
+        WriteMsg(__FILE__,__LINE__,tr("Derivative saved in %1").arg(FileName.filePath()));
 }
 
 /*=============================================================================*/
@@ -1348,63 +1349,63 @@ void MainScreen::on_SaveDerivativeMenu_triggered()
 /*=============================================================================*/
 void MainScreen::on_SaveSmoothMenu_triggered()
 {
-	int i;
-	double x,Slope,Offset,NextX,Bkgr;
+    int i;
+    double x, Slope = 1, Offset = 0, NextX, Bkgr;
 
-	if (!YSmooth)
-	{
-		WriteMsg(__FILE__,__LINE__,tr("No smoothed curve"));
-		return;
-	}
-	QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Smooth","");
-	if (FileName.filePath().isEmpty())
-	{
-		ConfigFile->Config_WriteFileName("Output","Smooth","smooth.txt");
-		WriteMsg(__FILE__,__LINE__,tr("No output file in the config file"));
-		return;
-	}
-	QFile fo(FileName.filePath());
-	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		WriteMsg(__FILE__,__LINE__,tr("Cannot save file %1").arg(FileName.filePath()));
-		return;
-	}
-	QTextStream Out(&fo);
-	//NextX=Time0;
-	//if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
-	if (XFreq<0.) //get last point if X axes reverted
-		NextX=XPlot[NPoints-1];
-	else
-		NextX=XPlot[0];
-	bool Error=false;
-	for (i=0 ; i<NPoints && !Error ; i++)
-	{
-		/*x=(double)i/XFreq+Time0;
-   if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
-	BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
-		if (XFreq>0.)
-		{
-			x=XPlot[i];
-			if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		else
-		{
-			x=XPlot[NPoints-1-i];
-			if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
-		}
-		Bkgr=x*Slope+Offset;
-		Out << YSmooth[i]-Bkgr << endl;
-		if (Out.status()!=QTextStream::Ok)
-		{
-			Error=true;
-			break;
-		}
-	}
-	fo.close();
-	if (Error)
-		WriteMsg(__FILE__,__LINE__,tr("Error while writting %1").arg(FileName.filePath()));
-	else
-		WriteMsg(__FILE__,__LINE__,tr("Smoothed curve saved in %1").arg(FileName.filePath()));
+    if (!YSmooth)
+    {
+        WriteMsg(__FILE__,__LINE__,tr("No smoothed curve"));
+        return;
+    }
+    QFileInfo FileName=ConfigFile->Config_GetFileName("Output","Smooth","");
+    if (FileName.filePath().isEmpty())
+    {
+        ConfigFile->Config_WriteFileName("Output","Smooth","smooth.txt");
+        WriteMsg(__FILE__,__LINE__,tr("No output file in the config file"));
+        return;
+    }
+    QFile fo(FileName.filePath());
+    if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        WriteMsg(__FILE__,__LINE__,tr("Cannot save file %1").arg(FileName.filePath()));
+        return;
+    }
+    QTextStream Out(&fo);
+    //NextX=Time0;
+    //if (XFreq<0.) NextX+=(double)(NPoints-1)/XFreq;  //get last point if X axes reverted
+    if (XFreq<0.) //get last point if X axes reverted
+        NextX=XPlot[NPoints-1];
+    else
+        NextX=XPlot[0];
+    bool Error=false;
+    for (i=0 ; i<NPoints && !Error ; i++)
+    {
+        /*x=(double)i/XFreq+Time0;
+        if ((XFreq>0. && x>=NextX) || (XFreq<0. && x<=NextX))
+            BackgroundForm->GetBackground(XFreq,&NextX,&Slope,&Offset);*/
+        if (XFreq>0.)
+        {
+            x=XPlot[i];
+            if (BgForm && x>=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+        }
+        else
+        {
+            x=XPlot[NPoints-1-i];
+            if (BgForm && x<=NextX) BgForm->GetBackground(XFreq,&NextX,&Slope,&Offset);
+        }
+        Bkgr = x * Slope + Offset;
+        Out << YSmooth[i]-Bkgr << Qt::endl;
+        if (Out.status()!=QTextStream::Ok)
+        {
+            Error=true;
+            break;
+        }
+    }
+    fo.close();
+    if (Error)
+        WriteMsg(__FILE__,__LINE__,tr("Error while writting %1").arg(FileName.filePath()));
+    else
+        WriteMsg(__FILE__,__LINE__,tr("Smoothed curve saved in %1").arg(FileName.filePath()));
 }
 
 /*==========================================================================*/
@@ -1417,31 +1418,31 @@ void MainScreen::on_SaveSmoothMenu_triggered()
 /*==========================================================================*/
 void MainScreen::on_SaveDataMenu_triggered()
 {
-	int i;
+    int i;
 
-	if (!XPlot || !YPlot)
-	{
-		WriteMsg(__FILE__,__LINE__,tr("No data to save"));
-		return;
-	}
-	QFileInfo SrcName(DefaultFileName);
+    if (!XPlot || !YPlot)
+    {
+        WriteMsg(__FILE__,__LINE__,tr("No data to save"));
+        return;
+    }
+    QFileInfo SrcName(DefaultFileName);
 
-	QString FileName=QFileDialog::getSaveFileName(this, tr("Save File"),
-												  SrcName.completeBaseName()+".txt",
-												  tr("Data (*.txt)"));
-	if (FileName.isEmpty()) return;
+    QString FileName=QFileDialog::getSaveFileName(this, tr("Save File"),
+                                                  SrcName.completeBaseName()+".txt",
+                                                  tr("Data (*.txt)"));
+    if (FileName.isEmpty()) return;
 
-	QFile fo(FileName);
-	if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		WriteMsg(__FILE__,__LINE__,tr("Cannot open output file %1 for writting").arg(FileName));
-		return;
-	}
-	QTextStream Out(&fo);
-	for (i=0 ; i<NPoints ; i++)
-		Out << XPlot[i] << "\t" << YPlot[i] << endl;
+    QFile fo(FileName);
+    if (!fo.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        WriteMsg(__FILE__,__LINE__,tr("Cannot open output file %1 for writting").arg(FileName));
+        return;
+    }
+    QTextStream Out(&fo);
+    for (i=0 ; i<NPoints ; i++)
+        Out << XPlot[i] << "\t" << YPlot[i] << Qt::endl;
 
-	fo.close();
+    fo.close();
 }
 
 /*==========================================================================*/
@@ -1502,17 +1503,18 @@ void MainScreen::SetBgMouseClick(bool Active)
 /*==========================================================================*/
 void MainScreen::BkgrLeftClick(QMouseEvent *event)
 {
-	double x,y;
+    double x,y;
 
-	if (ui->MainGraphCtrl->GetMousePos(event->x(),event->y(),&x,&y))
-	{
-		BgForm->AddPoint(x,y);
-		if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
-			ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
-		else
-			ui->MainGraphCtrl->DeleteCurve(2);
-		UpdateGraphics();
-	}
+    QPointF pt = event->position();
+    if (ui->MainGraphCtrl->GetMousePos(pt.x(),pt.y(),&x,&y))
+    {
+        BgForm->AddPoint(x,y);
+        if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+            ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+        else
+            ui->MainGraphCtrl->DeleteCurve(2);
+        UpdateGraphics();
+    }
 }
 
 /*==========================================================================*/
@@ -1526,17 +1528,18 @@ void MainScreen::BkgrLeftClick(QMouseEvent *event)
 /*==========================================================================*/
 void MainScreen::BkgrRightClick(QMouseEvent *event)
 {
-	double x,y;
+    double x,y;
 
-	if (ui->MainGraphCtrl->GetMousePos(event->x(),event->y(),&x,&y))
-	{
-		BgForm->RemovePoint(x,y);
-		if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
-			ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
-		else
-			ui->MainGraphCtrl->DeleteCurve(2);
-		UpdateGraphics();
-	}
+    QPointF pt = event->position();
+    if (ui->MainGraphCtrl->GetMousePos(pt.x(),pt.y(),&x,&y))
+    {
+        BgForm->RemovePoint(x,y);
+        if (BgForm->PrepareBkgr(Time0,XFreq,NPoints))
+            ui->MainGraphCtrl->SetGraphic(2,BgForm->XBkgr,BgForm->YBkgr,BgForm->NBgPoints);
+        else
+            ui->MainGraphCtrl->DeleteCurve(2);
+        UpdateGraphics();
+    }
 }
 
 /*==========================================================================*/
@@ -1777,87 +1780,87 @@ void MainScreen::on_YTracker_editingFinished()
 /*==========================================================================*/
 void MainScreen::TrackPosition(bool XSource)
 {
-	int i;
-	double XPosition,YPosition=0.;
-	double *XPtr,*YPtr,*XSrc,*YSrc;
-	QString Text;
-	bool Found;
+    int i;
+    double XPosition,YPosition=0.;
+    double *XPtr,*YPtr,*XSrc,*YSrc;
+    QString Text;
+    bool Found;
 
-	LastTrackSrc=XSource;
+    LastTrackSrc=XSource;
 
-	//***** get the source *****
-	if (ui->TrackSmooth->isChecked())
-	{
-		XSrc=XPlot;
-		YSrc=YSmooth;
-	}
-	else if (ui->TrackDerv->isChecked())
-	{
-		XSrc=XPlot;
-		YSrc=YDerv;
-	}
-	else
-	{
-		XSrc=XPlot;
-		YSrc=YPlot;
-	}
-	if (XSource)
-	{
-		if (ui->XTracker->text().isEmpty())
-		{
-			ui->YTracker->setText("");
-			return;
-		}
-		XPosition=ui->XTracker->text().toDouble();
-		XPtr=XSrc;
-		YPtr=YSrc;
-	}
-	else
-	{
-		if (ui->YTracker->text().isEmpty())
-		{
-			ui->XTracker->setText("");
-			return;
-		}
-		XPosition=ui->YTracker->text().toDouble();
-		XPtr=YSrc;
-		YPtr=XSrc;
-	}
+    //***** get the source *****
+    if (ui->TrackSmooth->isChecked())
+    {
+        XSrc=XPlot;
+        YSrc=YSmooth;
+    }
+    else if (ui->TrackDerv->isChecked())
+    {
+        XSrc=XPlot;
+        YSrc=YDerv;
+    }
+    else
+    {
+        XSrc=XPlot;
+        YSrc=YPlot;
+    }
+    if (XSource)
+    {
+        if (ui->XTracker->text().isEmpty())
+        {
+            ui->YTracker->setText("");
+            return;
+        }
+        XPosition=ui->XTracker->text().toDouble();
+        XPtr=XSrc;
+        YPtr=YSrc;
+    }
+    else
+    {
+        if (ui->YTracker->text().isEmpty())
+        {
+            ui->XTracker->setText("");
+            return;
+        }
+        XPosition=ui->YTracker->text().toDouble();
+        XPtr=YSrc;
+        YPtr=XSrc;
+    }
 
-	//***** scan the data for the corresponding point *****
-	Found=false;
-	if (XPtr && YPtr)
-	{
-		for (i=1 ; i<NPoints ; i++)
-		{
-			if ((XPosition-XPtr[i-1])*(XPosition-XPtr[i])<=0.)
-			{
-				if (fabs(YPtr[i]-YPtr[i-1])>=1e50*fabs(XPtr[i]-XPtr[i-1]))
-				{
-					YPosition=YPtr[i];
-				}
-				else
-				{
-					YPosition=(XPosition-XPtr[i])/(XPtr[i-1]-XPtr[i])*(YPtr[i-1]-YPtr[i])+YPtr[i];
-				}
-				Found=true;
-				break;
-			}
-		}
-	}
+    //***** scan the data for the corresponding point *****
+    Found=false;
+    if (XPtr && YPtr)
+    {
+        for (i=1 ; i<NPoints ; i++)
+        {
+            if ((XPosition-XPtr[i-1])*(XPosition-XPtr[i])<=0.)
+            {
+                if (fabs(YPtr[i]-YPtr[i-1])>=1e50*fabs(XPtr[i]-XPtr[i-1]))
+                {
+                    YPosition=YPtr[i];
+                }
+                else
+                {
+                    YPosition=(XPosition-XPtr[i])/(XPtr[i-1]-XPtr[i])*(YPtr[i-1]-YPtr[i])+YPtr[i];
+                }
+                Found=true;
+                break;
+            }
+        }
+    }
 
-	//***** display the corresponding value *****
-	Text[0]=0;
-	if (XSource)
-	{
-		if (Found) Text.sprintf("%.7lg",YPosition);
-		ui->YTracker->setText(Text);
-	}
-	else
-	{
-		if (Found) Text.sprintf("%.4lg",YPosition);
-		ui->XTracker->setText(Text);
-	}
+    //***** display the corresponding value *****
+    Text = "";
+    if (XSource)
+    {
+        if (Found) Text = QString::asprintf("%.7lg",YPosition);
+        ui->YTracker->setText(Text);
+    }
+    else
+    {
+        if (Found) Text = QString::asprintf("%.4lg",YPosition);
+        ui->XTracker->setText(Text);
+    }
 }
 
 
@@ -1919,104 +1922,104 @@ void MainScreen::on_TrackMouse_clicked()
 /*==========================================================================*/
 void MainScreen::on_CutMenu_triggered()
 {
-	double XStart,XStop,StartTime=0.;
-	double *TData;
-	int i,j;
-	QString Text;
+    double XStart,XStop,StartTime=0.;
+    double *TData;
+    int i,j;
+    QString Text;
 
-	if (!YData) return;
+    if (!YData) return;
 
-	{
-		XRange XRangeForm(this);
-		int Result=XRangeForm.exec();
-		if (Result!=QDialog::Accepted)
-		{
-			return;
-		}
-		XRangeForm.GetRange(&XStart,&XStop);
-	}
-	if (XStart==XStop)
-	{
-		WriteMsg(__FILE__,__LINE__,tr("XStart and XStop must be different"));
-		return;
-	}
-	if (!XData)
-	{
-		XData=(double *)malloc(NPoints*sizeof(double));
-		if (!XData)
-		{
-			WriteMsg(__FILE__,__LINE__,tr("Not enough memory to store XData"));
-			return;
-		}
-		for (i=0 ; i<NPoints ; i++) XData[i]=(double)i/XFreq+Time0;
-	}
+    {
+        XRange XRangeForm(this);
+        int Result=XRangeForm.exec();
+        if (Result!=QDialog::Accepted)
+        {
+            return;
+        }
+        XRangeForm.GetRange(&XStart,&XStop);
+    }
+    if (XStart==XStop)
+    {
+        WriteMsg(__FILE__,__LINE__,tr("XStart and XStop must be different"));
+        return;
+    }
+    if (!XData)
+    {
+        XData=(double *)malloc(NPoints*sizeof(double));
+        if (!XData)
+        {
+            WriteMsg(__FILE__,__LINE__,tr("Not enough memory to store XData"));
+            return;
+        }
+        for (i=0 ; i<NPoints ; i++) XData[i]=(double)i/XFreq+Time0;
+    }
 
-	//***** remove the data point *****
-	if (XStart<XStop)
-	{
-		for (i=0 , j=0 ; i<NPoints && XPlot[i]<=XStop ; i++)
-			if (XPlot[i]>=XStart)
-			{
-				if (j==0) StartTime=XPlot[i];
-				if (XData) XData[j]=XData[i];
-				YData[j]=YData[i];
-				j++;
-			}
-	}
-	else
-	{
-		for (i=0 , j=0 ; i<NPoints ; i++)
-			if (XPlot[i]<=XStart || XPlot[i]>=XStop)
-			{
-				if (j==0) StartTime=XPlot[i];
-				if (XData) XData[j]=XData[i];
-				YData[j]=YData[i];
-				j++;
-			}
-	}
-	if (j<2)
-	{
-		WriteMsg(__FILE__,__LINE__,tr("Those limits would remove every data points. Cut not performed"));
-		return;
-	}
-	NPoints=j;
-	Time0=StartTime;
-	Text.sprintf("%.4lf",Time0);
-	ui->XTime0->setText(Text);
-	HasBeenCut=true;
+    //***** remove the data point *****
+    if (XStart<XStop)
+    {
+        for (i=0 , j=0 ; i<NPoints && XPlot[i]<=XStop ; i++)
+            if (XPlot[i]>=XStart)
+            {
+                if (j==0) StartTime=XPlot[i];
+                if (XData) XData[j]=XData[i];
+                YData[j]=YData[i];
+                j++;
+            }
+    }
+    else
+    {
+        for (i=0 , j=0 ; i<NPoints ; i++)
+            if (XPlot[i]<=XStart || XPlot[i]>=XStop)
+            {
+                if (j==0) StartTime=XPlot[i];
+                if (XData) XData[j]=XData[i];
+                YData[j]=YData[i];
+                j++;
+            }
+    }
+    if (j<2)
+    {
+        WriteMsg(__FILE__,__LINE__,tr("Those limits would remove every data points. Cut not performed"));
+        return;
+    }
+    NPoints=j;
+    Time0=StartTime;
+    Text = QString::asprintf("%.4lf",Time0);
+    ui->XTime0->setText(Text);
+    HasBeenCut=true;
 
-	ConfigFile->Config_WriteDouble("Cut","XStart",XStart);
-	ConfigFile->Config_WriteDouble("Cut","XStop",XStop);
+    ConfigFile->Config_WriteDouble("Cut","XStart",XStart);
+    ConfigFile->Config_WriteDouble("Cut","XStop",XStop);
 
-	if (XData)
-	{
-		TData=(double *)realloc(XData,NPoints*sizeof(double));
-		if (TData) XData=TData;
-	}
-	TData=(double *)realloc(YData,NPoints*sizeof(double));
-	if (TData) YData=TData;
-	TData=(double *)realloc(XPlot,NPoints*sizeof(double));
-	if (TData) XPlot=TData;
-	TData=(double *)realloc(YPlot,NPoints*sizeof(double));
-	if (TData) YPlot=TData;
-	if (YSmooth)
-	{
-		TData=(double *)realloc(YSmooth,NPoints*sizeof(double));
-		if (TData) YSmooth=TData;
-	}
-	if (YDerv)
-	{
-		TData=(double *)realloc(YDerv,NPoints*sizeof(double));
-		if (TData) YDerv=TData;
-	}
+    if (XData)
+    {
+        TData=(double *)realloc(XData,NPoints*sizeof(double));
+        if (TData) XData=TData;
+    }
+    TData=(double *)realloc(YData,NPoints*sizeof(double));
+    if (TData) YData=TData;
+    TData=(double *)realloc(XPlot,NPoints*sizeof(double));
+    if (TData) XPlot=TData;
+    TData=(double *)realloc(YPlot,NPoints*sizeof(double));
+    if (TData) YPlot=TData;
+    if (YSmooth)
+    {
+        TData=(double *)realloc(YSmooth,NPoints*sizeof(double));
+        if (TData) YSmooth=TData;
+    }
+    if (YDerv)
+    {
+        TData=(double *)realloc(YDerv,NPoints*sizeof(double));
+        if (TData) YDerv=TData;
+    }
 
-	ui->MainGraphCtrl->DeleteAllCurves();
-	ui->DervGraphCtrl->DeleteAllCurves();
-	LastGWidth=-1.;
-	LastGNeigh=-1;
-	LastSGPoly=-1;
-	LastSGNeigh=-1;
-	UpdateGraphics();
+    ui->MainGraphCtrl->DeleteAllCurves();
+    ui->DervGraphCtrl->DeleteAllCurves();
+    LastGWidth=-1.;
+    LastGNeigh=-1;
+    LastSGPoly=-1;
+    LastSGNeigh=-1;
+    UpdateGraphics();
 }
 
 /*=============================================================================*/
@@ -2028,21 +2031,21 @@ void MainScreen::on_CutMenu_triggered()
 /*=============================================================================*/
 void MainScreen::TrackMouseMove(bool InGraph,double x,double y)
 {
-	QString Text;
+    QString Text;
 
-	if (!ui->TrackMouse->isChecked()) return;
-	if (InGraph)
-	{
-		Text.sprintf("%.7lg",x);
-		ui->XTracker->setText(Text);
-		Text.sprintf("%.4lg",y);
-		ui->YTracker->setText(Text);
-	}
-	else
-	{
-		ui->XTracker->setText("");
-		ui->YTracker->setText("");
-	}
+    if (!ui->TrackMouse->isChecked()) return;
+    if (InGraph)
+    {
+        Text = QString::asprintf("%.7lg",x);
+        ui->XTracker->setText(Text);
+        Text = QString::asprintf("%.4lg",y);
+        ui->YTracker->setText(Text);
+    }
+    else
+    {
+        ui->XTracker->setText("");
+        ui->YTracker->setText("");
+    }
 }
 
 /*=============================================================================*/
@@ -2067,26 +2070,26 @@ void MainScreen::on_AboutMenu_triggered()
 /*==========================================================================*/
 void MainScreen::ConfigureColors()
 {
-	QString Name=ConfigFile->Config_GetString("Colors","DispBg","#FFFFFF");
-	QColor Color(Name);
-	ui->MainGraphCtrl->SetBackgroundColor(Color);
-	ui->DervGraphCtrl->SetBackgroundColor(Color);
+    QString Name=ConfigFile->Config_GetString("Colors","DispBg","#FFFFFF");
+    QColor Color(Name);
+    ui->MainGraphCtrl->SetBackgroundColor(Color);
+    ui->DervGraphCtrl->SetBackgroundColor(Color);
 
-	Name=ConfigFile->Config_GetString("Colors","Data","#FF0000");
-	Color.setNamedColor(Name);
-	ui->MainGraphCtrl->SetCurveColor(0,Color);
+    Name=ConfigFile->Config_GetString("Colors","Data","#FF0000");
+    Color.fromString(Name);
+    ui->MainGraphCtrl->SetCurveColor(0,Color);
 
-	Name=ConfigFile->Config_GetString("Colors","Smooth","#00FF00");
-	Color.setNamedColor(Name);
-	ui->MainGraphCtrl->SetCurveColor(1,Color);
+    Name=ConfigFile->Config_GetString("Colors","Smooth","#00FF00");
+    Color.fromString(Name);
+    ui->MainGraphCtrl->SetCurveColor(1,Color);
 
-	Name=ConfigFile->Config_GetString("Colors","Bkgr","#0000FF");
-	Color.setNamedColor(Name);
-	ui->MainGraphCtrl->SetCurveColor(2,Color);
+    Name=ConfigFile->Config_GetString("Colors","Bkgr","#0000FF");
+    Color.fromString(Name);
+    ui->MainGraphCtrl->SetCurveColor(2,Color);
 
-	Name=ConfigFile->Config_GetString("Colors","Derv","#FF0000");
-	Color.setNamedColor(Name);
-	ui->DervGraphCtrl->SetCurveColor(0,Color);
+    Name=ConfigFile->Config_GetString("Colors","Derv","#FF0000");
+    Color.fromString(Name);
+    ui->DervGraphCtrl->SetCurveColor(0,Color);
 }
 
 /*=============================================================================*/

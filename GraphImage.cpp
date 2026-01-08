@@ -239,66 +239,66 @@ void GraphImage::Redraw()
 /*=============================================================================*/
 void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 {
-	double ex, fen, del=0., i,c,start,y10;
-	double y, xoffset, yoffset,ix;
-	char Deci=0;
-	QString val;
-	QRect Size;
+    double ex, fen, del=0., i,c,start,y10;
+    double y, xoffset, yoffset,ix;
+    char Deci=0;
+    QString val;
+    QRect Size;
 
-	fen=max-min;
-	if (fen==0.)
-	{
-		max=10.;
-		min=0.;
-		fen=10.;
-	}
-	if (fen<0.)
-	{
-		c=min;
-		max=min;
-		min=c;
-		xoffset = (double)GRight;
-		//ex = (double)(scr_l-scr_r)/fen;
-	}
-	else
-	{
-		xoffset = (double)GLeft;
-		//ex = (double)(scr_r-scr_l)/fen;
-	}
+    fen=max-min;
+    if (fen==0.)
+    {
+        max=10.;
+        min=0.;
+        fen=10.;
+    }
+    if (fen<0.)
+    {
+        c=min;
+        max=min;
+        min=c;
+        xoffset = (double)GRight;
+        //ex = (double)(scr_l-scr_r)/fen;
+    }
+    else
+    {
+        xoffset = (double)GLeft;
+        //ex = (double)(scr_r-scr_l)/fen;
+    }
 
-	ex = (double)(GRight-GLeft)/fen;
-	yoffset=(double)GBottom;
-	c=log10(fabs(fen)/3.);
-	y=floor(c);
-	y10=pow(10.,y);
-	if (c-y<2.) del=5.*y10;
-	if (c-y<.8) del=4.*y10;
-	if (c-y<.6) del=2.*y10;
-	if (c-y<.3) del=1.*y10;
-	start=ceil(min/y10)*y10;
-	if (del<1.) Deci=1;
-	PCanvas.setBrush(CTextBg);
-	for (i = start ; i <= max ; i += del)
-	{
-		ix = xoffset + (i - min) * ex;
-		PCanvas.setPen(CFrame);
-		PCanvas.drawLine((int)ix,(int)yoffset+1,(int)ix,(int)yoffset+GRAD);
-		//PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
-		if (Deci)
-			val.sprintf("%.2f",i);
-		else
-			val.sprintf("%.0f",i);
-		Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
-		if (ix+Size.width()/2<ImageWidth)
-		{
-			PCanvas.setPen(CText);
-			PCanvas.drawText(Size,Qt::AlignHCenter | Qt::AlignTop,val);
-		}
-	}
+    ex = (double)(GRight-GLeft)/fen;
+    yoffset=(double)GBottom;
+    c=log10(fabs(fen)/3.);
+    y=floor(c);
+    y10=pow(10.,y);
+    if (c-y<2.) del=5.*y10;
+    if (c-y<.8) del=4.*y10;
+    if (c-y<.6) del=2.*y10;
+    if (c-y<.3) del=1.*y10;
+    start=ceil(min/y10)*y10;
+    if (del<1.) Deci=1;
+    PCanvas.setBrush(CTextBg);
+    for (i = start ; i <= max ; i += del)
+    {
+        ix = xoffset + (i - min) * ex;
+        PCanvas.setPen(CFrame);
+        PCanvas.drawLine((int)ix,(int)yoffset+1,(int)ix,(int)yoffset+GRAD);
+        //PCanvas.drawLine((int)ix,(int)GTop+1,(int)ix,(int)GTop+GRAD);
+        if (Deci)
+            val = QString::asprintf("%.2f",i);
+        else
+            val = QString::asprintf("%.0f",i);
+        Size=PCanvas.boundingRect(QRect(ix,yoffset+GRAD,0,0),Qt::AlignHCenter | Qt::AlignTop,val);
+        if (ix+Size.width()/2<ImageWidth)
+        {
+            PCanvas.setPen(CText);
+            PCanvas.drawText(Size,Qt::AlignHCenter | Qt::AlignTop,val);
+        }
+    }
 
-	PCanvas.setPen(CText);
-	Size=PCanvas.boundingRect(QRect(GRight,ImageHeight,0,0),Qt::AlignRight | Qt::AlignBottom,XName);
-	PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignBottom,XName);
+    PCanvas.setPen(CText);
+    Size=PCanvas.boundingRect(QRect(GRight,ImageHeight,0,0),Qt::AlignRight | Qt::AlignBottom,XName);
+    PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignBottom,XName);
 }
 
 /*=============================================================================*/
@@ -310,60 +310,60 @@ void GraphImage::SetXTicks(QPainter &PCanvas,double min,double max)
 /*=============================================================================*/
 void GraphImage::ComputeGLeft(QPainter &PCanvas,double min,double max)
 {
-	double ex, fen, del=0., i, y10,c,start;
-	double y, yoffset, iy,Bottom=0.;
-	QString val;
-	QRect Size,Size1;
-	int wmax=0;
+    double ex, fen, del=0., i, y10,c,start;
+    double y, yoffset, iy,Bottom=0.;
+    QString val;
+    QRect Size,Size1;
+    int wmax=0;
 
-	fen = max - min;
-	if (fen==0.)
-	{
-		min=0.;
-		max=10.;
-		fen=10.;
-	}
+    fen = max - min;
+    if (fen==0.)
+    {
+        min=0.;
+        max=10.;
+        fen=10.;
+    }
 
-	if (fen<0.)
-	{
-		i=max;
-		max=min;
-		min=i;
-		yoffset = (double)GTop;
-	}
-	else
-	{
-		yoffset = (double)GBottom;
-	}
+    if (fen<0.)
+    {
+        i=max;
+        max=min;
+        min=i;
+        yoffset = (double)GTop;
+    }
+    else
+    {
+        yoffset = (double)GBottom;
+    }
 
-	ex = (double)(GBottom-GTop)/fen;
-	c=log10(fabs(fen)/3.);
-	y=floor(c);
-	y10=pow(10.,y);
-	if (c-y<2.) del=5.*y10;
-	if (c-y<.8) del=4.*y10;
-	if (c-y<.6) del=2.*y10;
-	if (c-y<.3) del=1.*y10;
-	start=ceil(min/y10)*y10;
-	//y--;
-	y10=pow(10.,y);
+    ex = (double)(GBottom-GTop)/fen;
+    c=log10(fabs(fen)/3.);
+    y=floor(c);
+    y10=pow(10.,y);
+    if (c-y<2.) del=5.*y10;
+    if (c-y<.8) del=4.*y10;
+    if (c-y<.6) del=2.*y10;
+    if (c-y<.3) del=1.*y10;
+    start=ceil(min/y10)*y10;
+    //y--;
+    y10=pow(10.,y);
 
-	PCanvas.setBrush(CTextBg);
-	for (i = start ; i <= max ; i += del)
-	{
-		iy = yoffset-((i - min) * ex);
-		if (iy>GTop+3+3*FontHeight/2)
-		{
-			val.sprintf("%5ld",(long int)((i-Bottom) / y10));
-			Size=PCanvas.boundingRect(QRect(0,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
-			if (wmax<Size.width()) wmax=Size.width();
-		}
-	}
+    PCanvas.setBrush(CTextBg);
+    for (i = start ; i <= max ; i += del)
+    {
+        iy = yoffset-((i - min) * ex);
+        if (iy>GTop+3+3*FontHeight/2)
+        {
+            val = QString::asprintf("%5ld",(long int)((i-Bottom) / y10));
+            Size=PCanvas.boundingRect(QRect(0,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+            if (wmax<Size.width()) wmax=Size.width();
+        }
+    }
 
-	val.sprintf("%+02d",(int)y);
-	Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
-	Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
-	GLeft=Size.width()+Size1.width()+wmax+GRAD;
+    val = QString::asprintf("%+02d",(int)y);
+    Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
+    Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
+    GLeft=Size.width()+Size1.width()+wmax+GRAD;
 }
 
 /*=============================================================================*/
@@ -375,87 +375,87 @@ void GraphImage::ComputeGLeft(QPainter &PCanvas,double min,double max)
 /*=============================================================================*/
 void GraphImage::SetYTicks(QPainter &PCanvas,double min,double max)
 {
-	double ex, fen, del=0., i, y10,c,start;
-	double y, xoffset, yoffset, iy,Bottom=0.;
-	QString val;
-	QRect Size,Size1;
+    double ex, fen, del=0., i, y10,c,start;
+    double y, xoffset, yoffset, iy,Bottom=0.;
+    QString val;
+    QRect Size,Size1;
 
-	//if (min<0.) min=0.;
-	//if (max<0.) max=10.;
+    //if (min<0.) min=0.;
+    //if (max<0.) max=10.;
 
-	// compute scale
-	fen = max - min;
-	if (fen==0.)
-	{
-		min=0.;
-		max=10.;
-		fen=10.;
-	}
+    // compute scale
+    fen = max - min;
+    if (fen==0.)
+    {
+        min=0.;
+        max=10.;
+        fen=10.;
+    }
 
-	if (fen<0.)
-	{
-		i=max;
-		max=min;
-		min=i;
-		//fen=-fen;
-		yoffset = (double)GTop;
-		//ex = (double)(scr_l-scr_r)/fen;
-	}
-	else
-	{
-		yoffset = (double)GBottom;
-		//ex = (double)(scr_r-scr_l)/fen;
-	}
+    if (fen<0.)
+    {
+        i=max;
+        max=min;
+        min=i;
+        //fen=-fen;
+        yoffset = (double)GTop;
+        //ex = (double)(scr_l-scr_r)/fen;
+    }
+    else
+    {
+        yoffset = (double)GBottom;
+        //ex = (double)(scr_r-scr_l)/fen;
+    }
 
-	ex = (double)(GBottom-GTop)/fen;
-	xoffset = (double)GLeft;
-	//yoffset = (double)scr_b;
-	c=log10(fabs(fen)/3.);
-	y=floor(c);
-	y10=pow(10.,y);
-	if (c-y<2.) del=5.*y10;
-	if (c-y<.8) del=4.*y10;
-	if (c-y<.6) del=2.*y10;
-	if (c-y<.3) del=1.*y10;
-	start=ceil(min/y10)*y10;
-	//y--;
-	y10=pow(10.,y);
+    ex = (double)(GBottom-GTop)/fen;
+    xoffset = (double)GLeft;
+    //yoffset = (double)scr_b;
+    c=log10(fabs(fen)/3.);
+    y=floor(c);
+    y10=pow(10.,y);
+    if (c-y<2.) del=5.*y10;
+    if (c-y<.8) del=4.*y10;
+    if (c-y<.6) del=2.*y10;
+    if (c-y<.3) del=1.*y10;
+    start=ceil(min/y10)*y10;
+    //y--;
+    y10=pow(10.,y);
 
-	// display scale
-	PCanvas.setBrush(CTextBg);
-	for (i = start ; i <= max ; i += del)
-	{
-		iy = yoffset-((i - min) * ex);
-		PCanvas.setPen(CFrame);
-		PCanvas.drawLine((int)xoffset-1,(int)iy,(int)xoffset-GRAD,(int)iy);
-		//PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
+    // display scale
+    PCanvas.setBrush(CTextBg);
+    for (i = start ; i <= max ; i += del)
+    {
+        iy = yoffset-((i - min) * ex);
+        PCanvas.setPen(CFrame);
+        PCanvas.drawLine((int)xoffset-1,(int)iy,(int)xoffset-GRAD,(int)iy);
+        //PCanvas.drawLine((int)GRight-1,(int)iy,(int)GRight-GRAD,(int)iy);
 
-		if (iy>GTop+3+3*FontHeight/2)
-		{
-			val.sprintf("%5ld",(long int)((i-Bottom) / y10));
-			PCanvas.setPen(CText);
-			Size=PCanvas.boundingRect(QRect(xoffset-GRAD,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
-			PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
-		}
-	}
+        if (iy>GTop+3+3*FontHeight/2)
+        {
+            val = QString::asprintf("%5ld",(long int)((i-Bottom) / y10));
+            PCanvas.setPen(CText);
+            Size=PCanvas.boundingRect(QRect(xoffset-GRAD,iy,0,0),Qt::AlignRight | Qt::AlignVCenter,val);
+            PCanvas.drawText(Size,Qt::AlignRight | Qt::AlignVCenter,val);
+        }
+    }
 
-	// display scaling factor
-	val.sprintf("%+02d",(int)y);
-	Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
-	Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
-	Size.translate(0,Size1.height()/2);
-	PCanvas.setPen(CText);
-	PCanvas.drawText(Size,Qt::AlignLeft | Qt::AlignTop,"x10");
-	PCanvas.drawText(Size1,Qt::AlignLeft | Qt::AlignTop,val);
+    // display scaling factor
+    val = QString::asprintf("%+02d",(int)y);
+    Size=PCanvas.boundingRect(QRect(0,GTop,0,0),Qt::AlignLeft | Qt::AlignTop,"x10");
+    Size1=PCanvas.boundingRect(QRect(Size.width(),GTop,0,0),Qt::AlignLeft | Qt::AlignTop,val);
+    Size.translate(0,Size1.height()/2);
+    PCanvas.setPen(CText);
+    PCanvas.drawText(Size,Qt::AlignLeft | Qt::AlignTop,"x10");
+    PCanvas.drawText(Size1,Qt::AlignLeft | Qt::AlignTop,val);
 
-	//if (h->DivEner)
-	/*SetTextAlign(DC,TA_RIGHT|TA_TOP);
-	PrintText(DC,0,scr_t+3*FontHeight,Spect->YName,900);
-	SetTextAlign(DC,TA_LEFT|TA_TOP);
-	if (!HasDC) ReleaseDC(MainHWind,DC);*/
-	/*Size=PCanvas->TextExtent(YName);
-	PCanvas->TextOut(0,GTop+Size1.cy/2,YName);*/
-	return;
+    //if (h->DivEner)
+    /*SetTextAlign(DC,TA_RIGHT|TA_TOP);
+    PrintText(DC,0,scr_t+3*FontHeight,Spect->YName,900);
+    SetTextAlign(DC,TA_LEFT|TA_TOP);
+    if (!HasDC) ReleaseDC(MainHWind,DC);*/
+    /*Size=PCanvas->TextExtent(YName);
+    PCanvas->TextOut(0,GTop+Size1.cy/2,YName);*/
+    return;
 }
 
 /*=============================================================================*/
@@ -664,31 +664,31 @@ void GraphImage::DeleteAllCurves()
  */
 /*=============================================================================*/
 void GraphImage::mousePressEvent(QMouseEvent *event)
-{
-	int X=event->x();
-	int Y=event->y();
-	if (X<GLeft || X>GRight || Y<GTop || Y>GBottom) return;
-	Qt::MouseButton Button=event->button();
-	if (Button==Qt::LeftButton) emit LeftMouseClick(event);
-	if (Button==Qt::RightButton) emit RightMouseClick(event);
-	if (Button==Qt::LeftButton && DispXMin!=DispXMax && DispYMin!=DispYMax && receivers(SIGNAL(LeftMouseClick(QMouseEvent*)))==0)
-	{
-		XZoom=X;
-		YZoom=Y;
-		XZoom2=XZoom;
-		YZoom2=YZoom;
-		Zooming=true;
-		if (!Selection) Selection=new QRubberBand(QRubberBand::Rectangle,this);
-		Selection->setGeometry(QRect(XZoom,YZoom,0,0));
-		Selection->show();
-	}
-	if (Button==Qt::RightButton && receivers(SIGNAL(RightMouseClick(QMouseEvent*)))==0)
-	{
-		ZoomEnabled=false;
-		Unzoom();
-		update();
-	}
-}
+    {
+    int X=event->position().x();
+    int Y=event->position().y();
+    if (X<GLeft || X>GRight || Y<GTop || Y>GBottom) return;
+    Qt::MouseButton Button=event->button();
+    if (Button==Qt::LeftButton) emit LeftMouseClick(event);
+    if (Button==Qt::RightButton) emit RightMouseClick(event);
+    if (Button==Qt::LeftButton && DispXMin!=DispXMax && DispYMin!=DispYMax && receivers(SIGNAL(LeftMouseClick(QMouseEvent*)))==0)
+    {
+        XZoom=X;
+        YZoom=Y;
+        XZoom2=XZoom;
+        YZoom2=YZoom;
+        Zooming=true;
+        if (!Selection) Selection=new QRubberBand(QRubberBand::Rectangle,this);
+        Selection->setGeometry(QRect(XZoom,YZoom,0,0));
+        Selection->show();
+    }
+    if (Button==Qt::RightButton && receivers(SIGNAL(RightMouseClick(QMouseEvent*)))==0)
+    {
+        ZoomEnabled=false;
+        Unzoom();
+        update();
+    }
+    }
 
 /*=============================================================================*/
 /*!
@@ -699,74 +699,74 @@ void GraphImage::mousePressEvent(QMouseEvent *event)
 /*=============================================================================*/
 void GraphImage::mouseMoveEvent(QMouseEvent *event)
 {
-	int x0,y0,x1,y1;
+    int x0,y0,x1,y1;
 
-	int X=event->x();
-	int Y=event->y();
-	if (receivers(SIGNAL(MouseMove(bool,double,double))))
-	{
-		bool InGraph=!(X<GLeft || X>GRight || Y<GTop || Y>GBottom);
-		double XPos=((double)X-bx)/ax;
-		double YPos=((double)Y-by)/ay;
-		emit MouseMove(InGraph,XPos,YPos);
-	}
-	if (Zooming)
-	{
-		if (abs(X-XZoom)<MIN_ZOOM_AREA) return;
-		if (abs(Y-YZoom)<MIN_ZOOM_AREA) return;
-		if (X<GLeft) X=GLeft;
-		if (X>GRight) X=GRight;
-		if (Y<GTop) Y=GTop;
-		if (Y>GBottom) Y=GBottom;
-		/*if (abs(XZoom-XZoom2)>=MIN_ZOOM_AREA && abs(YZoom-YZoom2)>=MIN_ZOOM_AREA)
-		{
-			if (XZoom<XZoom2)
-			{
-				x0=XZoom;
-				x1=XZoom2;
-			}
-			else
-			{
-				x0=XZoom2;
-				x1=XZoom;
-			}
-			if (YZoom<YZoom2)
-			{
-				y0=YZoom;
-				y1=YZoom2;
-			}
-			else
-			{
-				y0=YZoom2;
-				y1=YZoom;
-			}
-			PCanvas.DrawFocusRect(TRect(x0,y0,x1,y1));
-		}*/
-		XZoom2=X;
-		YZoom2=Y;
-		if (XZoom<XZoom2)
-		{
-			x0=XZoom;
-			x1=XZoom2;
-		}
-		else
-		{
-			x0=XZoom2;
-			x1=XZoom;
-		}
-		if (YZoom<YZoom2)
-		{
-			y0=YZoom;
-			y1=YZoom2;
-		}
-		else
-		{
-			y0=YZoom2;
-			y1=YZoom;
-		}
-		//PCanvas->DrawFocusRect(TRect(x0,y0,x1,y1));
-		Selection->setGeometry(QRect(x0,y0,x1-x0,y1-y0).normalized());
-	}
+    int X=event->position().x();
+    int Y=event->position().y();
+    if (receivers(SIGNAL(MouseMove(bool,double,double))))
+    {
+        bool InGraph=!(X<GLeft || X>GRight || Y<GTop || Y>GBottom);
+        double XPos=((double)X-bx)/ax;
+        double YPos=((double)Y-by)/ay;
+        emit MouseMove(InGraph,XPos,YPos);
+    }
+    if (Zooming)
+    {
+        if (abs(X-XZoom)<MIN_ZOOM_AREA) return;
+        if (abs(Y-YZoom)<MIN_ZOOM_AREA) return;
+        if (X<GLeft) X=GLeft;
+        if (X>GRight) X=GRight;
+        if (Y<GTop) Y=GTop;
+        if (Y>GBottom) Y=GBottom;
+        /*if (abs(XZoom-XZoom2)>=MIN_ZOOM_AREA && abs(YZoom-YZoom2)>=MIN_ZOOM_AREA)
+        {
+            if (XZoom<XZoom2)
+            {
+                x0=XZoom;
+                x1=XZoom2;
+            }
+            else
+            {
+                x0=XZoom2;
+                x1=XZoom;
+            }
+            if (YZoom<YZoom2)
+            {
+                y0=YZoom;
+                y1=YZoom2;
+            }
+            else
+            {
+                y0=YZoom2;
+                y1=YZoom;
+            }
+            PCanvas.DrawFocusRect(TRect(x0,y0,x1,y1));
+        }*/
+        XZoom2=X;
+        YZoom2=Y;
+        if (XZoom<XZoom2)
+        {
+            x0=XZoom;
+            x1=XZoom2;
+        }
+        else
+        {
+            x0=XZoom2;
+            x1=XZoom;
+        }
+        if (YZoom<YZoom2)
+        {
+            y0=YZoom;
+            y1=YZoom2;
+        }
+        else
+        {
+            y0=YZoom2;
+            y1=YZoom;
+        }
+        //PCanvas->DrawFocusRect(TRect(x0,y0,x1,y1));
+        Selection->setGeometry(QRect(x0,y0,x1-x0,y1-y0).normalized());
+    }
 }
 
 /*=============================================================================*/
@@ -778,69 +778,69 @@ void GraphImage::mouseMoveEvent(QMouseEvent *event)
 /*=============================================================================*/
 void GraphImage::mouseReleaseEvent(QMouseEvent *event)
 {
-	int x0,y0,x1,y1;
-	double zx0,zy0,zx1,zy1;
-	bool MousePointed;
+    int x0,y0,x1,y1;
+    double zx0,zy0,zx1,zy1;
+    bool MousePointed;
 
-	int X=event->x();
-	int Y=event->y();
-	if (Zooming)
-	{
-		Selection->hide();
-		if (X<GLeft) X=GLeft;
-		if (X>GRight) X=GRight;
-		if (Y<GTop) Y=GTop;
-		if (Y>GBottom) Y=GBottom;
-		if (abs(X-XZoom)>=MIN_ZOOM_AREA) XZoom2=X;
-		if (abs(Y-YZoom)>=MIN_ZOOM_AREA) YZoom2=Y;
-		if (XZoom<XZoom2)
-		{
-			x0=XZoom;
-			x1=XZoom2;
-		}
-		else
-		{
-			x0=XZoom2;
-			x1=XZoom;
-		}
-		if (YZoom<YZoom2)
-		{
-			y0=YZoom;
-			y1=YZoom2;
-		}
-		else
-		{
-			y0=YZoom2;
-			y1=YZoom;
-		}
-		if (X<GLeft || X>GRight || Y<GTop || Y>GBottom) return;
-		Zooming=false;
-		zx0=((double)x0-bx)/ax;
-		zy0=((double)y0-by)/ay;
-		zx1=((double)x1-bx)/ax;
-		zy1=((double)y1-by)/ay;
-		if (fabs(zx1-zx0)<MIN_ZOOM_FACTOR*fabs(DispXMax-DispXMin) ||
-				fabs(zy1-zy0)<MIN_ZOOM_FACTOR*fabs(DispYMax-DispYMin))
-		{
-			MousePointed=true;
-		}
-		else
-		{
-			MousePointed=false;
-			SetZoom(zx0,zx1,zy0,zy1);
-			ZoomEnabled=true;
-			update();
-		}
-	}
-	else
-	{
-		MousePointed=true;
-	}
-	/*if (MousePointed)
-   {
-   if (Button==mbLeft && LeftMouseClick) LeftMouseClick(ParentPtr,x,y,Shift);
-   if (Button==mbRight && RightMouseClick) RightMouseClick(ParentPtr,x,y,Shift);
-   }*/
+    int X=event->position().x();
+    int Y=event->position().y();
+    if (Zooming)
+    {
+        Selection->hide();
+        if (X<GLeft) X=GLeft;
+        if (X>GRight) X=GRight;
+        if (Y<GTop) Y=GTop;
+        if (Y>GBottom) Y=GBottom;
+        if (abs(X-XZoom)>=MIN_ZOOM_AREA) XZoom2=X;
+        if (abs(Y-YZoom)>=MIN_ZOOM_AREA) YZoom2=Y;
+        if (XZoom<XZoom2)
+        {
+            x0=XZoom;
+            x1=XZoom2;
+        }
+        else
+        {
+            x0=XZoom2;
+            x1=XZoom;
+        }
+        if (YZoom<YZoom2)
+        {
+            y0=YZoom;
+            y1=YZoom2;
+        }
+        else
+        {
+            y0=YZoom2;
+            y1=YZoom;
+        }
+        if (X<GLeft || X>GRight || Y<GTop || Y>GBottom) return;
+        Zooming=false;
+        zx0=((double)x0-bx)/ax;
+        zy0=((double)y0-by)/ay;
+        zx1=((double)x1-bx)/ax;
+        zy1=((double)y1-by)/ay;
+        if (fabs(zx1-zx0)<MIN_ZOOM_FACTOR*fabs(DispXMax-DispXMin) ||
+                fabs(zy1-zy0)<MIN_ZOOM_FACTOR*fabs(DispYMax-DispYMin))
+        {
+            MousePointed=true;
+        }
+        else
+        {
+            MousePointed=false;
+            SetZoom(zx0,zx1,zy0,zy1);
+            ZoomEnabled=true;
+            update();
+        }
+    }
+    else
+    {
+        MousePointed=true;
+    }
+    /*if (MousePointed)
+    {
+    if (Button==mbLeft && LeftMouseClick) LeftMouseClick(ParentPtr,x,y,Shift);
+    if (Button==mbRight && RightMouseClick) RightMouseClick(ParentPtr,x,y,Shift);
+    }*/
 }
 
 /*=============================================================================*/
@@ -852,57 +852,57 @@ void GraphImage::mouseReleaseEvent(QMouseEvent *event)
 /*=============================================================================*/
 void GraphImage::wheelEvent(QWheelEvent *event)
 {
-	int X=event->x();
-	int Y=event->y();
-	if (X<GLeft || X>GRight || Y<GTop || Y>GBottom)
-	{
-		event->ignore();
-		return;
-	}
-	double Scale=event->delta()/8.; //wheel rotation in degrees (15=1 wheel step)
-	if (Scale>0.)
-		Scale=Scale/15.*2./3.;
-	else
-		Scale=-Scale/15.*3./2.;
+    int X=event->position().x();
+    int Y=event->position().y();
+    if (X<GLeft || X>GRight || Y<GTop || Y>GBottom)
+    {
+        event->ignore();
+        return;
+    }
+    double Scale=event->angleDelta().y()/8.; //wheel rotation in degrees (15=1 wheel step)
+    if (Scale>0.)
+        Scale=Scale/15.*2./3.;
+    else
+        Scale=-Scale/15.*3./2.;
 
-	double ZoomWidth=(PlotXMax-PlotXMin)*Scale;
-	double ZoomHeight=(PlotYMax-PlotYMin)*Scale;
-	if (ZoomWidth>fabs(DispXMax-DispXMin)) ZoomWidth=fabs(DispXMax-DispXMax);
-	if (ZoomHeight>fabs(DispYMax-DispYMin)) ZoomHeight=fabs(DispYMax-DispYMax);
-	double zx=((double)X-bx)/ax;
-	double zy=((double)Y-by)/ay;
-	double zx0=(double)zx-ZoomWidth/2.;
-	double zx1=(double)zx+ZoomWidth/2.;
-	double zy0=(double)zy-ZoomHeight/2.;
-	double zy1=(double)zy+ZoomHeight/2.;
-	if (zx0<DispXMin)
-	{
-		zx0=DispXMin;
-		zx1=zx0+ZoomWidth;
-	}
-	else if (zx1>DispXMax)
-	{
-		zx1=DispXMax;
-		zx0=zx1-ZoomWidth;
-	}
-	if (zy0<DispYMin)
-	{
-		zy0=DispYMin;
-		zy1=zy0+ZoomHeight;
-	}
-	else if (zy1>DispYMax)
-	{
-		zy1=DispYMax;
-		zy0=zy1-ZoomHeight;
-	}
-	if (fabs(zx1-zx0)<MIN_ZOOM_FACTOR*fabs(DispXMax-DispXMin) ||
-			fabs(zy1-zy0)<MIN_ZOOM_FACTOR*fabs(DispYMax-DispYMin))
-	{
-		event->ignore();
-		return;
-	}
-	SetZoom(zx0,zx1,zy0,zy1);
-	update();
+    double ZoomWidth=(PlotXMax-PlotXMin)*Scale;
+    double ZoomHeight=(PlotYMax-PlotYMin)*Scale;
+    if (ZoomWidth>fabs(DispXMax-DispXMin)) ZoomWidth=fabs(DispXMax-DispXMax);
+    if (ZoomHeight>fabs(DispYMax-DispYMin)) ZoomHeight=fabs(DispYMax-DispYMax);
+    double zx=((double)X-bx)/ax;
+    double zy=((double)Y-by)/ay;
+    double zx0=(double)zx-ZoomWidth/2.;
+    double zx1=(double)zx+ZoomWidth/2.;
+    double zy0=(double)zy-ZoomHeight/2.;
+    double zy1=(double)zy+ZoomHeight/2.;
+    if (zx0<DispXMin)
+    {
+        zx0=DispXMin;
+        zx1=zx0+ZoomWidth;
+    }
+    else if (zx1>DispXMax)
+    {
+        zx1=DispXMax;
+        zx0=zx1-ZoomWidth;
+    }
+    if (zy0<DispYMin)
+    {
+        zy0=DispYMin;
+        zy1=zy0+ZoomHeight;
+    }
+    else if (zy1>DispYMax)
+    {
+        zy1=DispYMax;
+        zy0=zy1-ZoomHeight;
+    }
+    if (fabs(zx1-zx0)<MIN_ZOOM_FACTOR*fabs(DispXMax-DispXMin) ||
+            fabs(zy1-zy0)<MIN_ZOOM_FACTOR*fabs(DispYMax-DispYMin))
+    {
+        event->ignore();
+        return;
+    }
+    SetZoom(zx0,zx1,zy0,zy1);
+    update();
 }
 
 /*=============================================================================*/
@@ -994,9 +994,9 @@ QColor GraphImage::GetCurveColor(int Curve)
 /*=============================================================================*/
 void GraphImage::SetCurveColor(int Curve,const QColor &Color)
 {
-	if (Curve>=0 && Curve<MAX_CURVES && CData[Curve]!=Color)
-	{
-		CData[Curve]=Color;
-		update();
-	}
+    if (Curve>=0 && Curve<MAX_CURVES && CData[Curve]!=Color)
+    {
+        CData[Curve]=Color;
+        update();
+    }
 }

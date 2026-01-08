@@ -16,18 +16,18 @@ extern MainScreen *MainForm;
  */
 /*=============================================================================*/
 BackgroundForm::BackgroundForm(QWidget *parent) :
-	QDialog(parent,Qt::WindowMinimizeButtonHint),
+    QDialog(parent,Qt::WindowMinimizeButtonHint),
     ui(new Ui::BackgroundForm)
 {
-	ui->setupUi(this);
+    ui->setupUi(this);
 
-	NPoints=0;
-	Slope=0.;
-	Offset=0.;
-	AutoDefined=false;
-	BackgroundOk=false;
+    NPoints=0;
+    Slope=0.;
+    Offset=0.;
+    AutoDefined=false;
+    BackgroundOk=false;
 
-	Configure();
+    Configure();
 }
 
 /*=============================================================================*/
@@ -45,36 +45,35 @@ BackgroundForm::~BackgroundForm()
 /*=============================================================================*/
 void BackgroundForm::Configure()
 {
-	QString Text;
-	double dVal;
-	int iVal;
+    QString Text;
+    double dVal;
+    int iVal;
 
-	dVal=ConfigFile->Config_GetDouble("Background","LRFirst",0.0);
-	Text.sprintf("%.1lf%%",dVal);
-	ui->LRFirst->setText(Text);
-	dVal=ConfigFile->Config_GetDouble("Background","LRLast",10.0);
-	Text.sprintf("%.1lf%%",dVal);
-	ui->LRLast->setText(Text);
+    dVal=ConfigFile->Config_GetDouble("Background","LRFirst",0.0);
+    Text = QString::asprintf("%.1lf%%",dVal);
+    ui->LRFirst->setText(Text);
+    dVal=ConfigFile->Config_GetDouble("Background","LRLast",10.0);
+    Text = QString::asprintf("%.1lf%%",dVal);
+    ui->LRLast->setText(Text);
 
-	iVal=ConfigFile->Config_GetInt("Background","AverageStart",0);
-	Text.sprintf("%d",iVal);
-	ui->AverageStart->setText(Text);
-	iVal=ConfigFile->Config_GetInt("Background","AverageNPoints",100);
-	Text.sprintf("%d",iVal);
-	ui->AverageNPoints->setText(Text);
+    iVal=ConfigFile->Config_GetInt("Background","AverageStart",0);
+    Text = QString::asprintf("%d",iVal);
+    ui->AverageStart->setText(Text);
+    iVal=ConfigFile->Config_GetInt("Background","AverageNPoints",100);
+    Text = QString::asprintf("%d",iVal);
+    ui->AverageNPoints->setText(Text);
 
-	iVal=ConfigFile->Config_GetInt("Background","Type",1);
-	if (iVal==0)
-	{
-		ui->AverageButton->setChecked(false);
-		ui->LinearRegButton->setChecked(true);
-	}
-	else if (iVal==1)
-	{
-		ui->LinearRegButton->setChecked(false);
-		ui->AverageButton->setChecked(true);
-	}
-
+    iVal=ConfigFile->Config_GetInt("Background","Type",1);
+    if (iVal==0)
+    {
+        ui->AverageButton->setChecked(false);
+        ui->LinearRegButton->setChecked(true);
+    }
+    else if (iVal==1)
+    {
+        ui->LinearRegButton->setChecked(false);
+        ui->AverageButton->setChecked(true);
+    }
 }
 
 /*=============================================================================*/
@@ -86,38 +85,38 @@ void BackgroundForm::Configure()
 /*=============================================================================*/
 void BackgroundForm::AddPoint(double x, double y)
 {
-	int i;
+    int i;
 
-	if (ui->BackgroundMode->currentWidget()==ui->AutomaticSheet) return;
-	if (NPoints>=MAX_BKGRPOINTS) return;
-	AutoDefined=false;  //disable automatic background
-	BackgroundOk=false;
-	for (i=0 ; i<NPoints && x>XData[i] ; i++);
-	if (i>=NPoints || fabs(y-YData[i])<1e20*fabs(x-XData[i]))
-	{                                   //add the point only if the resoluting slope is not too big
-		for (int j=NPoints ; j>i ; j--)         //in the other case, replace the existing point
-		{
-			XData[j]=XData[j-1];
-			YData[j]=YData[j-1];
-		}
-		NPoints++;
-	}
-	XData[i]=x;
-	YData[i]=y;
+    if (ui->BackgroundMode->currentWidget()==ui->AutomaticSheet) return;
+    if (NPoints>=MAX_BKGRPOINTS) return;
+    AutoDefined=false;  //disable automatic background
+    BackgroundOk=false;
+    for (i=0 ; i<NPoints && x>XData[i] ; i++);
+    if (i>=NPoints || fabs(y-YData[i])<1e20*fabs(x-XData[i]))
+    {                                   //add the point only if the resoluting slope is not too big
+        for (int j=NPoints ; j>i ; j--)         //in the other case, replace the existing point
+        {
+            XData[j]=XData[j-1];
+            YData[j]=YData[j-1];
+        }
+        NPoints++;
+    }
+    XData[i]=x;
+    YData[i]=y;
 
-	if (NPoints>ui->BkgrPointsList->rowCount())
-	{
-		ui->BkgrPointsList->insertRow(i);
-	}
+    if (NPoints>ui->BkgrPointsList->rowCount())
+    {
+        ui->BkgrPointsList->insertRow(i);
+    }
 
-	QString Text;
-	Text.sprintf("%.3lg",x);
-	QTableWidgetItem *XListItem=new QTableWidgetItem(Text);
-	ui->BkgrPointsList->setItem(i,0,XListItem);
+    QString Text;
+    Text = QString::asprintf("%.3lg",x);
+    QTableWidgetItem *XListItem=new QTableWidgetItem(Text);
+    ui->BkgrPointsList->setItem(i,0,XListItem);
 
-	Text.sprintf("%.3lg",y);
-	QTableWidgetItem *YListItem=new QTableWidgetItem(Text);
-	ui->BkgrPointsList->setItem(i,1,YListItem);
+    Text = QString::asprintf("%.3lg",y);
+    QTableWidgetItem *YListItem=new QTableWidgetItem(Text);
+    ui->BkgrPointsList->setItem(i,1,YListItem);
 }
 
 /*=============================================================================*/
@@ -400,19 +399,19 @@ void BackgroundForm::on_DeleteAutoButton_clicked()
 /*=============================================================================*/
 void BackgroundForm::on_LRFirst_editingFinished()
 {
-	double Percent;
-	bool Ok=false;
+    double Percent;
+    bool Ok=false;
 
-	Percent=ui->LRFirst->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Percent<0.) Percent=0.;
-	else if (Percent>100.) Percent=100.;
+    Percent=ui->LRFirst->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Percent<0.) Percent=0.;
+    else if (Percent>100.) Percent=100.;
 
-	QString Text;
-	Text.sprintf("%.1lf%%",Percent);
-	ui->LRFirst->setText(Text);
-	ui->LRFirst->selectAll();
-	BackgroundOk=false;
+    QString Text;
+    Text = QString::asprintf("%.1lf%%",Percent);
+    ui->LRFirst->setText(Text);
+    ui->LRFirst->selectAll();
+    BackgroundOk=false;
 }
 
 /*=============================================================================*/
@@ -425,18 +424,18 @@ void BackgroundForm::on_LRFirst_editingFinished()
 /*=============================================================================*/
 void BackgroundForm::on_AverageStart_editingFinished()
 {
-	int Value;
-	bool Ok=false;
+    int Value;
+    bool Ok=false;
 
-	Value=ui->AverageStart->text().toDouble(&Ok);
-	if (!Ok) return;
-	if (Value<0) Value=0;
+    Value=ui->AverageStart->text().toDouble(&Ok);
+    if (!Ok) return;
+    if (Value<0) Value=0;
 
-	QString Text;
-	Text.sprintf("%d",Value);
-	ui->AverageStart->setText(Text);
-	ui->AverageStart->selectAll();
-	BackgroundOk=false;
+    QString Text;
+    Text = QString::asprintf("%d",Value);
+    ui->AverageStart->setText(Text);
+    ui->AverageStart->selectAll();
+    BackgroundOk=false;
 }
 
 /*=============================================================================*/
